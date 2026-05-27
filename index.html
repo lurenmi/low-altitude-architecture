@@ -81,33 +81,12 @@
       background: radial-gradient(circle, rgba(157, 78, 221, .18), transparent 66%);
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      color: var(--primary);
-      background: rgba(157, 78, 221, .08);
-      border: 1px solid rgba(157, 78, 221, .14);
-      font-size: 13px;
-      font-weight: 700;
-    }
-
     h1 {
       margin: 14px 0 10px;
       color: var(--ink);
       font-size: clamp(32px, 3.6vw, 54px);
       line-height: 1.08;
       letter-spacing: -.04em;
-    }
-
-    .hero p {
-      max-width: 1050px;
-      margin: 0;
-      color: #5c6c88;
-      font-size: 17px;
-      line-height: 1.72;
     }
 
     .version-strip {
@@ -331,17 +310,6 @@
       letter-spacing: -.03em;
     }
 
-    .diagram-tag {
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(157, 78, 221, .16);
-      color: var(--primary);
-      background: rgba(157, 78, 221, .06);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
     .diagram-wrap {
       width: 100%;
       height: min(88vh, 1040px);
@@ -356,13 +324,6 @@
     }
 
     svg { display: block; width: 100%; height: 100%; }
-
-    .note {
-      margin-top: 14px;
-      color: #6b7792;
-      font-size: 13px;
-      line-height: 1.7;
-    }
 
     @media (max-width: 1200px) {
       .summary {
@@ -422,9 +383,7 @@
 <body>
   <main class="page">
     <section class="hero">
-      <span class="eyebrow">Enterprise Architecture · Glassmorphism</span>
       <h1>浙大启真低空侦测与安全运营平台</h1>
-      <p>统一底座连接固定侦测站网、机动侦测处置单元与硬件生态，围绕应用展示、功能模块、算法融合、数据支撑、感知硬件和生态适配六个层级，形成可用于方案汇报的企业级系统架构图。</p>
     </section>
 
     <section class="version-strip" aria-label="市场化版本">
@@ -446,7 +405,6 @@
     <section class="diagram-card">
       <div class="diagram-head">
         <h2>系统架构总览</h2>
-        <span class="diagram-tag">主色调 #9D4EDD · 紫青渐变轻玻璃拟态</span>
       </div>
 
       <div class="diagram-wrap">
@@ -695,8 +653,6 @@
         </svg>
       </div>
     </section>
-
-    <div class="note">当前版本已收敛为单栏汇报版，便于直接用于方案汇报和投屏展示。</div>
   </main>
 
   <section class="product-modal" id="productModal" aria-hidden="true" aria-labelledby="modalTitle" role="dialog">

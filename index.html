@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>浙大启真低空侦测与安全运营平台｜企业级系统架构图</title>
-  <script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
-  <link href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.123/Build/Cesium/Cesium.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/cesium@1.123/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
   <style>
     :root {
       --primary: #9D4EDD;
@@ -897,115 +897,6 @@
     </section>
   </main>
 
-  <section class="product-modal" id="productModal" aria-hidden="true" aria-labelledby="modalTitle" role="dialog">
-    <div class="modal-panel" role="document">
-      <div class="modal-head">
-        <div>
-          <span class="modal-kicker">重点产品框架</span>
-          <h2 class="modal-title" id="modalTitle"></h2>
-          <p class="modal-desc" id="modalDesc"></p>
-        </div>
-        <button class="modal-close" type="button" aria-label="关闭弹窗">×</button>
-      </div>
-      <div class="modal-body" id="modalBody"></div>
-    </div>
-  </section>
-
-  <script>
-    const versionFrameworks = {
-      demo: {
-        title: '样板展示版',
-        desc: '面向领导汇报、客户参观和生态伙伴共建，优先形成可看、可讲、可演示的最小闭环。',
-        cards: [
-          ['产品定位', ['低空安全样板点', '平台演示驾驶舱', '一次演练和一段演示视频']],
-          ['核心产品包', ['1套平台展示页', '1至2套侦测样机接入', '基础告警、轨迹和复盘报告']],
-          ['交付重点', ['快速部署、低成本验证', '突出可视化效果和闭环脚本', '沉淀参观路线和宣传素材']],
-          ['适用场景', ['内部立项汇报', '政府或园区参观', '生态伙伴联合展示']]
-        ]
-      },
-      event: {
-        title: '活动保障版',
-        desc: '面向会展、赛事、演出、会议等临时保障任务，强调快速布防、临时规则和现场处置闭环。',
-        cards: [
-          ['产品定位', ['重大活动低空安全保障', '临时管控区和白名单管理', '活动结束专项复盘']],
-          ['核心产品包', ['便携/车载侦测单元', '临时规则配置', '告警工单和现场回执']],
-          ['交付重点', ['活动前勘察和预案', '活动中值守和联动', '活动后报告和证据归档']],
-          ['适用场景', ['展会赛事', '文旅演出', '领导调研和重要会议']]
-        ]
-      },
-      park: {
-        title: '园区标准版',
-        desc: '面向低空产业园、科创园、物流园和无人机运营基地，兼顾合法飞行运营和异常飞行防控。',
-        cards: [
-          ['产品定位', ['园区低空安全运营底座', '合法任务与未知目标区分', '日常巡防和运营报表']],
-          ['核心产品包', ['固定侦测点', 'RID/射频接入', '园区地图、边界和航线规则']],
-          ['交付重点', ['设备在线率和告警有效率', '飞行任务统计', '月度运营报告']],
-          ['适用场景', ['低空产业园', '物流起降点', '大学科技园和试飞基地']]
-        ]
-      },
-      sensitive: {
-        title: '敏感目标增强版',
-        desc: '面向机场周边、能源设施、交通枢纽、重点机关等高风险区域，突出边界防护、复核取证和授权处置。',
-        cards: [
-          ['产品定位', ['重点目标低空防护', '高风险目标分级预警', '证据链和授权流程强化']],
-          ['核心产品包', ['射频/RID+雷达+光电组合', '敏感区规则引擎', '视频复核和证据归档']],
-          ['交付重点', ['点位勘察和覆盖评估', '误报治理和规则调优', '反制授权全流程留痕']],
-          ['适用场景', ['机场净空区', '能源石化设施', '政府机关、学校医院和交通枢纽']]
-        ]
-      },
-      city: {
-        title: '城市治理扩展版',
-        desc: '面向区县或城市级低空治理，强调多点站网、统一态势、多部门联动和长期运营服务。',
-        cards: [
-          ['产品定位', ['城市级低空安全运营平台', '多园区、多重点区域统一监管', '低空治理数据底座']],
-          ['核心产品包', ['固定站网和机动单元', '多源融合算法层', '城市驾驶舱、工单和运营分析']],
-          ['交付重点', ['分期建设和标准接口', '跨部门联动机制', '年度运营和扩面模型']],
-          ['适用场景', ['中心城区治理', '低空经济示范区', '城市级低空新基建']]
-        ]
-      }
-    };
-
-    const modal = document.getElementById('productModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDesc = document.getElementById('modalDesc');
-    const modalBody = document.getElementById('modalBody');
-    const closeButton = modal.querySelector('.modal-close');
-
-    function openProductModal(key) {
-      const data = versionFrameworks[key];
-      if (!data) return;
-
-      modalTitle.textContent = data.title;
-      modalDesc.textContent = data.desc;
-      modalBody.innerHTML = data.cards.map(([title, items]) => `
-        <article class="framework-card">
-          <strong>${title}</strong>
-          <ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>
-        </article>
-      `).join('');
-
-      modal.classList.add('is-open');
-      modal.setAttribute('aria-hidden', 'false');
-      closeButton.focus();
-    }
-
-    function closeProductModal() {
-      modal.classList.remove('is-open');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    document.querySelectorAll('.version-chip').forEach(button => {
-      button.addEventListener('click', () => openProductModal(button.dataset.version));
-    });
-
-    closeButton.addEventListener('click', closeProductModal);
-    modal.addEventListener('click', event => {
-      if (event.target === modal) closeProductModal();
-    });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeProductModal();
-    });
-  </script>
   <script>
     const fallbackDemoData = {
       version: '样板展示版',
@@ -1014,7 +905,7 @@
         displayName: '未来科技城 · 南湖未来科学园 · 中国飞谷样板区',
         city: '杭州市余杭区',
         center: [120.0118, 30.2846, 1600],
-        camera: { destination: [120.0118, 30.2846, 2500], heading: 35, pitch: -48, roll: 0 },
+        camera: { destination: [120.0118, 30.2846, 2600], heading: 35, pitch: -48, roll: 0 },
         boundary: [[119.9898, 30.2998], [120.0326, 30.2992], [120.0385, 30.2747], [119.9952, 30.2708]]
       },
       metrics: [
@@ -1043,38 +934,41 @@
       samples: [
         { name: '中国飞谷总体布局', source: '杭州市科技局/人民网等公开报道', value: '未来科技城核心区建设低空经济产业园，南湖未来科学园为产业拓展区之一' },
         { name: '南湖未来科学园场景', source: '杭州网公开报道', value: '南湖未来科学园位于城西科创大走廊核心区域，并提出低空试飞场等场景' },
-        { name: '3D 地图底座', source: 'CesiumJS + OpenStreetMap', value: '采用 Cesium 三维地球、OSM 影像与演示边界/点位叠加' }
+        { name: '3D 地图底座', source: 'CesiumJS + 多源公开底图', value: '采用 Cesium 三维地球 + 多底图回退链，提升可用性' }
       ],
       references: [
         { label: '杭州市科技局：“中国飞谷”来了，杭州余杭重仓布局低空经济', url: 'https://kj.hangzhou.gov.cn/art/2024/6/7/art_1228922128_58927066.html' },
         { label: '人民网：“中国飞谷”在杭州余杭揭牌成立', url: 'https://zj.people.com.cn/BIG5/n2/2024/0606/c370990-40870779.html' },
         { label: '杭州网：南湖未来科学园正式开园，将迎来首个低空试飞场', url: 'https://ori.hangzhou.com.cn/ornews/content/2024-12/06/content_8822849.htm' },
-        { label: 'Cesium：Cesium OSM Buildings / CesiumJS 三维地图能力', url: 'https://cesium.com/blog/2020/06/01/cesium-osm-buildings/' }
+        { label: 'Cesium OSM Buildings', url: 'https://cesium.com/blog/2020/06/01/cesium-osm-buildings/' }
       ]
     };
 
-    const comingSoon = {
-      event: '活动保障版 Demo 将围绕会展/赛事临时管控区、白名单、机动侦测车和现场处置工单展开。',
-      park: '园区标准版 Demo 将围绕常态化站网、合法任务识别、园区航线偏离告警和月度运营报表展开。',
-      sensitive: '敏感目标增强版 Demo 将围绕重点边界、雷达光电复核、证据链和反制授权流程展开。',
-      city: '城市治理扩展版 Demo 将围绕多区域统一态势、跨部门联动和城市级低空治理指标展开。'
+    const versionNotes = {
+      demo: '服务区域设置为余杭未来科技城低空产业园区，展示可参观、可演示、可复盘的最小闭环。',
+      event: '活动保障版将围绕临时管控区、白名单、机动保障和现场处置闭环展开。',
+      park: '园区标准版将围绕常态化站网、合法任务识别、园区告警和运营报表展开。',
+      sensitive: '敏感目标增强版将围绕重点边界、复核取证与授权处置流程展开。',
+      city: '城市治理扩展版将围绕多区统一态势、跨部门联动和城市级治理指标展开。'
     };
 
-    let cesiumViewer;
+    let cesiumViewer = null;
+    let activeVersion = 'demo';
 
     async function loadDemoData() {
       try {
         const response = await fetch('/api/demo/sample-board', { cache: 'no-store' });
         if (!response.ok) throw new Error('API unavailable');
         return await response.json();
-      } catch (error) {
+      } catch {
         return fallbackDemoData;
       }
     }
 
     function renderDemoCards(data) {
+      const desc = versionNotes[activeVersion] || versionNotes.demo;
       document.getElementById('demoTitle').textContent = `${data.version} Demo`;
-      document.getElementById('demoDesc').textContent = `服务区域：${data.serviceArea.displayName}。基于公开区域信息和演示样本数据，展示低空侦测与安全运营平台从“看见目标”到“闭环复盘”的样板能力。`;
+      document.getElementById('demoDesc').textContent = `服务区域：${data.serviceArea.displayName}。${desc}`;
       document.getElementById('metricGrid').innerHTML = data.metrics.map(metric => `
         <div class="metric-card">
           <b>${metric.value}</b>
@@ -1095,7 +989,25 @@
       `).join('');
     }
 
-    function addCesiumEntities(data) {
+    function createImageryCandidates(Cesium) {
+      return [
+        () => new Cesium.UrlTemplateImageryProvider({
+          url: 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+          subdomains: ['1', '2', '3', '4'],
+          credit: '© AutoNavi'
+        }),
+        () => new Cesium.UrlTemplateImageryProvider({
+          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          credit: '© OpenStreetMap contributors'
+        }),
+        () => new Cesium.UrlTemplateImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          credit: '© Esri'
+        })
+      ];
+    }
+
+    function addCesiumEntities(Cesium, data) {
       const boundaryPositions = data.serviceArea.boundary.map(([lng, lat]) => Cesium.Cartesian3.fromDegrees(lng, lat));
       cesiumViewer.entities.add({
         name: data.serviceArea.name,
@@ -1111,8 +1023,21 @@
         cesiumViewer.entities.add({
           name: site.name,
           position: Cesium.Cartesian3.fromDegrees(site.lng, site.lat, 40),
-          point: { pixelSize: 12, color: Cesium.Color.fromCssColorString('#2DD4BF'), outlineColor: Cesium.Color.WHITE, outlineWidth: 2 },
-          label: { text: site.type, font: '13px Microsoft YaHei', fillColor: Cesium.Color.WHITE, outlineColor: Cesium.Color.fromCssColorString('#172033'), outlineWidth: 3, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -24) }
+          point: {
+            pixelSize: 12,
+            color: Cesium.Color.fromCssColorString('#2DD4BF'),
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 2
+          },
+          label: {
+            text: site.type,
+            font: '13px Microsoft YaHei',
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.fromCssColorString('#172033'),
+            outlineWidth: 3,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -24)
+          }
         });
       });
 
@@ -1121,22 +1046,52 @@
         cesiumViewer.entities.add({
           name: `${target.name} ${target.id}`,
           position: Cesium.Cartesian3.fromDegrees(target.lng, target.lat, target.alt),
-          ellipsoid: { radii: new Cesium.Cartesian3(38, 38, 38), material: Cesium.Color.fromCssColorString(color).withAlpha(.82) },
-          path: { show: true, material: Cesium.Color.fromCssColorString(color), width: 2 },
-          label: { text: `${target.type} / ${target.risk}风险`, font: '13px Microsoft YaHei', fillColor: Cesium.Color.WHITE, outlineColor: Cesium.Color.BLACK, outlineWidth: 3, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -32) }
+          ellipsoid: {
+            radii: new Cesium.Cartesian3(38, 38, 38),
+            material: Cesium.Color.fromCssColorString(color).withAlpha(.82)
+          },
+          label: {
+            text: `${target.type} / ${target.risk}风险`,
+            font: '13px Microsoft YaHei',
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 3,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -32)
+          }
         });
+      });
+    }
+
+    function showMapFallback(message) {
+      document.getElementById('cesiumMap').innerHTML = `<div style="padding:28px;color:#52627f;line-height:1.7;">${message}</div>`;
+    }
+
+    function applyImageryWithFallback(Cesium, index, candidates) {
+      if (index >= candidates.length) {
+        showMapFallback('地图底图连接失败：已自动回退多源底图但仍不可达。请检查网络后刷新页面。');
+        return;
+      }
+
+      const provider = candidates[index]();
+      const layer = cesiumViewer.imageryLayers.addImageryProvider(provider, 0);
+      let switched = false;
+      provider.errorEvent.addEventListener(() => {
+        if (switched) return;
+        switched = true;
+        cesiumViewer.imageryLayers.remove(layer, false);
+        applyImageryWithFallback(Cesium, index + 1, candidates);
       });
     }
 
     async function initCesiumMap(data) {
       if (!window.Cesium) {
-        document.getElementById('cesiumMap').innerHTML = '<div style="padding:28px;color:#52627f;">3D 地图库加载失败，请检查网络；当前 Demo 数据仍可查看。</div>';
+        showMapFallback('3D 地图库未加载成功。页面已保留样板指标、产品框架和样本说明。');
         return;
       }
+      const Cesium = window.Cesium;
 
-      if (cesiumViewer) {
-        cesiumViewer.entities.removeAll();
-      } else {
+      if (!cesiumViewer) {
         Cesium.Ion.defaultAccessToken = '';
         cesiumViewer = new Cesium.Viewer('cesiumMap', {
           animation: false,
@@ -1148,15 +1103,16 @@
           navigationHelpButton: false,
           baseLayerPicker: false,
           terrainProvider: new Cesium.EllipsoidTerrainProvider(),
-          imageryProvider: new Cesium.UrlTemplateImageryProvider({
-            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            credit: '© OpenStreetMap contributors'
-          })
+          imageryProvider: false
         });
         cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+        const candidates = createImageryCandidates(Cesium);
+        applyImageryWithFallback(Cesium, 0, candidates);
+      } else {
+        cesiumViewer.entities.removeAll();
       }
 
-      addCesiumEntities(data);
+      addCesiumEntities(Cesium, data);
       const camera = data.serviceArea.camera;
       cesiumViewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(...camera.destination),
@@ -1170,20 +1126,16 @@
     }
 
     async function showDemoBoard(versionKey) {
-      closeProductModal();
+      activeVersion = versionKey;
       const board = document.getElementById('demoBoard');
       board.classList.add('is-active');
       board.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      if (versionKey !== 'demo') {
-        document.getElementById('demoTitle').textContent = document.querySelector(`[data-version="${versionKey}"]`)?.textContent + ' Demo';
-        document.getElementById('demoDesc').textContent = comingSoon[versionKey] || '该版本 Demo 正在扩展中。';
-        document.getElementById('demoBadge').textContent = '待扩展 · 当前先展示样板展示版底座';
-        return;
-      }
-
-      document.getElementById('demoBadge').textContent = '真实 3D 地图 · 公开样本数据';
       const data = await loadDemoData();
+      document.getElementById('demoBadge').textContent = versionKey === 'demo'
+        ? '真实 3D 地图 · 公开样本数据'
+        : `版本切换：${document.querySelector(`[data-version="${versionKey}"]`)?.textContent || '待扩展版本'}`;
+
       renderDemoCards(data);
       await initCesiumMap(data);
     }
@@ -1191,10 +1143,11 @@
     document.querySelectorAll('.version-chip').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
-        event.stopImmediatePropagation();
         showDemoBoard(button.dataset.version);
-      }, true);
+      });
     });
+
+    showDemoBoard('demo');
   </script>
 </body>
 </html>

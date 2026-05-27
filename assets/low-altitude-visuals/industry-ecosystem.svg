@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131f"/>
+      <stop offset=".5" stop-color="#0a2333"/>
+      <stop offset="1" stop-color="#123125"/>
+    </linearGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="60%">
+      <stop offset="0" stop-color="#53e0d2" stop-opacity=".9"/>
+      <stop offset=".45" stop-color="#53e0d2" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#53e0d2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="920" fill="url(#bg)"/>
+  <g opacity=".18" stroke="#53e0d2">
+    <path d="M0 160H1600M0 280H1600M0 400H1600M0 520H1600M0 640H1600M0 760H1600"/>
+    <path d="M160 0V920M320 0V920M480 0V920M640 0V920M800 0V920M960 0V920M1120 0V920M1280 0V920M1440 0V920"/>
+  </g>
+  <g transform="translate(800 460)">
+    <circle r="290" fill="none" stroke="#53e0d2" stroke-width="2" opacity=".25"/>
+    <circle r="210" fill="none" stroke="#5bb8ff" stroke-width="2" opacity=".25"/>
+    <circle r="130" fill="none" stroke="#ffcc66" stroke-width="2" opacity=".25"/>
+    <circle r="78" fill="url(#core)"/>
+    <circle r="64" fill="#0e2b35" stroke="#53e0d2" stroke-width="3"/>
+    <text x="0" y="-8" text-anchor="middle" fill="#53e0d2" font-family="Microsoft YaHei, Arial" font-size="26" font-weight="900">低空经济</text>
+    <text x="0" y="28" text-anchor="middle" fill="#eef7f8" font-family="Microsoft YaHei, Arial" font-size="18" font-weight="800">产业 + 场景 + 安全 + 数据</text>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="900">
+    <g transform="translate(350 230)">
+      <rect width="250" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#53e0d2"/>
+      <text x="28" y="40" fill="#53e0d2" font-size="24">物流配送</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">空中走廊 + 起降点 + 安全底座</text>
+    </g>
+    <g transform="translate(1010 208)">
+      <rect width="250" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#5bb8ff"/>
+      <text x="28" y="40" fill="#5bb8ff" font-size="24">巡检运维</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">电力、能源、交通、园区巡检</text>
+    </g>
+    <g transform="translate(1160 502)">
+      <rect width="250" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#ffcc66"/>
+      <text x="28" y="40" fill="#ffcc66" font-size="24">文旅活动</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">大型活动、赛事、展会保障</text>
+    </g>
+    <g transform="translate(958 710)">
+      <rect width="260" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#53e0d2"/>
+      <text x="28" y="40" fill="#53e0d2" font-size="24">城市治理</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">监管、处置、审计、复盘闭环</text>
+    </g>
+    <g transform="translate(300 702)">
+      <rect width="260" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#5bb8ff"/>
+      <text x="28" y="40" fill="#5bb8ff" font-size="24">应急救援</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">灾情侦察、联动调度、快速响应</text>
+    </g>
+    <g transform="translate(168 492)">
+      <rect width="280" height="96" rx="22" fill="#07131f" opacity=".85" stroke="#ff8a4b"/>
+      <text x="28" y="40" fill="#ff8a4b" font-size="24">数字孪生</text>
+      <text x="28" y="68" fill="#aac1c2" font-size="17">地图、任务、数据、规则一体化</text>
+    </g>
+  </g>
+  <g fill="none" stroke-width="4" opacity=".45">
+    <path d="M540 278C640 350 690 390 800 460" stroke="#53e0d2"/>
+    <path d="M1110 304C1010 360 940 400 800 460" stroke="#5bb8ff"/>
+    <path d="M1290 548C1160 520 1040 500 800 460" stroke="#ffcc66"/>
+    <path d="M1040 742C960 680 900 620 800 460" stroke="#53e0d2"/>
+    <path d="M430 750C560 700 650 620 800 460" stroke="#5bb8ff"/>
+    <path d="M408 560C520 540 650 510 800 460" stroke="#ff8a4b"/>
+  </g>
+</svg>

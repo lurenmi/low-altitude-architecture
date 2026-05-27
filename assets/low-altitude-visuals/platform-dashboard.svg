@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06131f"/>
+      <stop offset=".55" stop-color="#0a2533"/>
+      <stop offset="1" stop-color="#08261f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1260" height="760" rx="42" fill="#07131f" opacity=".76" stroke="#53e0d2" stroke-opacity=".34"/>
+  <rect x="100" y="110" width="810" height="640" rx="34" fill="#0a1f2c" stroke="#ffffff" stroke-opacity=".10"/>
+  <rect x="945" y="110" width="320" height="150" rx="28" fill="#102b36" stroke="#53e0d2" stroke-opacity=".25"/>
+  <rect x="945" y="285" width="320" height="150" rx="28" fill="#102b36" stroke="#53e0d2" stroke-opacity=".25"/>
+  <rect x="945" y="460" width="320" height="150" rx="28" fill="#102b36" stroke="#53e0d2" stroke-opacity=".25"/>
+  <rect x="945" y="635" width="320" height="115" rx="28" fill="#102b36" stroke="#53e0d2" stroke-opacity=".25"/>
+  <g opacity=".22" stroke="#53e0d2">
+    <path d="M100 190H910M100 270H910M100 350H910M100 430H910M100 510H910M100 590H910M100 670H910"/>
+    <path d="M180 110V750M260 110V750M340 110V750M420 110V750M500 110V750M580 110V750M660 110V750M740 110V750M820 110V750"/>
+  </g>
+  <g fill="none">
+    <circle cx="498" cy="415" r="98" stroke="#53e0d2" stroke-width="2" opacity=".55"/>
+    <circle cx="498" cy="415" r="180" stroke="#53e0d2" stroke-width="2" opacity=".26"/>
+    <circle cx="498" cy="415" r="265" stroke="#5bb8ff" stroke-width="2" opacity=".16"/>
+    <path d="M210 586C365 450 510 335 735 252" stroke="#53e0d2" stroke-width="5" stroke-dasharray="14 18"/>
+    <path d="M274 292C480 372 626 432 820 620" stroke="#ffcc66" stroke-width="4" stroke-dasharray="10 16"/>
+  </g>
+  <g fill="#53e0d2">
+    <circle cx="498" cy="415" r="13"/><circle cx="735" cy="252" r="10"/><circle cx="820" cy="620" r="10"/>
+  </g>
+  <g fill="#ff8a4b">
+    <circle cx="575" cy="360" r="12"/><circle cx="665" cy="520" r="12"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="800">
+    <text x="130" y="160" fill="#eef7f8" font-size="34">低空态势一张图</text>
+    <text x="970" y="160" fill="#53e0d2" font-size="24">目标卡片</text>
+    <text x="970" y="205" fill="#eef7f8" font-size="18">高度 118m / 速度 12m/s</text>
+    <text x="970" y="240" fill="#ffcc66" font-size="18">身份缺失，命中敏感区规则</text>
+    <text x="970" y="335" fill="#53e0d2" font-size="24">告警工单</text>
+    <text x="970" y="382" fill="#eef7f8" font-size="18">高风险 / 已派发 / 04:23</text>
+    <text x="970" y="418" fill="#aac1c2" font-size="18">处置建议：光电复核 + 现场确认</text>
+    <text x="970" y="510" fill="#53e0d2" font-size="24">设备健康</text>
+    <text x="970" y="557" fill="#eef7f8" font-size="18">在线 97.8% / 链路稳定</text>
+    <text x="970" y="592" fill="#aac1c2" font-size="18">射频、RID、雷达、光电接入</text>
+    <text x="970" y="685" fill="#53e0d2" font-size="24">复盘报告</text>
+    <text x="970" y="728" fill="#eef7f8" font-size="18">轨迹 / 截图 / 日志 / 结论</text>
+  </g>
+</svg>

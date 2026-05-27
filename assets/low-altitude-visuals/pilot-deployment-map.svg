@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06131f"/>
+      <stop offset=".52" stop-color="#0b2532"/>
+      <stop offset="1" stop-color="#0d3026"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)"/>
+  <g opacity=".20" stroke="#53e0d2">
+    <path d="M0 150H1400M0 260H1400M0 370H1400M0 480H1400M0 590H1400M0 700H1400M0 810H1400"/>
+    <path d="M140 0V900M280 0V900M420 0V900M560 0V900M700 0V900M840 0V900M980 0V900M1120 0V900M1260 0V900"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="900">
+    <text x="88" y="110" fill="#eef7f8" font-size="44">首轮样板部署：小成本、大宣传、快出样板</text>
+    <text x="90" y="154" fill="#aac1c2" font-size="20">1个样板点 + 1次活动保障演练 + 1套平台演示中心</text>
+  </g>
+  <g fill="none">
+    <circle cx="390" cy="455" r="110" stroke="#53e0d2" stroke-width="2" opacity=".56"/>
+    <circle cx="390" cy="455" r="205" stroke="#53e0d2" stroke-width="2" opacity=".28"/>
+    <circle cx="725" cy="408" r="135" stroke="#5bb8ff" stroke-width="2" opacity=".44"/>
+    <circle cx="1045" cy="528" r="120" stroke="#ffcc66" stroke-width="2" opacity=".44"/>
+    <path d="M390 455C520 320 650 300 725 408S890 590 1045 528" stroke="#53e0d2" stroke-width="5" stroke-dasharray="18 16"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="900">
+    <g>
+      <circle cx="390" cy="455" r="36" fill="#53e0d2"/>
+      <text x="374" y="466" fill="#06131f" font-size="26">1</text>
+      <rect x="230" y="580" width="320" height="120" rx="28" fill="#07131f" opacity=".86" stroke="#53e0d2"/>
+      <text x="270" y="630" fill="#53e0d2" font-size="26">低空安全样板点</text>
+      <text x="270" y="670" fill="#eef7f8" font-size="18">园区 / 楼顶 / 展示区 / 合作场地</text>
+    </g>
+    <g>
+      <circle cx="725" cy="408" r="36" fill="#5bb8ff"/>
+      <text x="709" y="419" fill="#06131f" font-size="26">2</text>
+      <rect x="590" y="198" width="320" height="120" rx="28" fill="#07131f" opacity=".86" stroke="#5bb8ff"/>
+      <text x="630" y="248" fill="#5bb8ff" font-size="26">活动保障演练</text>
+      <text x="630" y="288" fill="#eef7f8" font-size="18">开放日 / 沙龙 / 应急演练 / 参观日</text>
+    </g>
+    <g>
+      <circle cx="1045" cy="528" r="36" fill="#ffcc66"/>
+      <text x="1029" y="539" fill="#06131f" font-size="26">3</text>
+      <rect x="900" y="650" width="340" height="120" rx="28" fill="#07131f" opacity=".86" stroke="#ffcc66"/>
+      <text x="940" y="700" fill="#ffcc66" font-size="26">平台演示中心</text>
+      <text x="940" y="740" fill="#eef7f8" font-size="18">态势图 / 工单 / 复盘 / 宣传素材</text>
+    </g>
+  </g>
+  <g opacity=".78">
+    <rect x="96" y="750" width="1180" height="70" rx="28" fill="#07131f" stroke="#53e0d2" stroke-opacity=".35"/>
+    <text x="138" y="795" fill="#eef7f8" font-family="Microsoft YaHei, Arial" font-size="24" font-weight="900">宣传资产同步产出：样板区、架构图、演示视频、新闻稿、试运行报告、参观路线</text>
+  </g>
+</svg>

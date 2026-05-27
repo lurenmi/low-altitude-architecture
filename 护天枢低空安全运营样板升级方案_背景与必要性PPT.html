@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>护天枢低空安全运营样板升级方案 - 背景与必要性PPT</title>
+  <style>
+    :root {
+      --bg: #06111b;
+      --bg2: #0b2233;
+      --ink: #eef7f8;
+      --muted: #a9c0c2;
+      --cyan: #53e0d2;
+      --blue: #5bb8ff;
+      --lime: #b8f35f;
+      --amber: #ffcc66;
+      --orange: #ff8a4b;
+      --red: #ff5d6c;
+      --panel: rgba(255,255,255,.075);
+      --panel2: rgba(255,255,255,.12);
+      --line: rgba(83,224,210,.16);
+      --shadow: 0 30px 80px rgba(0,0,0,.34);
+      --radius: 28px;
+      --font: "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 12%, rgba(83,224,210,.18), transparent 26%),
+        radial-gradient(circle at 82% 10%, rgba(91,184,255,.16), transparent 30%),
+        radial-gradient(circle at 70% 84%, rgba(184,243,95,.08), transparent 28%),
+        linear-gradient(135deg, var(--bg), #071826 44%, #0f2a25);
+    }
+    .deck { position: relative; width: 100vw; height: 100vh; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 44px 54px 52px 196px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.015)),
+        radial-gradient(circle at 88% 12%, rgba(83,224,210,.08), transparent 26%),
+        radial-gradient(circle at 12% 84%, rgba(91,184,255,.08), transparent 24%);
+    }
+    .slide.active { display: block; animation: enter .42s cubic-bezier(.2,.8,.2,1); }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(14px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 34px;
+      pointer-events: none;
+    }
+    .slide::after {
+      content: "";
+      position: absolute;
+      right: -110px;
+      bottom: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      border: 1px solid rgba(83,224,210,.18);
+      box-shadow:
+        inset 0 0 0 44px rgba(83,224,210,.03),
+        inset 0 0 0 90px rgba(91,184,255,.025);
+      pointer-events: none;
+    }
+    .slide > * { position: relative; z-index: 1; }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(83,224,210,.26);
+      color: var(--cyan);
+      background: rgba(83,224,210,.08);
+      letter-spacing: 2px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    h1, h2, p { margin: 0; }
+    h1 {
+      margin-top: 28px;
+      max-width: 860px;
+      font-size: 66px;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      font-weight: 900;
+    }
+    h2 {
+      margin-top: 16px;
+      max-width: 1080px;
+      font-size: 42px;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      font-weight: 900;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.72;
+      font-size: 18px;
+    }
+    .lead {
+      max-width: 780px;
+      margin-top: 20px;
+      font-size: 22px;
+      line-height: 1.62;
+      color: #d8e9ea;
+    }
+    .accent { color: var(--cyan); }
+    .grid { display: grid; gap: 16px; }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      position: relative;
+      padding: 20px 22px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.11);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(83,224,210,.10), transparent 42%);
+      opacity: .85;
+      pointer-events: none;
+    }
+    .card > * { position: relative; z-index: 1; }
+    .card b {
+      display: block;
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    .big-num {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: -1px;
+    }
+    .visual-box {
+      position: relative;
+      border-radius: 34px;
+      overflow: hidden;
+      border: 1px solid rgba(83,224,210,.22);
+      box-shadow: var(--shadow);
+      background: rgba(2,8,14,.46);
+      min-height: 360px;
+    }
+    .visual-box img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .visual-box::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 58%, rgba(2,8,14,.50)),
+        radial-gradient(circle at 70% 20%, rgba(83,224,210,.14), transparent 34%);
+      pointer-events: none;
+    }
+    .picture-label {
+      position: absolute;
+      left: 22px;
+      bottom: 20px;
+      z-index: 2;
+      display: inline-flex;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(7,19,31,.76);
+      border: 1px solid rgba(83,224,210,.26);
+      color: #eafffb;
+      font-size: 13px;
+      font-weight: 900;
+      backdrop-filter: blur(12px);
+    }
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-top: 24px;
+    }
+    .cover-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 560px;
+    }
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .metric {
+      padding: 18px 16px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .metric b {
+      display: block;
+      font-size: 34px;
+      line-height: 1;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .side-stack {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .band {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .band .card { min-height: 118px; }
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 22px;
+      margin-top: 26px;
+      align-items: stretch;
+    }
+    .quote {
+      padding: 24px 26px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(83,224,210,.14), rgba(255,255,255,.05));
+      border: 1px solid rgba(83,224,210,.22);
+      box-shadow: var(--shadow);
+    }
+    .quote b {
+      display: block;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1.24;
+      margin-bottom: 10px;
+    }
+    .quote p { color: #dceced; font-size: 16px; }
+    .notes {
+      display: grid;
+      gap: 12px;
+    }
+    .note {
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.11);
+    }
+    .note b { display: block; color: var(--cyan); font-size: 18px; margin-bottom: 7px; }
+    .note span { display: block; color: var(--muted); font-size: 15px; line-height: 1.52; }
+    .bottom-band {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.11);
+    }
+    .bottom-band .chip {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(7,19,31,.55);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+    .chip b { display: block; color: #fff; font-size: 18px; margin-bottom: 6px; }
+    .chip span { display: block; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .nav {
+      position: fixed;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 90;
+      width: 156px;
+      padding: 16px 12px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(7,19,31,.90), rgba(7,19,31,.50));
+      border: 1px solid rgba(83,224,210,.18);
+      box-shadow: 0 24px 72px rgba(0,0,0,.28);
+      backdrop-filter: blur(16px);
+    }
+    .nav::before {
+      content: "章节";
+      display: block;
+      margin: 2px 8px 12px;
+      color: rgba(238,247,248,.5);
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+    .nav-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 8px;
+      margin: 6px 0;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: rgba(238,247,248,.64);
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .nav-item b {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(238,247,248,.55);
+      color: #06131f;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .nav-item span { font-size: 13px; line-height: 1.25; font-weight: 800; }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(83,224,210,.23), rgba(91,184,255,.10));
+      box-shadow: inset 0 0 0 1px rgba(83,224,210,.22);
+    }
+    .nav-item.active b { background: var(--cyan); box-shadow: 0 0 20px rgba(83,224,210,.5); }
+    .footer {
+      position: fixed;
+      left: 196px;
+      right: 40px;
+      bottom: 26px;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: rgba(238,247,248,.60);
+      font-size: 13px;
+    }
+    .progress {
+      width: 280px;
+      height: 5px;
+      background: rgba(255,255,255,.12);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--lime));
+      border-radius: inherit;
+      transition: width .25s ease;
+    }
+    .controls {
+      position: fixed;
+      right: 22px;
+      bottom: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      border: 1px solid rgba(255,255,255,.16);
+      color: var(--ink);
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-family: var(--font);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .btn:hover { border-color: rgba(83,224,210,.60); color: var(--cyan); }
+
+    .scene {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+      align-items: stretch;
+    }
+    .scene.reverse { grid-template-columns: 1fr 1fr; }
+    .scene .visual-box { min-height: 420px; }
+    .scene .side-stack { align-content: stretch; }
+
+    @media print {
+      html, body { overflow: visible; background: #06111b; }
+      .deck { height: auto; }
+      .slide {
+        position: relative;
+        display: block !important;
+        width: 100vw;
+        height: 56.25vw;
+        page-break-after: always;
+        break-after: page;
+      }
+      .nav, .controls, .footer { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" id="nav" aria-label="章节导航">
+    <button class="nav-item active" data-target="0"><b>01</b><span>封面与判断</span></button>
+    <button class="nav-item" data-target="1"><b>02</b><span>产业背景</span></button>
+    <button class="nav-item" data-target="2"><b>03</b><span>监管背景</span></button>
+    <button class="nav-item" data-target="3"><b>04</b><span>浙江窗口</span></button>
+    <button class="nav-item" data-target="4"><b>05</b><span>现实风险</span></button>
+    <button class="nav-item" data-target="5"><b>06</b><span>建设必要性</span></button>
+  </nav>
+
+  <main class="deck" id="deck">
+    <section class="slide active">
+      <span class="kicker">护天枢 · 低空安全运营</span>
+      <h1>护天枢低空安全运营样板</h1>
+      <p class="lead">基于现有平台与侦测1.0基础，先做出一个<span class="accent">可展示、可运营、可复制</span>的样板，再把能力复制到园区、活动、重点区域和城市治理。</p>
+      <div class="cover-grid">
+        <div class="cover-panel">
+          <div class="quote">
+            <b>低空经济不是只看“能不能飞”，而是先把“谁在飞、是否合规、风险多大、谁来处置”讲清楚。</b>
+            <p>这份PPT只讲一件事：为什么现在必须升级护天枢，为什么它值得从侦测1.0升级成低空安全运营样板。</p>
+          </div>
+          <div class="metric-row">
+            <div class="metric"><b>217.7万</b><span>2024年底全行业注册无人机规模</span></div>
+            <div class="metric"><b>2666.7万</b><span>2024年无人机全年累计飞行小时</span></div>
+            <div class="metric"><b>2026.05</b><span>两项强制性国家标准正式实施</span></div>
+          </div>
+        </div>
+        <figure class="visual-box">
+          <img src="assets/low-altitude-visuals/hero-low-altitude-city.svg" alt="低空城市视觉图" />
+          <figcaption class="picture-label">护天枢视觉：低空城市安全感知网络</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="kicker">低空经济背景</span>
+      <h2>低空经济正在从应用热，走向基础设施战</h2>
+      <div class="scene">
+        <figure class="visual-box">
+          <img src="assets/low-altitude-visuals/industry-ecosystem.svg" alt="低空经济生态图" />
+          <figcaption class="picture-label">产业不再只看飞行器，而是看安全、数据和运营底座</figcaption>
+        </figure>
+        <div class="side-stack">
+          <div class="card"><b>产业链</b><span>低空经济已不只是无人机产业，而是把飞行器、空域、通信、平台、服务和治理组织成完整链条。</span></div>
+          <div class="card"><b>应用场景</b><span>物流、巡检、应急、文旅、赛事、园区和城市治理都需要低空活动进入可管理状态。</span></div>
+          <div class="card"><b>基础设施</b><span>未来竞争不只是设备参数，而是站网、平台、规则和运营能力能否一起落地。</span></div>
+          <div class="card"><b>数据价值</b><span>飞行轨迹、告警事件、处置记录和复盘材料会沉淀为低空数字化经营资产。</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="card"><b>政策推动</b><span>2024年开始，国家层面对低空经济的表述从鼓励发展转向规模应用与安全健康发展并重。</span></div>
+        <div class="card"><b>行业成熟</b><span>无人机规模增长已把“飞行能力”推到前台，把“治理能力”推成刚需。</span></div>
+        <div class="card"><b>启真机会</b><span>已有平台基础，适合把侦测能力升级成可运营、可展示、可复制的样板产品。</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="kicker">监管背景</span>
+      <h2>低空治理正从“能飞起来”进入“可识别、可监管、可追溯”</h2>
+      <figure class="visual-box" style="min-height: 380px; margin-top: 24px;">
+        <img src="assets/low-altitude-visuals/policy-timeline.svg" alt="政策时间轴" />
+        <figcaption class="picture-label">法规、标准、运行识别，正在把低空治理推向闭环化</figcaption>
+      </figure>
+      <div class="grid cols-3" style="margin-top: 18px;">
+        <div class="card"><b>飞行合法性</b><span>实名登记、运行识别、飞行计划、空域审批和电子围栏，让“能不能飞”先有明确边界。</span></div>
+        <div class="card"><b>过程安全</b><span>运行监视、风险识别、异常预警、跨部门联动和应急处置，让“飞的过程”可被管理。</span></div>
+        <div class="card"><b>事后复盘</b><span>日志留存、证据链、责任追溯、统计报表和规则优化，让“出了事怎么办”也能被追踪。</span></div>
+      </div>
+      <div class="bottom-band">
+        <div class="chip"><b>侦测产品的位置</b><span>它不只是设备，而是把制度要求转成现场治理动作的关键工具。</span></div>
+        <div class="chip"><b>多源融合的必要性</b><span>RID、无线电、雷达、光电、平台研判需要一起上，才能覆盖存量设备、改装设备和复杂环境。</span></div>
+        <div class="chip"><b>未来的底层逻辑</b><span>合规无人机会越来越可识别，但治理平台仍然要解决异常、遮挡、静默和越界场景。</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="kicker">浙江与杭州</span>
+      <h2>浙江有政策，杭州有场景，试点窗口已经打开</h2>
+      <div class="scene reverse">
+        <div class="side-stack">
+          <div class="note"><b>政策支持</b><span>浙江高水平建设民航强省，杭州也在持续推出低空经济高质量发展措施，试点并不缺政策窗口。</span></div>
+          <div class="note"><b>数字底座</b><span>城市大脑、数字孪生、基层治理、应急指挥等基础能力已具备，适合把侦测接进现有体系。</span></div>
+          <div class="note"><b>场景丰富</b><span>园区、物流、文旅、赛事、应急和重点目标都可形成样板，且更容易对外展示。</span></div>
+          <div class="note"><b>启真策略</b><span>先做小成本样板，再把样板扩成园区版、活动版和城市版，不一开始就追求大而全。</span></div>
+        </div>
+        <figure class="visual-box">
+          <img src="assets/low-altitude-visuals/zhejiang-window.svg" alt="浙江和杭州试点窗口图" />
+          <figcaption class="picture-label">浙江窗口：政策、底座、场景、试点时机正在同时到位</figcaption>
+        </figure>
+      </div>
+      <div class="band">
+        <div class="card"><b>先样板</b><span>领导看的是“能不能先出一个拿得出手的案例”。</span></div>
+        <div class="card"><b>再复制</b><span>客户看的是“能不能从一个点复制到多个场景”。</span></div>
+        <div class="card"><b>后运营</b><span>公司看的是“样板能不能转成长期服务和持续收入”。</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="kicker">现实风险</span>
+      <h2>风险不只是飞过来，而是有人在帮它绕开规则</h2>
+      <div class="scene">
+        <figure class="visual-box">
+          <img src="assets/low-altitude-visuals/risk-case-map.svg" alt="非法破解飞控风险地图" />
+          <figcaption class="picture-label">公安部公开案例说明，破解、改装和绕规则已成现实风险</figcaption>
+        </figure>
+        <div class="notes">
+          <div class="note"><b>破解限高与禁飞</b><span>禁飞区、限飞区、限高限制被破解后，合规边界被直接绕开。</span></div>
+          <div class="note"><b>篡改载重参数</b><span>大型农用无人机等设备参数被改写后，会带来坠落和设施损坏风险。</span></div>
+          <div class="note"><b>关闭运行识别</b><span>合规识别被关闭或被弱化后，单一RID能力会明显失效。</span></div>
+          <div class="note"><b>服务化牟利</b><span>破解软件、破解服务、破解设备销售已经开始形成链条。</span></div>
+        </div>
+      </div>
+      <div class="bottom-band">
+        <div class="chip"><b>10起典型案例</b><span>公安部公开披露的案例已经足够说明，低空治理不是未来问题，而是现实问题。</span></div>
+        <div class="chip"><b>270余台口径</b><span>公开披露的破解数量说明，风险具有规模性和可复制性。</span></div>
+        <div class="chip"><b>启示</b><span>侦测产品必须覆盖改装、破解、关闭识别和绕开电子围栏等异常目标。</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="kicker">建设必要性</span>
+      <h2>侦测产品不是设备，而是低空安全运营的入口</h2>
+      <div class="scene reverse">
+        <div class="side-stack">
+          <div class="card"><b>公共安全</b><span>它把低慢小目标从“看不见”变成“看得见、判得准、能留痕”，补强传统安防的低空短板。</span></div>
+          <div class="card"><b>产业运营</b><span>它为物流、巡检、应急、文旅和园区开放提供安全底座，让低空应用更容易规模化。</span></div>
+          <div class="card"><b>公司战略</b><span>它帮助启真从项目交付转向产品化运营，沉淀数据、规则、流程和样板。</span></div>
+          <div class="card"><b>合规闭环</b><span>它把反制授权、处置流程和证据留痕统一纳入系统，减少越权和责任不清风险。</span></div>
+        </div>
+        <figure class="visual-box">
+          <img src="assets/low-altitude-visuals/platform-dashboard.svg" alt="低空侦测平台驾驶舱" />
+          <figcaption class="picture-label">真正的价值，不只是看见目标，而是形成运营闭环</figcaption>
+        </figure>
+      </div>
+      <div class="quote" style="margin-top: 18px;">
+        <b>谁先把低空风险看见，谁就更容易掌握后续运营、数据和服务。</b>
+        <p>所以护天枢要做的，不是单点设备，而是把“看得见、判得准、派得出、留得住”真正跑成闭环。</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    <span id="label">01 / 06</span>
+    <div class="progress"><i id="bar"></i></div>
+    <span>方向键翻页｜P 打印/导出 PDF｜Home/End 首尾页</span>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">上一页</button>
+    <button class="btn" id="next">下一页</button>
+    <button class="btn" id="print">打印/PDF</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const label = document.getElementById('label');
+    const bar = document.getElementById('bar');
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    let current = 0;
+
+    function render() {
+      slides.forEach((slide, index) => slide.classList.toggle('active', index === current));
+      label.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+      bar.style.width = ((current + 1) / slides.length * 100) + '%';
+      navItems.forEach((item, index) => item.classList.toggle('active', index === current));
+      location.hash = 'slide-' + (current + 1);
+    }
+
+    function go(delta) {
+      current = Math.max(0, Math.min(slides.length - 1, current + delta));
+      render();
+    }
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        current = Number(item.dataset.target);
+        render();
+      });
+    });
+    document.getElementById('prev').addEventListener('click', () => go(-1));
+    document.getElementById('next').addEventListener('click', () => go(1));
+    document.getElementById('print').addEventListener('click', () => window.print());
+
+    window.addEventListener('keydown', e => {
+      if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(1); }
+      if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); go(-1); }
+      if (e.key.toLowerCase() === 'p') window.print();
+      if (e.key.toLowerCase() === 'home') { current = 0; render(); }
+      if (e.key.toLowerCase() === 'end') { current = slides.length - 1; render(); }
+    });
+
+    const hashMatch = location.hash.match(/slide-(\d+)/);
+    if (hashMatch) current = Math.max(0, Math.min(slides.length - 1, Number(hashMatch[1]) - 1));
+    render();
+  </script>
+</body>
+</html>

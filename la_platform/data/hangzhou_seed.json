@@ -1,0 +1,283 @@
+{
+  "meta": {
+    "city": "Hangzhou",
+    "timezone": "Asia/Shanghai",
+    "seed_version": "1.0.0",
+    "generated_utc": "2026-05-19T04:00:00Z"
+  },
+  "data_sources": [
+    {
+      "source_name": "Wikipedia - Hangzhou",
+      "source_type": "city_coordinate",
+      "source_url": "https://en.wikipedia.org/wiki/Hangzhou",
+      "last_verified_utc": "2026-05-19T04:00:00Z"
+    },
+    {
+      "source_name": "Wikipedia - Hangzhou Xiaoshan International Airport",
+      "source_type": "airport_coordinate",
+      "source_url": "https://en.wikipedia.org/wiki/Hangzhou_Xiaoshan_International_Airport",
+      "last_verified_utc": "2026-05-19T04:00:00Z"
+    },
+    {
+      "source_name": "Wikipedia - Binjiang, Hangzhou",
+      "source_type": "district_coordinate",
+      "source_url": "https://en.wikipedia.org/wiki/Binjiang,_Hangzhou",
+      "last_verified_utc": "2026-05-19T04:00:00Z"
+    },
+    {
+      "source_name": "Wikipedia - Xihu, Hangzhou",
+      "source_type": "district_coordinate",
+      "source_url": "https://en.wikipedia.org/wiki/Xihu,_Hangzhou",
+      "last_verified_utc": "2026-05-19T04:00:00Z"
+    },
+    {
+      "source_name": "Wikipedia - Xixi National Wetland Park",
+      "source_type": "poi_coordinate",
+      "source_url": "https://en.wikipedia.org/wiki/Xixi_National_Wetland_Park",
+      "last_verified_utc": "2026-05-19T04:00:00Z"
+    }
+  ],
+  "data_resources": [
+    {
+      "resource_code": "RES_MAP_BASE",
+      "resource_name": "低空一张图对象资源",
+      "resource_category": "map",
+      "schema_version": "v1",
+      "owner_module": "low_altitude_map",
+      "description": "空域、航线、起降点、禁限飞区、敏感区和实时目标底座资源"
+    },
+    {
+      "resource_code": "RES_FLIGHT_SERVICE",
+      "resource_name": "飞行服务业务资源",
+      "resource_category": "flight_service",
+      "schema_version": "v1",
+      "owner_module": "flight_service",
+      "description": "飞行计划、风险校验、审批流、动态放行底座资源"
+    },
+    {
+      "resource_code": "RES_AIRSPACE_FAC",
+      "resource_name": "空域设施资源",
+      "resource_category": "airspace",
+      "schema_version": "v1",
+      "owner_module": "airspace_facility",
+      "description": "四维空域网格、容量评估、设施台账、微气象与通信覆盖"
+    }
+  ],
+  "map_layers": [
+    {
+      "layer_code": "LAYER_ADMIN",
+      "layer_name": "行政区",
+      "layer_type": "polygon",
+      "is_default_visible": 1,
+      "style_json": "{\"stroke\":\"#7c3aed\",\"fill\":\"#ede9fe\"}"
+    },
+    {
+      "layer_code": "LAYER_ROUTE",
+      "layer_name": "航线航路",
+      "layer_type": "polyline",
+      "is_default_visible": 1,
+      "style_json": "{\"stroke\":\"#ec4899\",\"width\":3}"
+    },
+    {
+      "layer_code": "LAYER_RESTRICTED",
+      "layer_name": "禁限飞区",
+      "layer_type": "polygon",
+      "is_default_visible": 1,
+      "style_json": "{\"stroke\":\"#dc2626\",\"fill\":\"#fecaca\"}"
+    },
+    {
+      "layer_code": "LAYER_FACILITY",
+      "layer_name": "起降点与机库",
+      "layer_type": "point",
+      "is_default_visible": 1,
+      "style_json": "{\"point\":\"#16a34a\"}"
+    },
+    {
+      "layer_code": "LAYER_REALTIME",
+      "layer_name": "实时飞行器",
+      "layer_type": "point",
+      "is_default_visible": 1,
+      "style_json": "{\"point\":\"#7c3aed\"}"
+    }
+  ],
+  "map_objects": [
+    {
+      "object_code": "OBJ_ROUTE_QIANTANG_01",
+      "object_name": "钱塘江巡查航线",
+      "object_type": "route",
+      "geometry_type": "polyline",
+      "geometry_json": "[[30.2068,120.1828],[30.2198,120.1964],[30.2335,120.2128],[30.2458,120.2265]]",
+      "district": "Binjiang-Shangcheng",
+      "risk_level": "medium",
+      "status": "enabled",
+      "source_ref": 1
+    },
+    {
+      "object_code": "OBJ_ROUTE_LOGI_01",
+      "object_name": "滨江低空物流测试航线",
+      "object_type": "route",
+      "geometry_type": "polyline",
+      "geometry_json": "[[30.2052,120.2118],[30.2142,120.2336],[30.2261,120.2568]]",
+      "district": "Binjiang",
+      "risk_level": "medium",
+      "status": "enabled",
+      "source_ref": 2
+    },
+    {
+      "object_code": "OBJ_NOFLY_XIHU_CORE",
+      "object_name": "西湖景区核心禁飞区",
+      "object_type": "restricted_zone",
+      "geometry_type": "polygon",
+      "geometry_json": "[[30.2668,120.1225],[30.2756,120.1318],[30.2702,120.1450],[30.2588,120.1432],[30.2544,120.1296]]",
+      "district": "Xihu",
+      "risk_level": "high",
+      "status": "enabled",
+      "source_ref": 4
+    },
+    {
+      "object_code": "OBJ_ALERT_OLYMPIC_ZONE",
+      "object_name": "奥体中心活动保障区",
+      "object_type": "sensitive_zone",
+      "geometry_type": "polygon",
+      "geometry_json": "[[30.2398,120.2248],[30.2398,120.2412],[30.2278,120.2412],[30.2278,120.2248]]",
+      "district": "Xiaoshan",
+      "risk_level": "high",
+      "status": "enabled",
+      "source_ref": 1
+    },
+    {
+      "object_code": "OBJ_POI_XIXI_WETLAND",
+      "object_name": "西溪国家湿地公园敏感区域",
+      "object_type": "sensitive_zone",
+      "geometry_type": "point",
+      "geometry_json": "{\"lat\":30.2580,\"lng\":120.0740}",
+      "district": "Xihu",
+      "risk_level": "medium",
+      "status": "enabled",
+      "source_ref": 5
+    }
+  ],
+  "organizations": [
+    {"org_code": "ORG_HZ_CG", "org_name": "杭州市城市治理巡查中心", "org_type": "government", "status": "active"},
+    {"org_code": "ORG_HZ_LOGI", "org_name": "杭州低空物流示范公司", "org_type": "enterprise", "status": "active"},
+    {"org_code": "ORG_HZ_EMG", "org_name": "杭州应急救援航空保障队", "org_type": "emergency", "status": "active"}
+  ],
+  "pilots": [
+    {"pilot_code": "PILOT_ZHANGSAN", "pilot_name": "张三", "license_level": "A2", "license_expiry_utc": "2028-05-01T00:00:00Z", "org_code": "ORG_HZ_CG", "status": "active"},
+    {"pilot_code": "PILOT_LISI", "pilot_name": "李四", "license_level": "A2", "license_expiry_utc": "2027-12-15T00:00:00Z", "org_code": "ORG_HZ_LOGI", "status": "active"},
+    {"pilot_code": "PILOT_WANGWU", "pilot_name": "王五", "license_level": "A3", "license_expiry_utc": "2027-03-10T00:00:00Z", "org_code": "ORG_HZ_EMG", "status": "active"}
+  ],
+  "aircraft_registry": [
+    {"aircraft_code": "UAV-HZ-021", "aircraft_model": "DJI M350 RTK", "max_altitude_m": 500, "org_code": "ORG_HZ_CG", "status": "active"},
+    {"aircraft_code": "UAV-HZ-022", "aircraft_model": "DJI M30T", "max_altitude_m": 300, "org_code": "ORG_HZ_LOGI", "status": "active"},
+    {"aircraft_code": "UAV-HZ-023", "aircraft_model": "XAG P100 Pro", "max_altitude_m": 200, "org_code": "ORG_HZ_EMG", "status": "active"}
+  ],
+  "facilities": [
+    {
+      "facility_code": "FAC_QIANJIANG_PAD",
+      "facility_name": "钱江新城综合起降点",
+      "facility_type": "vertiport",
+      "district": "Shangcheng",
+      "latitude": 30.2489,
+      "longitude": 120.2058,
+      "status": "online",
+      "capacity": 12,
+      "metadata_json": "{\"provider\":\"city\",\"source\":\"Hangzhou sample\"}"
+    },
+    {
+      "facility_code": "FAC_BINJIANG_HANGAR",
+      "facility_name": "滨江物联机库",
+      "facility_type": "hangar",
+      "district": "Binjiang",
+      "latitude": 30.2052,
+      "longitude": 120.2118,
+      "status": "online",
+      "capacity": 18,
+      "metadata_json": "{\"provider\":\"logistics\",\"source\":\"Hangzhou sample\"}"
+    },
+    {
+      "facility_code": "FAC_XIAOSHAN_AIRPORT",
+      "facility_name": "杭州萧山国际机场协同点",
+      "facility_type": "airport_gateway",
+      "district": "Xiaoshan",
+      "latitude": 30.2361,
+      "longitude": 120.4346,
+      "status": "online",
+      "capacity": 30,
+      "metadata_json": "{\"provider\":\"airport\",\"source\":\"wikipedia\"}"
+    }
+  ],
+  "airspace_zones": [
+    {
+      "zone_code": "ZONE_XIHU_NOFLY",
+      "zone_name": "西湖核心禁飞区",
+      "zone_type": "no_fly",
+      "min_altitude_m": 0,
+      "max_altitude_m": 120,
+      "district": "Xihu",
+      "status": "active",
+      "polygon_json": "[[30.2668,120.1225],[30.2756,120.1318],[30.2702,120.1450],[30.2588,120.1432],[30.2544,120.1296]]",
+      "effective_from_utc": "2026-01-01T00:00:00Z",
+      "effective_to_utc": ""
+    },
+    {
+      "zone_code": "ZONE_OLYMPIC_EVENT",
+      "zone_name": "奥体活动临时管制区",
+      "zone_type": "temporary_control",
+      "min_altitude_m": 0,
+      "max_altitude_m": 180,
+      "district": "Xiaoshan",
+      "status": "active",
+      "polygon_json": "[[30.2398,120.2248],[30.2398,120.2412],[30.2278,120.2412],[30.2278,120.2248]]",
+      "effective_from_utc": "2026-05-01T00:00:00Z",
+      "effective_to_utc": "2026-10-01T00:00:00Z"
+    }
+  ],
+  "airspace_grids": [
+    {"grid_code": "GRID-BJ-120-A", "district": "Binjiang", "min_altitude_m": 0, "max_altitude_m": 120, "capacity_limit": 32, "current_load": 24, "risk_level": "medium"},
+    {"grid_code": "GRID-SC-120-B", "district": "Shangcheng", "min_altitude_m": 0, "max_altitude_m": 120, "capacity_limit": 28, "current_load": 23, "risk_level": "high"},
+    {"grid_code": "GRID-XH-120-C", "district": "Xihu", "min_altitude_m": 0, "max_altitude_m": 120, "capacity_limit": 20, "current_load": 11, "risk_level": "low"}
+  ],
+  "weather_cells": [
+    {"cell_code": "WX-BJ-01", "district": "Binjiang", "center_lat": 30.2050, "center_lng": 120.2200, "wind_speed_ms": 6.2, "visibility_km": 8.1, "rainfall_mm": 0.0, "risk_level": "low"},
+    {"cell_code": "WX-SC-01", "district": "Shangcheng", "center_lat": 30.2440, "center_lng": 120.2240, "wind_speed_ms": 8.4, "visibility_km": 6.4, "rainfall_mm": 0.2, "risk_level": "medium"},
+    {"cell_code": "WX-XS-01", "district": "Xiaoshan", "center_lat": 30.2320, "center_lng": 120.4200, "wind_speed_ms": 11.3, "visibility_km": 4.8, "rainfall_mm": 1.1, "risk_level": "high"}
+  ],
+  "flight_plans": [
+    {
+      "plan_no": "FP-HZ-20260519-032",
+      "task_name": "钱塘江巡查 2026-05-19 午后班次",
+      "task_type": "city_inspection",
+      "org_code": "ORG_HZ_CG",
+      "pilot_code": "PILOT_ZHANGSAN",
+      "aircraft_code": "UAV-HZ-021",
+      "district": "Binjiang-Shangcheng",
+      "start_time_utc": "2026-05-19T06:30:00Z",
+      "end_time_utc": "2026-05-19T07:10:00Z",
+      "min_altitude_m": 60,
+      "max_altitude_m": 120,
+      "route_json": "[[30.2068,120.1828],[30.2198,120.1964],[30.2335,120.2128],[30.2458,120.2265]]",
+      "status": "draft"
+    },
+    {
+      "plan_no": "FP-HZ-20260519-041",
+      "task_name": "滨江物流测试班次",
+      "task_type": "logistics",
+      "org_code": "ORG_HZ_LOGI",
+      "pilot_code": "PILOT_LISI",
+      "aircraft_code": "UAV-HZ-022",
+      "district": "Binjiang",
+      "start_time_utc": "2026-05-19T08:15:00Z",
+      "end_time_utc": "2026-05-19T08:55:00Z",
+      "min_altitude_m": 50,
+      "max_altitude_m": 100,
+      "route_json": "[[30.2052,120.2118],[30.2142,120.2336],[30.2261,120.2568]]",
+      "status": "pending_review"
+    }
+  ],
+  "realtime_aircraft": [
+    {"aircraft_code": "UAV-HZ-021", "aircraft_type": "DJI M350 RTK", "status": "ok", "latitude": 30.2335, "longitude": 120.2128, "altitude_m": 98, "speed_ms": 11.2, "heading_deg": 72, "plan_no": "FP-HZ-20260519-032"},
+    {"aircraft_code": "UAV-HZ-022", "aircraft_type": "DJI M30T", "status": "warn", "latitude": 30.2142, "longitude": 120.2336, "altitude_m": 87, "speed_ms": 9.1, "heading_deg": 53, "plan_no": "FP-HZ-20260519-041"},
+    {"aircraft_code": "UAV-HZ-BF-099", "aircraft_type": "Unknown", "status": "unauthorized", "latitude": 30.2329, "longitude": 120.2332, "altitude_m": 156, "speed_ms": 12.0, "heading_deg": 102, "plan_no": ""}
+  ]
+}

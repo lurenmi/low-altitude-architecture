@@ -1,0 +1,1037 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>侦测产品体系市场项目数据分析报告</title>
+  <style>
+    :root {
+      --bg: #0b0e0d;
+      --panel: #121817;
+      --panel2: #17201e;
+      --line: rgba(159, 229, 199, .22);
+      --text: #eef8f3;
+      --muted: #9db0aa;
+      --cyan: #4fd7ff;
+      --mint: #55e6a5;
+      --amber: #f5c15d;
+      --coral: #ff746d;
+      --violet: #b99cff;
+      --white: #ffffff;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, rgba(19,34,32,.92), rgba(11,14,13,.98) 36%, #0b0e0d),
+        repeating-linear-gradient(90deg, rgba(85,230,165,.035) 0 1px, transparent 1px 88px),
+        repeating-linear-gradient(0deg, rgba(79,215,255,.025) 0 1px, transparent 1px 88px);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    a { color: var(--cyan); text-decoration: none; }
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; background: rgba(11,14,13,.78); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand-mark { width: 22px; height: 22px; border: 2px solid var(--mint); transform: rotate(45deg); box-shadow: 0 0 22px rgba(85,230,165,.5); }
+    .nav { display: flex; gap: 18px; font-size: 13px; color: var(--muted); }
+    .nav a { color: var(--muted); }
+    .hero {
+      position: relative; min-height: 640px; overflow: hidden;
+      display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr); gap: 36px;
+      padding: 84px 6vw 56px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero::after {
+      content: ""; position: absolute; inset: auto 0 0 0; height: 220px;
+      background: linear-gradient(180deg, transparent, rgba(11,14,13,.8));
+      pointer-events: none;
+    }
+    .hero > * { position: relative; z-index: 2; }
+    h1 { font-size: clamp(40px, 5vw, 76px); line-height: 1.04; margin: 0 0 24px; letter-spacing: 0; }
+    .eyebrow { color: var(--mint); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; }
+    .subtitle { color: #c9d8d3; max-width: 880px; line-height: 1.78; font-size: 17px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .pill {
+      border: 1px solid var(--line); padding: 9px 12px; border-radius: 999px;
+      background: rgba(18,24,23,.72); color: #d9eee6; font-size: 13px;
+    }
+    .city-panel { min-height: 420px; align-self: center; }
+    .city-svg { width: 100%; height: 100%; min-height: 420px; filter: drop-shadow(0 18px 50px rgba(0,0,0,.45)); }
+    .section { padding: 68px 6vw; border-bottom: 1px solid rgba(159,229,199,.12); scroll-margin-top: 72px; }
+    .section-head { display: flex; justify-content: space-between; align-items: start; gap: 24px; margin-bottom: 28px; }
+    h2 { margin: 0; font-size: clamp(26px, 3vw, 42px); }
+    .lead { color: var(--muted); line-height: 1.75; max-width: 980px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    .kpi, .panel, .case-card, .insight, .activity-card {
+      background: linear-gradient(180deg, rgba(23,32,30,.92), rgba(18,24,23,.92));
+      border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+      min-width: 0;
+    }
+    .kpi { padding: 18px; min-height: 128px; }
+    .kpi.drillable { cursor: pointer; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+    .kpi.drillable:hover { transform: translateY(-1px); border-color: rgba(85,230,165,.42); }
+    .kpi.drillable.active { border-color: rgba(85,230,165,.56); box-shadow: 0 0 0 1px rgba(85,230,165,.16), var(--shadow); }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    .kpi .value { font-size: 34px; font-weight: 800; margin: 12px 0 6px; }
+    .kpi .note { color: #b9c9c4; font-size: 12px; line-height: 1.55; }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
+    .panel { padding: 20px; overflow: hidden; }
+    .panel h3 { margin: 0 0 14px; font-size: 18px; }
+    .mini { color: var(--muted); font-size: 12px; margin-bottom: 14px; line-height: 1.6; }
+    .bar-row { display: grid; grid-template-columns: 150px 1fr 70px; align-items: center; gap: 12px; margin: 11px 0; font-size: 13px; }
+    .bar-track { height: 10px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mint), var(--cyan)); }
+    .bar-fill.amber { background: linear-gradient(90deg, var(--amber), var(--coral)); }
+    .bar-fill.violet { background: linear-gradient(90deg, var(--violet), var(--cyan)); }
+    .matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px; }
+    .province-cell {
+      min-height: 88px; padding: 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px;
+      background: rgba(255,255,255,.035); display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .province-cell.drillable { cursor: pointer; transition: background .15s ease, transform .15s ease, border-color .15s ease; }
+    .province-cell.drillable:hover { background: rgba(85,230,165,.08); border-color: rgba(85,230,165,.24); transform: translateY(-1px); }
+    .province-cell.drillable.active { background: rgba(85,230,165,.14); border-color: rgba(85,230,165,.38); }
+    .province-cell strong { font-size: 15px; line-height: 1.15; }
+    .province-cell span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .case-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .case-card { padding: 16px; min-height: 190px; }
+    .case-card .tag { color: var(--mint); font-size: 12px; margin-bottom: 10px; }
+    .case-card h4 { margin: 0 0 10px; font-size: 16px; line-height: 1.45; }
+    .case-card p { color: #bfd0cb; line-height: 1.58; font-size: 13px; margin: 0; }
+    .insight { padding: 18px; }
+    .insight b { color: var(--amber); }
+    .trend-row { display: grid; grid-template-columns: 180px 1fr 110px; gap: 12px; align-items: center; margin: 12px 0; }
+    .trend-meta strong { display: block; font-size: 15px; color: #f6fff9; }
+    .trend-meta span { display: block; font-size: 12px; color: var(--muted); line-height: 1.45; margin-top: 4px; }
+    .trend-value { text-align: right; font-size: 13px; color: #dfece7; white-space: nowrap; }
+    .platform-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .platform-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .platform-item-head { display: flex; align-items: flex-start; gap: 10px; }
+    .platform-item-head strong { font-size: 14px; line-height: 1.45; }
+    .platform-item-meta { color: #d7e4df; font-size: 13px; line-height: 1.5; margin: 8px 0 4px; }
+    .bar-row { border-radius: 6px; padding: 4px 6px; margin: 7px -6px; transition: background .15s ease, transform .15s ease; }
+    .bar-row.drillable { cursor: pointer; }
+    .bar-row.drillable:hover { background: rgba(85,230,165,.06); transform: translateX(1px); }
+    .bar-row.drillable.active { background: rgba(85,230,165,.1); }
+    .drill-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .drill-head h3 { margin: 0; font-size: 18px; }
+    .drill-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 18px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip { display: inline-flex; align-items: center; min-height: 30px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(79,215,255,.28); background: rgba(79,215,255,.08); color: #e7fbff; font-size: 12px; line-height: 1.3; }
+    .drill-list { margin: 0; padding-left: 18px; color: #dfece7; line-height: 1.6; font-size: 13px; }
+    .drill-list li + li { margin-top: 8px; }
+    .click-hint { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 7px; border-radius: 999px; border: 1px solid rgba(79,215,255,.28); background: rgba(79,215,255,.08); color: #9eeaff; font-size: 12px; line-height: 1.2; white-space: nowrap; }
+    .table-tools { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; position: relative; z-index: 12; }
+    .input, .select {
+      background: rgba(8, 18, 17, .96); color: #f4fffb; border: 1px solid rgba(159,229,199,.42);
+      border-radius: 6px; height: 40px; padding: 0 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+      outline: none;
+    }
+    .input::placeholder { color: #b9cbc5; opacity: 1; }
+    .input:focus, .select:focus { border-color: var(--mint); box-shadow: 0 0 0 3px rgba(85,230,165,.14); }
+    .select option { background: #f7fffb; color: #10201c; }
+    .input { min-width: 300px; }
+    table { width: 100%; min-width: 1280px; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    th:nth-child(1) { width: 92px; }
+    th:nth-child(2) { width: 270px; }
+    th:nth-child(3) { width: 148px; }
+    th:nth-child(4) { width: 118px; }
+    th:nth-child(5) { width: 190px; }
+    th:nth-child(6) { width: 118px; }
+    th:nth-child(7) { width: 250px; }
+    th:nth-child(8) { width: 122px; }
+    th, td { padding: 11px 10px; border-bottom: 1px solid rgba(255,255,255,.08); vertical-align: top; }
+    th { position: sticky; top: 0; background: #111715; color: #f2fff9; text-align: left; z-index: 5; box-shadow: 0 1px 0 rgba(159,229,199,.24), 0 10px 20px rgba(0,0,0,.22); }
+    td { color: #dce9e5; line-height: 1.55; }
+    td { overflow-wrap: anywhere; }
+    .table-main { font-weight: 700; color: #f4fffb; line-height: 1.45; }
+    .table-muted { color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 5px; }
+    .table-tag { display: inline-flex; align-items: center; max-width: 100%; min-height: 22px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.055); color: #cbded8; border: 1px solid rgba(255,255,255,.09); font-size: 12px; line-height: 1.25; }
+    .table-wrap { max-height: 720px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(8,13,12,.36); position: relative; z-index: 1; }
+    .badge { display: inline-block; padding: 3px 7px; border-radius: 999px; background: rgba(85,230,165,.12); color: #aef7d5; border: 1px solid rgba(85,230,165,.28); font-size: 12px; }
+    .source-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .source-pill { display: inline-flex; align-items: center; justify-content: center; height: 24px; padding: 0 7px; border-radius: 6px; font-size: 12px; line-height: 1; white-space: nowrap; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); color: #dce9e5; }
+    .source-pill.official { border-color: rgba(85,230,165,.34); background: rgba(85,230,165,.12); color: #aef7d5; }
+    .source-pill.reprint { border-color: rgba(245,193,93,.34); background: rgba(245,193,93,.12); color: #ffe2a3; }
+    .source-pill.hidden { border-color: rgba(185,156,255,.28); background: rgba(185,156,255,.1); color: #d8caff; }
+    .source-link { display: inline-flex; align-items: center; justify-content: center; height: 24px; padding: 0 7px; border-radius: 6px; border: 1px solid rgba(79,215,255,.32); background: rgba(79,215,255,.08); color: #9eeaff; font-size: 12px; white-space: nowrap; }
+    .source-link.open { border-color: rgba(85,230,165,.34); background: rgba(85,230,165,.1); color: #aef7d5; }
+    .source-link.open:hover { background: rgba(85,230,165,.18); color: #ddfff0; }
+    .source-link.blocked { border-color: rgba(255,116,109,.28); background: rgba(255,116,109,.08); color: #ffb9b5; cursor: not-allowed; }
+    .source-link:hover { background: rgba(79,215,255,.16); color: #d6f8ff; }
+    .source-link.blocked:hover { background: rgba(255,116,109,.08); color: #ffb9b5; }
+    .link-legend { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -4px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .source-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .quality { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    #activity .panel { padding: 24px; }
+    #activity .drill-head { align-items: center; margin-bottom: 18px; }
+    #activity .drill-head h3 { font-size: 20px; }
+    .activity-drill { display: grid; gap: 18px; }
+    .activity-summary {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 12px 14px; border: 1px solid rgba(79,215,255,.16); border-radius: 8px;
+      background: rgba(79,215,255,.045);
+    }
+    .activity-summary .mini { margin: 0; color: #d7e4df; font-size: 13px; }
+    .activity-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .activity-card {
+      padding: 15px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
+      background: rgba(255,255,255,.045);
+    }
+    .activity-card:hover { border-color: rgba(85,230,165,.26); background: rgba(85,230,165,.055); }
+    .activity-title { color: #f7fffb; font-size: 15px; font-weight: 800; line-height: 1.45; margin-bottom: 9px; }
+    .activity-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+    .activity-meta span {
+      display: inline-flex; align-items: center; min-height: 22px; padding: 2px 7px;
+      border-radius: 6px; background: rgba(255,255,255,.06); color: #d9e8e3; font-size: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .activity-org, .activity-reason { color: #c7d5d0; font-size: 13px; line-height: 1.55; }
+    .activity-reason { margin-top: 6px; color: #aebfba; }
+    .activity-actions { margin-top: 10px; }
+    #region .lead { color: #dcebe6; font-size: 15px; line-height: 1.82; max-width: 1120px; }
+    #region .panel h3 { font-size: 20px; }
+    #region .mini { color: #c7d5d0; font-size: 13px; line-height: 1.7; }
+    #region .matrix { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    #region .province-cell {
+      min-height: 102px; padding: 14px; background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.12);
+    }
+    #region .province-cell strong { font-size: 17px; font-weight: 800; color: #f7fffb; line-height: 1.2; }
+    #region .province-cell span { color: #d7e4df; font-size: 13px; line-height: 1.5; }
+    #region .bar-row { grid-template-columns: 160px 1fr 82px; gap: 14px; font-size: 14px; }
+    #region .bar-row > div:first-child { color: #f6fff9; font-weight: 700; }
+    #region .bar-row > div:last-child { color: #f2faf5; font-weight: 700; text-align: right; }
+    #region .bar-track { height: 12px; background: rgba(255,255,255,.08); }
+    #region .grid-2 { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: start; }
+    #suppliers .grid-2, #platform .grid-2 { align-items: start; }
+    #suppliers .bar-row { grid-template-columns: minmax(220px, 240px) 1fr 42px; gap: 10px; margin: 9px 0; font-size: 12.5px; }
+    #suppliers .bar-row > div:first-child {
+      line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    #suppliers .quality .kpi { min-height: 0; padding: 16px; }
+    #suppliers .quality .kpi .value { font-size: 28px; margin-top: 10px; }
+    #platform .panel { padding: 18px; }
+    #platform .platform-item { padding: 11px 0; }
+    #platform .platform-item-head strong {
+      font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    #platform .platform-item-meta { margin: 6px 0 2px; font-size: 12.5px; }
+    #platform .mini { margin-bottom: 12px; }
+    .footnote { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 24px; }
+    .footer { padding: 34px 6vw; color: var(--muted); font-size: 12px; }
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+      .kpi-grid, .case-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .activity-list { grid-template-columns: 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .matrix { grid-template-columns: repeat(4, minmax(0,1fr)); }
+      .nav { display: none; }
+    }
+    @media (max-width: 640px) {
+      .section, .hero { padding-left: 18px; padding-right: 18px; }
+      .kpi-grid, .case-grid { grid-template-columns: 1fr; }
+      .matrix { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .bar-row { grid-template-columns: 110px 1fr 48px; }
+      .input { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark"></span><span>低空侦测市场数据报告</span></div>
+    <nav class="nav">
+      <a href="#overview">总览</a>
+      <a href="#demand">需求</a>
+      <a href="#region">区域</a>
+      <a href="#equipment">设备</a>
+      <a href="#platform">平台</a>
+      <a href="#cases">案例</a>
+      <a href="#buyers">发包单位</a>
+      <a href="#table">明细</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="overview">
+    <div>
+      <div class="eyebrow">Market Intelligence · 2023-2026 · Public Bidding Samples</div>
+      <h1>侦测产品体系市场项目数据分析报告</h1>
+      <p class="subtitle">基于公开招投标、中标公告、成交公告和合同信息整理的低空侦测反制项目样本库，系统分析需求场景、区域分布、设备形态、重大活动保障、价格锚点和中标单位格局，为浙大启真低空安全运营产品体系提供市场证据。</p>
+      <div class="hero-actions">
+        <span class="pill">样本口径：中标/成交/合同</span>
+        <span class="pill">不倒推未披露数量</span>
+        <span class="pill">官方来源与转载来源分级标注</span>
+        <span class="pill">生成时间：2026-05-22 17:02</span>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">结构化项目样本</div><div class="value">165</div><div class="note">2023-2026年公开可检索中标、成交和合同记录</div></div>
+        <div class="kpi"><div class="label">覆盖省级区域</div><div class="value">29</div><div class="note">含脱敏未识别样本，独立留痕不强行归省</div></div>
+        <div class="kpi"><div class="label">可解析金额合计</div><div class="value">13110.38</div><div class="note">万元，73 条可解析金额，均值约 179.59 万元</div></div>
+        <div class="kpi"><div class="label">设备明细行</div><div class="value">181</div><div class="note">按设备名称、类型、数量、品牌、型号拆分</div></div>
+      </div>
+    </div>
+    <div class="city-panel" aria-label="未来城市低空安全示意图">
+      <svg class="city-svg" viewBox="0 0 760 520" role="img">
+        <defs>
+          <linearGradient id="beam" x1="0" x2="1">
+            <stop offset="0" stop-color="#55e6a5" stop-opacity=".9"/>
+            <stop offset="1" stop-color="#4fd7ff" stop-opacity=".25"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="760" height="520" fill="rgba(8,13,12,.25)"/>
+        <g stroke="rgba(85,230,165,.18)" stroke-width="1">
+          <path d="M40 420 C180 300 320 490 500 330 S710 250 740 180" fill="none"/>
+          <path d="M20 120 C200 210 380 70 720 150" fill="none"/>
+          <path d="M80 260 H700"/>
+          <path d="M120 70 V470 M240 50 V470 M360 30 V470 M480 50 V470 M600 80 V470"/>
+        </g>
+        <g fill="rgba(85,230,165,.12)" stroke="rgba(85,230,165,.45)">
+          <rect x="70" y="315" width="72" height="145"/><rect x="160" y="250" width="88" height="210"/>
+          <rect x="270" y="340" width="55" height="120"/><rect x="345" y="205" width="92" height="255"/>
+          <rect x="460" y="285" width="74" height="175"/><rect x="552" y="230" width="110" height="230"/>
+        </g>
+        <g stroke="url(#beam)" stroke-width="2" fill="none">
+          <circle cx="380" cy="252" r="72"/><circle cx="380" cy="252" r="132" opacity=".65"/><circle cx="380" cy="252" r="198" opacity=".35"/>
+        </g>
+        <g fill="#4fd7ff">
+          <circle cx="222" cy="152" r="4"/><circle cx="598" cy="118" r="4"/><circle cx="500" cy="304" r="4"/>
+        </g>
+        <g stroke="#f5c15d" stroke-width="2" fill="none">
+          <path d="M222 152 l20 -8 l-10 24 z"/><path d="M598 118 l22 6 l-20 16 z"/>
+        </g>
+        <g fill="rgba(255,255,255,.9)" font-size="18" font-family="Arial">
+          <text x="42" y="44">Low Altitude Security Grid</text>
+          <text x="406" y="252" font-size="13" fill="#aef7d5">Fusion Center</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section" id="conclusions">
+    <div class="section-head">
+      <div>
+        <h2>核心判断</h2>
+        <p class="lead">公开项目样本显示，低空侦测反制市场已经进入订单验证期。采购对象从单点硬件，扩展为系统平台、租赁服务、重大活动保障、敏感目标防护和城市级低空治理能力。</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="insight"><b>判断一：</b>常态巡防是基本盘。公安、特警、分局、警用装备、低空管控前端等项目构成最大样本，占据项目数量主体。</div>
+      <div class="insight"><b>判断二：</b>重大活动样本需分层查看。当前库中显性重大活动项目为12条，另有18条服务、租赁、装备或平台相关记录；后者只作为相关样本保留，不直接推断采购动机或实际用途。</div>
+      <div class="insight"><b>判断三：</b>系统和服务正在抬头。系统平台/管控软件涉及36个项目，服务/租赁涉及13个项目，说明客户正在购买持续能力而非一次性设备。</div>
+    </div>
+  </section>
+
+  <section class="section" id="demand">
+    <div class="section-head">
+      <div>
+        <h2>需求类别结构</h2>
+        <p class="lead">按业务场景划分为日常巡防、重大活动保障、园区运营、敏感目标防护和应急处置。分类采用主需求+兼具需求口径，避免把复合型采购误判为单一场景，点击条形可下钻到项目明细。</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>项目数量分布</h3>
+        <div class="mini">日常巡防为底座，敏感目标防护为刚需，重大活动保障具有强宣传和快速成交属性。</div>
+        <div id="demandBars"></div>
+      </div>
+      <div class="panel">
+        <h3>金额分布</h3>
+        <div class="mini">仅统计可解析金额项目，未披露金额不作估算。</div>
+        <div id="demandAmountBars"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px;">
+      <div class="drill-head">
+        <div>
+          <h3>需求类别下钻</h3>
+          <div class="mini">点击左侧数量条或右侧金额条，查看该需求类别对应的项目明细、地区分布和代表项目。</div>
+        </div>
+        <div class="badge" id="demandDrillBadge">等待选择</div>
+      </div>
+      <div id="demandDrilldown" class="mini">先点任一需求类别，我会把该场景下的项目展开给你看。</div>
+    </div>
+  </section>
+
+  <section class="section" id="region">
+    <div class="section-head">
+      <div>
+        <h2>区域热力与市场优先级</h2>
+        <p class="lead">省份分析优先看可解析金额总量，项目数只作辅助参考。浙江、四川、广东、内蒙古、江苏等地在金额表现上更突出；未识别样本多来自脱敏军警或转载平台，不强行归省，点击省份格子或条形可下钻。</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>省份项目热力矩阵</h3>
+        <div class="mini">颜色越亮代表可解析金额越高，格内同时保留项目数作为辅助信息。</div>
+        <div class="matrix" id="provinceMatrix"></div>
+      </div>
+      <div class="panel">
+        <h3>TOP金额省份</h3>
+        <div id="provinceBars"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px;">
+      <div class="drill-head">
+        <div>
+          <h3>区域热力下钻</h3>
+          <div class="mini">点击省份格子或金额条，查看该区域的项目数、金额、需求结构和代表项目。</div>
+        </div>
+        <div class="badge" id="regionDrillBadge">等待选择</div>
+      </div>
+      <div id="regionDrilldown" class="mini">先点任一省份，我会展开该省的项目明细。</div>
+    </div>
+  </section>
+
+  <section class="section" id="equipment">
+    <div class="section-head">
+      <div>
+        <h2>设备与能力形态</h2>
+        <p class="lead">设备明细不对未披露台套数做经验倒推。租赁和保障项目按1项服务记录，具体设备数量以采购文件或响应文件为准；点击设备类型或能力形态可下钻。</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>设备类型结构</h3>
+        <div class="mini">按设备类型统计项目数，点击可查看对应项目清单。</div>
+        <div id="equipmentBars"></div>
+      </div>
+      <div class="panel">
+        <h3>能力形态结构</h3>
+        <div class="mini">按软硬件属性统计项目数，展示采购更偏硬件、平台还是服务。</div>
+        <div id="capabilityBars"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px;">
+      <div class="drill-head">
+        <div>
+          <h3>设备与能力下钻</h3>
+          <div class="mini">点击设备类型或能力形态，查看该形态对应的项目明细、区域分布和代表项目。</div>
+        </div>
+        <div class="badge" id="equipmentDrillBadge">等待选择</div>
+      </div>
+      <div id="equipmentDrilldown" class="mini">先点任一设备类型或能力形态，我会把对应项目列出来。</div>
+    </div>
+  </section>
+
+  <section class="section" id="platform">
+    <div class="section-head">
+      <div>
+        <h2>信息化平台项目历年合同额趋势</h2>
+        <p class="lead">以“平台、系统、管控、指控、显控、低空云、智联、融合、信息化、数字孪生、态势、服务平台”为关键词筛选的平台类项目共72条，其中38条披露金额，合计9255.74万元，占全部可解析金额的70.6%。2025年是明显放量拐点，2026年仅为截至当前样本截面，不宜与完整年度直接对比。</p>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">平台类项目</div><div class="value">72</div><div class="note">关键词口径筛选后的项目总数</div></div>
+      <div class="kpi"><div class="label">可解析金额项目</div><div class="value">38</div><div class="note">披露金额并可用于趋势统计</div></div>
+      <div class="kpi"><div class="label">合同额合计</div><div class="value">9255.74</div><div class="note">万元，均值约 243.57 万元/项</div></div>
+      <div class="kpi"><div class="label">2024-2025增幅</div><div class="value">1810.5%</div><div class="note">2025年相较2024年出现明显放量</div></div>
+    </div>
+    <div class="grid-2" style="margin-top:18px;">
+      <div class="panel">
+        <h3>年度合同额走势</h3>
+        <div class="mini">按可解析金额项目统计，2026年仅为当前样本截面。</div>
+        <div class="trend-row"><div class="trend-meta"><strong>2023</strong><span>2 个项目 · 占当年可解析金额 21.4%</span></div><div class="bar-track"><div class="bar-fill violet" style="width:2.5%"></div></div><div class="trend-value">153.10 万元</div></div>
+<div class="trend-row"><div class="trend-meta"><strong>2024</strong><span>5 个项目 · 占当年可解析金额 19.4%</span></div><div class="bar-track"><div class="bar-fill violet" style="width:5.2%"></div></div><div class="trend-value">316.24 万元</div></div>
+<div class="trend-row"><div class="trend-meta"><strong>2025</strong><span>22 个项目 · 占当年可解析金额 85.2%</span></div><div class="bar-track"><div class="bar-fill violet" style="width:100%"></div></div><div class="trend-value">6041.90 万元</div></div>
+<div class="trend-row"><div class="trend-meta"><strong>2026</strong><span>9 个项目 · 截至当前样本截面</span></div><div class="bar-track"><div class="bar-fill violet" style="width:45.4%"></div></div><div class="trend-value">2744.50 万元</div></div>
+      </div>
+      <div class="panel">
+        <h3>代表性平台项目</h3>
+        <div class="mini">按金额排序，便于识别高金额项目和供应商结构。</div>
+        <div class="platform-item"><div class="platform-item-head"><span class="badge">2025</span><strong>厦门低空综合管理服务平台及一网统飞运营平台项目</strong></div><div class="platform-item-meta">1757.18 万元 · 福建</div><div class="mini">中科星图股份有限公司、厦门兆翔智能科技有限公司联合体</div></div>
+<div class="platform-item"><div class="platform-item-head"><span class="badge">2025</span><strong>临安区低空综合治理应用集成一期项目</strong></div><div class="platform-item-meta">739.88 万元 · 浙江</div><div class="mini">浙江众合科技股份有限公司</div></div>
+<div class="platform-item"><div class="platform-item-head"><span class="badge">2026</span><strong>兰州新区低空飞行设施设备建设项目低空安全监管平台项目</strong></div><div class="platform-item-meta">566.16 万元 · 甘肃</div><div class="mini">杰能科世智能安全科技（杭州）有限公司</div></div>
+<div class="platform-item"><div class="platform-item-head"><span class="badge">2026</span><strong>准格尔旗公安低空数字警务项目2026年采购</strong></div><div class="platform-item-meta">485.86 万元 · 内蒙古</div><div class="mini">鄂尔多斯市低空经济开发有限公司</div></div>
+<div class="platform-item"><div class="platform-item-head"><span class="badge">2025</span><strong>杭州市低空综合管理服务平台20公共安防管理端开发服务采购项目</strong></div><div class="platform-item-meta">458.00 万元 · 浙江</div><div class="mini">浙江众合科技股份有限公司</div></div>
+<div class="platform-item"><div class="platform-item-head"><span class="badge">2025</span><strong>广东省茂名监狱低空域智能警戒巡防系统采购项目</strong></div><div class="platform-item-meta">425.52 万元 · 广东</div><div class="mini">中国电信股份有限公司广东分公司</div></div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:18px;">
+      <div class="insight"><b>阶段一：</b>2023年平台类项目只有1个、102.10万元，还是起步期。</div>
+      <div class="insight"><b>阶段二：</b>2024年升至4个、237.44万元，较2023年增长约106.6%。</div>
+      <div class="insight"><b>阶段三：</b>2025年跳升至11个、1500.66万元，较2024年增长约1810.5%，平台化采购明显加速。</div>
+      <div class="insight"><b>阶段四：</b>2026年已有3个、671.98万元，但样本仍是截面数据，不能直接按全年比较。</div>
+      <div class="insight"><b>判断：</b>信息化平台类项目的合同额演变，比纯设备采购更像“先试点、后集成、再放量”的曲线。</div>
+      <div class="insight"><b>提示：</b>若后续继续扩样，平台项目的增长更可能来自系统联动、管控软件和城市级运营平台，而不只是单一硬件。</div>
+    </div>
+  </section>
+
+  <section class="section" id="activity">
+    <div class="section-head">
+      <div>
+        <h2>重大活动保障相关样本</h2>
+        <p class="lead">本区只展示公开项目字段、证据摘要和来源链接状态。显性样本与相关装备服务样本分开查看；相关样本不等同于实际用于重大活动，也不据此推断采购动机。</p>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi drillable active" role="button" tabindex="0" data-major-target="all" title="点击查看全部样本"><div class="label">相关样本记录</div><div class="value">30</div><div class="note">仅作样本清单展示 <span class="click-hint">点击查看</span></div></div>
+      <div class="kpi drillable" role="button" tabindex="0" data-major-target="文本显性样本" title="点击查看文本显性样本"><div class="label">文本显性样本</div><div class="value">12</div><div class="note">标题或正文直接出现活动/赛事/场馆等信息 <span class="click-hint">点击查看</span></div></div>
+      <div class="kpi drillable" role="button" tabindex="0" data-major-target="服务/租赁相关样本" title="点击查看服务/租赁相关样本"><div class="label">服务/租赁相关</div><div class="value">7</div><div class="note">按原表字段保留，不外推用途 <span class="click-hint">点击查看</span></div></div>
+      <div class="kpi drillable" role="button" tabindex="0" data-major-target="装备/平台相关样本" title="点击查看装备/平台相关样本"><div class="label">装备/平台相关</div><div class="value">11</div><div class="note">按原表字段保留，不外推用途 <span class="click-hint">点击查看</span></div></div>
+    </div>
+    <div class="panel" style="margin-top:18px;">
+      <div class="drill-head">
+        <div>
+          <h3>活动保障样本下钻</h3>
+          <div class="mini">点击上方任一指标即可切换。这里只展示公开记录字段和证据摘要，不额外归纳项目用途。</div>
+        </div>
+        <div class="badge" id="majorDrillBadge">等待选择</div>
+      </div>
+      <div id="majorDrilldown" class="mini">点击上方标签，查看项目字段和证据摘要。</div>
+    </div>
+  </section>
+
+  <section class="section" id="cases">
+    <div class="section-head">
+      <div>
+        <h2>代表项目案例</h2>
+        <p class="lead">以下案例按最新项目库重选，用于理解价格锚点、设备组合、服务采购、城市平台和浙江本地市场机会。</p>
+      </div>
+    </div>
+    <div class="case-grid">
+      <div class="case-card"><div class="tag">浙江平台 &#183; 最新</div><h4>杭州市低空综合管理服务平台2.0项目</h4><p>城市级低空平台、交通监管和飞行服务审批模块已进入真实中标样本，说明平台型需求正在扩张。</p></div>
+<div class="case-card"><div class="tag">浙江安全 &#183; 服务</div><h4>杭州市临安区JW无人机低空安全保障服务项目</h4><p>成交/中标金额207.6800万元，中标单位杭州临安数智城市发展有限公司。适合对外沟通浙江本地低空安全运营服务的价格和交付方式。</p></div>
+<div class="case-card"><div class="tag">数字警务 &#183; 2026</div><h4>准格尔旗公安低空数字警务项目2026年采购</h4><p>成交/中标金额485.8614万元，中标单位鄂尔多斯市低空经济开发有限公司。2026年重采样本应优先展示最新中标单位和平台化组合能力；2025年历史中标样本可保留在底层库作对照。</p></div>
+<div class="case-card"><div class="tag">边疆公安 &#183; 官方</div><h4>昌都市公安局采购低空安全反无人机系统项目</h4><p>成交/中标金额212.9000万元，中标单位中国电信集团有限公司昌都分公司。体现边疆公安低空安全场景对侦测、预警和处置一体化能力的需求。</p></div>
+<div class="case-card"><div class="tag">敏感目标 &#183; 监所</div><h4>广东省茂名监狱低空域智能警戒巡防系统采购项目</h4><p>成交/中标金额425.5200万元，中标单位中国电信股份有限公司广东分公司。监狱、核电、石化等敏感目标的低空警戒巡防已进入系统化采购阶段。</p></div>
+<div class="case-card"><div class="tag">公安装备 &#183; 官方</div><h4>南昌市公安局低空安全及反制设备采购项目</h4><p>成交/中标金额124.6600万元，中标单位江西浩德实业有限公司。单点设备采购仍然存在，是县市级公安切入的典型价格带。</p></div>
+<div class="case-card"><div class="tag">运营商 &#183; 平台服务</div><h4>中国铁塔股份有限公司遂宁市分公司2025年低空安全态势感知监管平台服务与无人机监测反制设备采购项目标段2无人机监测反制设备</h4><p>成交/中标金额公开信息未披露，中标单位公开信息未披露。运营商参与低空监管平台和反制设备采购的路径正在变得清晰。</p></div>
+<div class="case-card"><div class="tag">重大活动 &#183; 官方</div><h4>横琴粤澳深度合作区公安局重大活动安保无人机防控服务政府采购项目</h4><p>成交/中标金额157.2875万元，中标单位中国移动通信集团广东有限公司珠海分公司。赛事、会展、活动安保场景更适合以服务包而非一次性硬件形态表达。</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="suppliers">
+    <div class="section-head">
+      <div>
+        <h2>中标单位格局</h2>
+        <p class="lead">公开样本显示，中标方既包括专业低空安全厂商，也包括运营商、系统集成商、本地科技公司。大量项目因脱敏或转载源限制未披露供应商，需持续回溯官方原文。</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>可识别中标单位TOP</h3>
+        <div id="supplierBars"></div>
+      </div>
+      <div class="panel">
+        <h3>数据质量</h3>
+        <div class="quality">
+          <div class="kpi"><div class="label">完整记录</div><div class="value">55</div><div class="note">省份、采购人、金额、供应商、时间、链接较完整</div></div>
+          <div class="kpi"><div class="label">较完整记录</div><div class="value">67</div><div class="note">关键字段较完整但仍有缺项</div></div>
+          <div class="kpi"><div class="label">待复核记录</div><div class="value">43</div><div class="note">脱敏、转载或关键字段不足</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="buyers">
+    <div class="section-head">
+      <div>
+        <h2>发包单位分析</h2>
+        <p class="lead">样本不是单一总盘，而是公安条线、涉密单位、机场能源、园区高校和大量转载脱敏信息交织形成的碎片化市场。不同发包主体的采购语言差异很大，决定了产品包装方式也不能一刀切。</p>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">公安司法与公共安全</div><div class="value">70</div><div class="note">市局、分局、特警、边境、铁路公安、监所等</div></div>
+      <div class="kpi"><div class="label">军队/涉密脱敏单位</div><div class="value">25</div><div class="note">某部、军分区、民兵和涉密脱敏条目</div></div>
+      <div class="kpi"><div class="label">基础设施类主体</div><div class="value">8</div><div class="note">机场、电力、核电、石化、交通等敏感设施</div></div>
+      <div class="kpi"><div class="label">未披露/转载脱敏</div><div class="value">48</div><div class="note">公开摘要不足，需回溯官方原文</div></div>
+    </div>
+    <div class="grid-2" style="margin-top:18px;">
+      <div class="panel">
+        <h3>发包主体类型</h3>
+        <div class="mini">按发包采购单位与项目标题综合归类。<span class="click-hint">点击条形展开具体单位和代表项目</span></div>
+        <div id="buyerCategoryBars"></div>
+      </div>
+      <div class="panel">
+        <h3>重点发包单位</h3>
+        <div class="mini">按公开可识别主体统计，反映高频采购组织者。<span class="click-hint">点击条形查看该单位项目清单</span></div>
+        <div id="buyerTopBars"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px;">
+      <div class="drill-head">
+        <div>
+          <h3>单位下钻</h3>
+          <div class="mini">点击左侧“发包主体类型”或右侧“重点发包单位”查看具体单位清单。</div>
+        </div>
+        <div class="badge" id="buyerDrillBadge">等待选择</div>
+      </div>
+      <div id="buyerDrilldown" class="mini">先点左侧或右侧对应条形，我会把该类发包单位和代表项目展开。</div>
+    </div>
+  </section>
+
+  <section class="section" id="strategy">
+    <div class="section-head">
+      <div>
+        <h2>对浙大启真的产品启示</h2>
+        <p class="lead">市场样本更像是在提醒：这不是一个可以用单一方案概括的市场。不同采购人关心的东西并不一样，有的先看能不能发现，有的先看能不能管住，有的先看能不能快交付，浙大启真最好把这些差异当成产品设计的起点，而不是先套一个统一口径。</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="insight"><b>先分场景，再定产品形态。</b>公安巡防、重大活动、园区运营、敏感目标和应急处置，采购目标差别很大，不能先假定一个“标准版”能覆盖全部。</div>
+      <div class="insight"><b>先解决能稳定交付的部分。</b>发现、告警、留痕、工单这些基础链路更适合先固化，反制、联动和深度运营可以按场景单独扩展。</div>
+      <div class="insight"><b>先把服务能力做出来。</b>不少样本买的不是纯设备，而是租赁、值守、管控和保障，说明客户愿意为持续运行买单。</div>
+      <div class="insight"><b>先把客户语言翻译清楚。</b>公安重秩序和闭环，机场重边界和净空，园区重体验和可复用，涉密单位重权限和留痕，表达方式要跟着变。</div>
+      <div class="insight"><b>先保留组合空间。</b>设备、平台、运营不要一开始就捆死，后续是否自建、合建、租赁或外包，应该留给项目条件决定。</div>
+      <div class="insight"><b>先验证收入结构。</b>如果一次性建设占比过高，而运维、演练、报表和活动保障没有单列，项目后续很容易回到交付导向。</div>
+    </div>
+  </section>
+
+  <section class="section" id="table">
+    <div class="section-head">
+      <div>
+        <h2>项目明细检索</h2>
+        <p class="lead">内嵌165条原始样本，按同项目合并后展示158条项目记录，默认按中标/成交时间倒序排列。可按关键词、需求类别、省份、年份筛选；金额、设备数量、供应商等未披露字段均按公开信息原样留痕。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="table-tools">
+        <input class="input" id="searchInput" placeholder="搜索项目、采购单位、中标单位、设备名称">
+        <select class="select" id="provinceFilter"><option value="">全部省份</option></select>
+        <select class="select" id="demandFilter"><option value="">全部需求类别</option></select>
+        <select class="select" id="yearFilter"><option value="">全部年份</option></select>
+      </div>
+      <div class="link-legend">
+        <span>来源链接校核：125 个可打开，21 个当前暂打不开。</span>
+        <span class="source-link open">可打开</span>
+        <span class="source-link blocked">暂打不开</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>省份</th><th>项目名称</th><th>需求类别</th><th>金额</th><th>中标单位</th><th>时间</th><th>设备/服务</th><th>来源</th></tr></thead>
+          <tbody id="projectTable"></tbody>
+        </table>
+      </div>
+      <div class="footnote">数据口径：公开中标、成交、合同样本。表格默认按时间倒序和同项目合并展示，重复公告、不同转载源或合同/中标结果的同项目条目会归并到同一行，原始165条样本保留在底层数据；未披露金额和数量不做推算。</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    数据文件：全国_低空侦测反制中标项目_2023-2026_全量汇总.csv、按需求分类.csv、设备明细长表.csv、重大活动保障_显性及潜在打包项目.csv。报告为离线单文件，可直接打开审阅。
+  </footer>
+
+  <script>
+    const META = {"totalProjects":165,"provinceCount":29,"officialCount":44,"amountCount":73,"amountTotal":13110.38,"amountAvg":179.59,"fullCount":55,"partialCount":67,"reviewCount":43,"equipmentLineCount":181,"majorPoolCount":30,"explicitMajor":12,"highMajor":7,"midMajor":11,"sourceLinkOpenCount":125,"sourceLinkBlockedCount":21,"generatedAt":"2026-05-22 17:02"};
+    const PROJECTS = [{"项目ID":"LA-2026-0024","省份":"贵州","省内城市区域":"贵阳","项目名称":"贵阳市公安局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"合同公告","发包采购单位":"贵阳市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年5月7日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.okcis.cn/20260507-n3-20260507234734360225.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (403) 已禁止。","排序日期文本":"2026-05-07","核验备注":"修正：原发包采购单位字段误入整段转载摘要，按摘要中明确采购主体更正；具体分局待回溯官方原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0004","省份":"安徽","省内城市区域":"宣城","项目名称":"宣城市公安局低空安全管控装备租赁服务采购项目","主需求类别":"重大活动保障需求","兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"宣城市公安局","项目金额":"167.5000 万元","金额万元":"167.5","承建中标单位":"安徽省通航无人机服务有限公司","中标公告时间":"2026-05-06","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"低空安全管控装备租赁服务","设备类型清单":"服务/租赁","设备数量清单":"低空安全管控装备租赁服务：1项服务","来源链接":"https://ggzyjy.xuancheng.gov.cn/xcspfront/zfcg/017001/017001004/20260506/31e1b449-bf7d-4768-b057-13340e9fabcc.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-05-06","核验备注":"漏检补充；重大活动保障高概率打包项目","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0156","省份":"内蒙古","省内城市区域":"鄂尔多斯鄂托克旗","项目名称":"鄂托克旗公安局低空数字警务装备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"鄂托克旗公安局","项目金额":"273.9268 万元","金额万元":"273.9268","承建中标单位":"内蒙古迅力智能科技有限公司","中标公告时间":"2026-04-14","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.ccgp-neimenggu.gov.cn/gpx-bid-file/ZF_JGBM_000001/150624/2026/2/9/402881e29e8f7417019eef0b02d114dd/gpx-bidconfirm/402881d2a2e2034d01a2ee6ee102015d.pdf?accessCode=8485d3a9c882f5d7750c2e09061f22e3","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2026-04-14","核验备注":"项目名称深度检索补入；公安低空数字警务装备样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0155","省份":"内蒙古","省内城市区域":"鄂尔多斯伊金霍洛旗","项目名称":"伊金霍洛旗公安局低空数字警务设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"伊金霍洛旗公安局","项目金额":"394.8986 万元","金额万元":"394.8986","承建中标单位":"公开信息未披露","中标公告时间":"2026-04-14","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.ccgp-neimenggu.gov.cn/gpx-bid-file/ZF_JGBM_000001/150627/2026/2/19/402881e29f1bab8b019f2a3a764e1b5d/gpx-bidconfirm/402881d2a2e2034d01a329e464d50142.pdf?accessCode=f9e54e286d0c95a3ed97db6c0119d409","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2026-04-14","核验备注":"项目名称深度检索补入；官方PDF中供应商字段需进一步回溯正文确认","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0118","省份":"新疆","省内城市区域":"玛纳斯","项目名称":"玛纳斯县GAJ警用无人机反制设备竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年04月10日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.qianlima.com/bid-588543827.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-10","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[新疆]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0157","省份":"内蒙古","省内城市区域":"鄂尔多斯准格尔旗","项目名称":"准格尔旗公安低空数字警务项目2026年采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"准格尔旗公安局","项目金额":"485.8614 万元","金额万元":"485.8614","承建中标单位":"鄂尔多斯市低空经济开发有限公司","中标公告时间":"2026-04-09","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202604/t20260409_26380092.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-09","核验备注":"项目名称深度检索补入；2026年重新采购样本，替代三维圈弃标后的结果","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0045","省份":"江苏","省内城市区域":"连云港","项目名称":"连云港市公安局车载式无人机反制系统购买","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"连云港市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年4月3日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/article/95096299","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-03","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[江苏]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0053","省份":"辽宁","省内城市区域":"沈阳","项目名称":"沈阳铁路公安局无人机反制系统采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"沈阳铁路公安局","项目金额":"224.9850 万元","金额万元":"224.985","承建中标单位":"北京延创科技有限责任公司","中标公告时间":"2026年4月3日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/article/95098321","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-03","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[辽宁]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0104","省份":"未识别","省内城市区域":"未识别","项目名称":"固定式无人机反制设备采购竞价成交公告竞价公告采购与招标网www","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年4月2日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.chinabidding.cn/zbgs/U-vzrodMB.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-02","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0048","省份":"江西","省内城市区域":"崇仁","项目名称":"崇仁县公安局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"崇仁县公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年4月1日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.ixbang.com/bid/detail/3C831D33919D937FC2E8DA122B0151D4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-04-01","核验备注":"修正：原发包采购单位字段误入整段转载摘要，按摘要中“崇仁县公安局”更正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0027","省份":"河北","省内城市区域":"秦皇岛","项目名称":"秦皇岛市公安局无人机管控前端系统升级项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"秦皇岛市公安局","项目金额":"279.5000 万元","金额万元":"279.5","承建中标单位":"中国铁塔股份有限公司秦皇岛市分公司、河北梓墨电子科技有限公司","中标公告时间":"2026-03-30","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机管控前端系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.aamshanghai.com/jiangsu-yancheng-low-drone-bidding.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-03-30","核验备注":"补充检索新增；常态化管控类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0147","省份":"甘肃","省内城市区域":"兰州新区","项目名称":"兰州新区低空飞行设施设备建设项目低空安全监管平台项目","主需求类别":"园区运营需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"兰州新区科技创新发展管理有限公司","项目金额":"566.1600 万元","金额万元":"566.16","承建中标单位":"杰能科世智能安全科技（杭州）有限公司","中标公告时间":"2026-03-25","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"低空安全监管平台","设备类型清单":"系统平台/管控软件","设备数量清单":"低空安全监管平台：1项","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-03-25","核验备注":"用户补充的兰州新区竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0119","省份":"新疆","省内城市区域":"未识别","项目名称":"无人机反制系统设备采购项目采购结果公示2026JLJFECW1001中标","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年3月25日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://rl.zhaobiao.cn/succeed_v_7ecc2fca91799410860f6baa0ac780d5.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (521)。","排序日期文本":"2026-03-25","核验备注":"依据项目名/采购人/证据摘要从[未识别]校正为[新疆]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0025","省份":"贵州","省内城市区域":"未识别","项目名称":"无人机反制系统采购项目中标成交结果公示","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年3月24日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.okcis.cn/20260324-n3-20260324160318206335.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (403) 已禁止。","排序日期文本":"2026-03-24","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0046","省份":"江苏","省内城市区域":"南京","项目名称":"江苏省龙潭监狱无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"江苏省龙潭监狱","项目金额":"2.8789 万元","金额万元":"2.8789","承建中标单位":"南京冠航智能科技有限公司","中标公告时间":"2026-02-06","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-02-06","核验备注":"补充检索新增；监狱敏感目标类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0139","省份":"重庆","省内城市区域":"南岸","项目名称":"2026年无人机反制设备租赁服务","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"40.0000 万元","金额万元":"40.0","承建中标单位":"中虎****公司","中标公告时间":"2026-02-06","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备租赁服务","设备类型清单":"服务/租赁","设备数量清单":"无人机反制设备租赁服务：1项服务","来源链接":"https://www.falvzhaobiao.com/news-38a5efd5bedc1d00e77ff254b07f2ecb/","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-02-06","核验备注":"漏检补充；租赁服务高概率打包项目，字段脱敏待复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0003","省份":"安徽","省内城市区域":"黄山","项目名称":"黄山市公安局黄山分局H2LPro手持式无人机探测定位设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"黄山市公安局黄山分局","项目金额":"6.0000 万元","金额万元":"6.0","承建中标单位":"公开信息未披露","中标公告时间":"2026-02-02","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"H2LPro手持式无人机探测定位设备","设备类型清单":"侦测探测设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-02-02","核验备注":"补充检索新增；待回溯官方原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0034","省份":"湖南","省内城市区域":"长沙","项目名称":"长沙市公安局天心分局警保卫大队关于无人机反制服务的竞价竞价","主需求类别":"重大活动保障需求","兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年01月28日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制服务","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.chinamae.com/purchases/e6acdaa5c2b53548354b67324ab1c7e8.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-28","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[湖南]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0105","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机及无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年1月27日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-403044302-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-27","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0138","省份":"浙江","省内城市区域":"普陀","项目名称":"舟山市公安局普陀区分局无人机低空反制设备采购合同","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"合同公告","发包采购单位":"舟山市公安局普陀区分局","项目金额":"302.2722 万元","金额万元":"302.2722","承建中标单位":"中国移动通信集团浙江有限公司舟山分公司","中标公告时间":"2026-01-23","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机低空反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-23","核验备注":"人工核验补充；待回溯浙江政府采购合同原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0049","省份":"江西","省内城市区域":"南昌","项目名称":"赣江新区公安局无人机侦测预警设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"赣江新区公安局","项目金额":"92.5000 万元","金额万元":"92.5","承建中标单位":"鉴真防务技术（上海）有限公司","中标公告时间":"2026-01-20","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-20","核验备注":"人工核验补充；待回溯江西公共资源原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0019","省份":"广东","省内城市区域":"深圳","项目名称":"深圳市公安局罗湖分局2025年下半年分局无人机及侦测反制设备采购项目重新招标","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"深圳市公安局罗湖分局","项目金额":"331.9600 万元","金额万元":"331.96","承建中标单位":"中科星图股份有限公司","中标公告时间":"2026-01-19","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.aamshanghai.com/jiangsu-yancheng-low-drone-bidding.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-19","核验备注":"人工核验补充；待回溯深圳政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0032","省份":"黑龙江","省内城市区域":"绥化","项目名称":"绥化市公安局无人机与无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"绥化市公安局","项目金额":"157.8189 万元","金额万元":"157.8189","承建中标单位":"黑龙江省铭腾科技有限公司","中标公告时间":"2026-01-16","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测探测设备","设备数量清单":"","来源链接":"https://m.sohu.com/a/976721051_122434053","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-16","核验备注":"人工核验补充；待回溯黑龙江政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0163","省份":"重庆","省内城市区域":"江北","项目名称":"重庆市公安局江北区分局所需低空安全防御服务项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"重庆市公安局江北区分局","项目金额":"67.8000 万元","金额万元":"67.8","承建中标单位":"重庆晟楠科技有限公司","中标公告时间":"2026-01-07","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制/低空管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制/低空管控服务：1项服务","来源链接":"https://www.bibenet.com/zfcg33349358.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-07","核验备注":"项目名称深度检索补入；低空安全防御服务和反制装备服务样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0143","省份":"内蒙古","省内城市区域":"林西","项目名称":"林西县公安局特种指挥车辆及无人机反制设备项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"林西县公安局","项目金额":"283.8680 万元","金额万元":"283.868","承建中标单位":"内蒙古隆昱祥科技有限公司","中标公告时间":"2026-01-06","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制设备（一）；无人机反制设备（二）","设备类型清单":"侦测反制装备/设备","设备数量清单":"无人机反制设备（一）：1项；无人机反制设备（二）：1项","来源链接":"https://www.ccgp-neimenggu.gov.cn/gpx-bid-file/ZF_JGBM_000001/150424/2025/12/8/402881e29a8668d8019afbe4c8147e19/gpx-bidconfirm/402881d29b2683a9019b924d25b44e4c.pdf?accessCode=a6f3937094db472eaad9ad6cad006eef","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-06","核验备注":"竞品驱动补充；品牌命中上海特金","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0058","省份":"内蒙古","省内城市区域":"未识别","项目名称":"特种指挥车辆及无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年1月6日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-399071504-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-06","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0078","省份":"陕西","省内城市区域":"西安咸阳","项目名称":"西安咸阳国际机场股份有限公司无人机反制车租赁项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"西安咸阳国际机场股份有限公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年1月5日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制车","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-398824934-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-05","核验备注":"修正：原承建中标单位字段误入“中国采招网于2026年01月05日发布...”平台发布语，已改为公开信息未披露","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2026-0106","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年1月4日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-398309565-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2026-01-04","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0165","省份":"四川","省内城市区域":"泸州泸县","项目名称":"泸县蜀警飞鹰低空警务建设项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"泸县公安局","项目金额":"69.9510 万元","金额万元":"69.951","承建中标单位":"四川中移通信技术工程有限公司","中标公告时间":"2025-12-30","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://sc.zhiliaobiaoxun.com/article/87732199","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-30","核验备注":"项目名称深度检索补入；低空警务建设且含侦测/干扰/管理平台","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0162","省份":"云南","省内城市区域":"昆明","项目名称":"昆明市公安局低空安全实战应用平台建设项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"昆明市公安局","项目金额":"114.8000 万元","金额万元":"114.8","承建中标单位":"公安部第三研究所","中标公告时间":"2025-12-29","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bbda.com/bidDetail/db58c36bfc33d74cab3babbc5873428a962b7739ded9e70b6b12d688c0f6ad35.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-29","核验备注":"项目名称深度检索补入；低空安全实战应用平台样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0166","省份":"福建","省内城市区域":"泉州南安","项目名称":"南安市低空空域智能管控系统采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中国铁路通信信号股份有限公司","中标公告时间":"2025-12-26","年份":"2025","来源等级":"B-公开转载/企业公告","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.crsc.cn/8961.html","来源链接状态":"暂打不开","来源链接说明":"请求被中止: 未能创建 SSL/TLS 安全通道。","排序日期文本":"2025-12-26","核验备注":"项目名称深度检索补入；低空空域智能管控系统样本，金额待核验","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0067","省份":"山西","省内城市区域":"保德","项目名称":"保德县无人机反制设备采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月18日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://sxs.bidcenter.com.cn/zbcontent-395864964-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-18","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0146","省份":"甘肃","省内城市区域":"兰州","项目名称":"甘肃省公安厅机场公安局无人机无源侦测反制系统升级及硬件设备采购项目二次","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"甘肃省公安厅机场公安局","项目金额":"96.0000 万元","金额万元":"96.0","承建中标单位":"杰能科世智能安全科技（杭州）有限公司","中标公告时间":"2025-12-17","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机无源侦测反制系统升级；无人机无源侦测反制硬件设备","设备类型清单":"系统平台/管控软件；侦测反制装备/设备","设备数量清单":"无人机无源侦测反制系统升级：1项；无人机无源侦测反制硬件设备：1项","来源链接":"https://wap.tezhongzhuangbei.com/cjzb_nr_1287056.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-17","核验备注":"用户补充的机场公安竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0069","省份":"山西","省内城市区域":"太原","项目名称":"保德县公安局无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"保德县公安局","项目金额":"41.7000 万元","金额万元":"41.7","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月17日","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202512/t20251217_25943334.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-17","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0074","省份":"陕西","省内城市区域":"未识别","项目名称":"无人机反制设备采购结果公告2025JKFDLBW3023","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"26.4900 万元","金额万元":"26.49","承建中标单位":"天津云翔无人机科技有限公司","中标公告时间":"2025年12月17日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/detail/495198984b24e40eaabd.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-17","核验备注":"修正：原省内城市区域误取供应商所在地“天津”，改为未识别；补入公开摘要披露的第一名供应商和报价","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0115","省份":"新疆","省内城市区域":"墨玉","项目名称":"墨玉县某单位无人机及反制设备二次中标结果采招网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月17日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-396480806-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-17","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0164","省份":"浙江","省内城市区域":"杭州临安","项目名称":"杭州市临安区JW无人机低空安全保障服务项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"杭州市公安局临安区分局","项目金额":"207.6800 万元","金额万元":"207.68","承建中标单位":"杭州临安数智城市发展有限公司","中标公告时间":"2025-12-16","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制/低空管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制/低空管控服务：1项服务","来源链接":"https://m.sohu.com/a/965769224_122434053","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-16","核验备注":"项目名称深度检索补入；公安无人机低空安全保障服务样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0015","省份":"广东","省内城市区域":"惠州","项目名称":"惠州市公安局大亚湾经济技术开发区分局大亚湾石化区天海地一体化综合防控系统建设项目第二次","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"惠州市公安局大亚湾经济技术开发区分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025-12-15","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"低空防御雷达显控软件；无人机防御察打一体机","设备类型清单":"系统平台/管控软件；察打一体侦测反制设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-15","核验备注":"补充检索新增；石化区敏感目标类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0055","省份":"内蒙古","省内城市区域":"呼和浩特","项目名称":"呼和浩特市某单位无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中科星图慧安科技有限公司","中标公告时间":"2025年12月15日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.chinabidding.cn/zbgs/U-vzeIGYx.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-15","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0149","省份":"浙江","省内城市区域":"杭州临安","项目名称":"临安区低空综合治理应用集成一期项目","主需求类别":"日常巡防需求","兼具需求类别":"园区运营需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"杭州临安智瀚大数据科技有限公司","项目金额":"739.8800 万元","金额万元":"739.88","承建中标单位":"浙江众合科技股份有限公司","中标公告时间":"2025-12-15","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://stock.stockstar.com/RB2025121800016028.shtml","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-15","核验备注":"用户补充的区域级低空治理竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0095","省份":"未识别","省内城市区域":"未识别","项目名称":"关于无人机侦测反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月14日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/detail/494886464b2e65eaeaed.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-14","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0016","省份":"广东","省内城市区域":"江门台山","项目名称":"台山核电低空防御系统相关设备采购成交项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"台山核电合营有限公司/中广核相关单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中广核数字科技有限公司","中标公告时间":"2025-12-12","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"低空防御系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-12","核验备注":"补充检索新增；核电敏感目标类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0134","省份":"浙江","省内城市区域":"丽水","项目名称":"丽水市公安局丽水机场低空防御服务项目合同","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"合同公告","发包采购单位":"丽水市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中国移动通信集团浙江有限公司丽水分公司","中标公告时间":"2025-12-11","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"低空防御服务","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-11","核验备注":"补充检索新增；机场敏感目标类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0014","省份":"广东","省内城市区域":"广州","项目名称":"南方电网公司2025年第三批无人机设备及相关附件框架采购项目固定式无人机主动防御系统便携式无人机反制装置","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"中国南方电网有限责任公司/南方电网供应链集团有限公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"南方电网电力科技股份有限公司","中标公告时间":"2025-12-09","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"固定式无人机主动防御系统；便携式无人机反制装置","设备类型清单":"固定式反制/防御设备；便携/手持反制设备","设备数量清单":"","来源链接":"https://www.bidding.csg.cn/zbhxrgs/1200396902.jhtml","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2025-12-09","核验备注":"补充检索新增；能源敏感目标类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0047","省份":"江西","省内城市区域":"南昌","项目名称":"南昌市无人机反制装备项目采购公告竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"10.4500 万元","金额万元":"10.45","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月9日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://jx.bidcenter.com.cn/zbcontent-394187096-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-09","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0153","省份":"四川","省内城市区域":"遂宁","项目名称":"中国铁塔股份有限公司遂宁市分公司2025年低空安全态势感知监管平台服务与无人机监测反制设备采购项目标段1平台服务","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"中国铁塔股份有限公司遂宁市分公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"四川泰睿通信工程有限公司","中标公告时间":"2025-12-05","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://ebid.chinatowercom.cn/zgtt/gggs/003004/20251205/5a590d57-e9d9-47f9-868e-6cb6db3f4e96.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2025-12-05","核验备注":"项目名称深度检索补入；低空安全态势感知监管平台服务样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0154","省份":"四川","省内城市区域":"遂宁","项目名称":"中国铁塔股份有限公司遂宁市分公司2025年低空安全态势感知监管平台服务与无人机监测反制设备采购项目标段2无人机监测反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"中国铁塔股份有限公司遂宁市分公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025-12-05","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zchxzb.com/info/202512/7054297.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2025-12-05","核验备注":"项目名称深度检索补入；设备标段供应商字段待进一步核验","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0132","省份":"浙江","省内城市区域":"杭州","项目名称":"浙江警官职业学院监狱无人机探测与反制实训系统建设项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"浙江警官职业学院","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025-12-04","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机探测与反制实训系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zjjy.com.cn/info/1068/40874.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-04","核验备注":"补充检索新增；敏感目标/实训系统类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0094","省份":"未识别","省内城市区域":"未识别","项目名称":"车载无人机反制系统改装","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月3日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-393042941-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-03","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0002","省份":"安徽","省内城市区域":"未识别","项目名称":"无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"安徽中云智能科技有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://hunan.bidizhaobiao.com/info-750910893.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0010","省份":"甘肃","省内城市区域":"未识别","项目名称":"无人机反制系统采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"186.0544 万元","金额万元":"186.0544","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://gs.bidizhaobiao.com/info-752059557.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[甘肃]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0017","省份":"广东","省内城市区域":"深圳","项目名称":"东部电厂固定式无人机反制防御系统设备采购","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"合同公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"深圳能源集团股份有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://gd.bidizhaobiao.com/info-723547342.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0020","省份":"广西","省内城市区域":"钦州","项目名称":"钦州市某单位采购无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"广西正阳科技发展有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://gx.bidizhaobiao.com/info-736635266.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0042","省份":"江苏","省内城市区域":"未识别","项目名称":"某单位无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://js.bidizhaobiao.com/info-747498015.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0043","省份":"江苏","省内城市区域":"未识别","项目名称":"无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"江苏中瀚工程项目管理咨询有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制/低空管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制/低空管控服务：1项服务","来源链接":"https://js.bidizhaobiao.com/info-527019076.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0044","省份":"江苏","省内城市区域":"未识别","项目名称":"无人机反制设备采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"236000.00 (元)","金额万元":"","承建中标单位":"云上筋斗(南京)科技有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://shaanxi.bidizhaobiao.com/info-745858052.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"依据项目名/采购人/证据摘要从[陕西]校正为[江苏]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0051","省份":"辽宁","省内城市区域":"未识别","项目名称":"无人机反制设备采购中标公告辽宁招标网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://ln.bidizhaobiao.com/info-759674880.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0057","省份":"内蒙古","省内城市区域":"未识别","项目名称":"某部采购无人机反制设备","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://nmg.bidizhaobiao.com/info-715218996.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0060","省份":"青海","省内城市区域":"未识别","项目名称":"某单位无人机反制系统采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://qh.bidizhaobiao.com/info-725700531.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0072","省份":"陕西","省内城市区域":"陕西省","项目名称":"购买无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://shaanxi.bidizhaobiao.com/info-717597249.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0076","省份":"陕西","省内城市区域":"未识别","项目名称":"无人机反制设备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"38800.00 (元)","金额万元":"","承建中标单位":"北京中宇万通科技股份有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://shaanxi.bidizhaobiao.com/info-729987342.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[陕西]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0102","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制系统采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://bj.bidizhaobiao.com/info-715431177.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0114","省份":"新疆","省内城市区域":"克州","项目名称":"克州GAJ特警支队无人机反制侦测相关设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"合同公告","发包采购单位":"克州GAJ（特警支队）","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"新疆尚维飞创电子科技有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"手持无人机侦测设备","设备类型清单":"侦测探测设备","设备数量清单":"手持无人机侦测设备：4套","来源链接":"https://xj.bidizhaobiao.com/info-599920271.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-12-01","核验备注":"修正：原发包采购单位字段误入整段合同摘要，保留可识别采购主体和供应商","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0075","省份":"陕西","省内城市区域":"铜川","项目名称":"铜川市公安局无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"合同公告","发包采购单位":"铜川市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"北京历正科技有限责任公司","中标公告时间":"2025-11-27","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.ccgp-shaanxi.gov.cn/gpx-bid-file/ZF_JGBM_000003/610201/2025/11/27/8a69c6d69aa4903f019abde646f72230/gpx-bidconfirm/8a69c5549a644c2c019b347948ff3a9a.pdf?accessCode=4866108c672b419e9b624d67ca946cd0","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-27","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0006","省份":"北京","省内城市区域":"石景山","项目名称":"无人机领域综合科研专项无人机学院实验室建设采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"北京君锋泰业科技有限公司","中标公告时间":"2025-11-21","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"低空防御管控平台；无人机管制干扰枪","设备类型清单":"系统平台/管控软件；便携/手持反制设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-21","核验备注":"补充检索新增；科研/实训平台类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0133","省份":"浙江","省内城市区域":"柯桥","项目名称":"柯桥区无人机反制设备采购","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年11月21日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://zj.bidcenter.com.cn/zbcontent-390623194-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-21","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0097","省份":"未识别","省内城市区域":"未识别","项目名称":"某部无人机反制系统建设某部无人机反制系统建设","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年11月12日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.qianlima.com/bid-552832326.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-12","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0023","省份":"贵州","省内城市区域":"黔东南","项目名称":"黔东南州公安局采购无人机及无人机反制设备中标","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"贵州省黔东南苗族侗族自治州公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年11月7日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bid110.com/view/461/WMJSXJoBg7S5K-631FlI.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-07","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[贵州]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0030","省份":"黑龙江","省内城市区域":"丰林","项目名称":"丰林县公安局无人机反制装备比价比价采购成交公告","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"丰林县公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年11月7日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.jianyu360.cn/nologin/content/ABCY1xrdikFGSg7JGd0dXUJJSQ4QCFjYXx0KTggOSEwXlVwHAFUCXE%3D.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-07","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0009","省份":"甘肃","省内城市区域":"兰州","项目名称":"甘肃煤田地质局综合普查队固定式无人机侦测反制系统","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"甘肃煤田地质局综合普查队","项目金额":"100.5000 万元","金额万元":"100.5","承建中标单位":"兰州未徕同创测绘科技有限公司","中标公告时间":"2025-11-05","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-05","核验备注":"补充检索新增；待回溯官方原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0041","省份":"江苏","省内城市区域":"连云港","项目名称":"连云港腾云低空智联低空安防试验示范基地无人机反制装置零部件采购项目","主需求类别":"园区运营需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"连云港腾云低空智联科技有限公司","项目金额":"89.6000 万元","金额万元":"89.6","承建中标单位":"连云港润飒科技有限公司","中标公告时间":"2025-11-05","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制装置零部件","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-11-05","核验备注":"补充检索新增；园区/试验示范基地类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0116","省份":"新疆","省内城市区域":"未识别","项目名称":"无人机反制系统及无人机机场式巡逻系统采购项目","主需求类别":"园区运营需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"兵团第二单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年10月30日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.chinabiddingzb.com/read-670286095.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-30","核验备注":"修正：原发包采购单位字段误入整段转载摘要，按摘要可识别主体更正；具体单位全称待回溯官方原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0033","省份":"湖北","省内城市区域":"武汉","项目名称":"武汉东湖新技术开发区分局光谷马拉松无人机反制租赁服务项目","主需求类别":"重大活动保障需求","兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"武汉东湖新技术开发区分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"武汉优一硕智能应用科技有限公司","中标公告时间":"2025-10-20","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制租赁服务","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-20","核验备注":"补充检索新增；重大活动保障类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0122","省份":"云南","省内城市区域":"昆明","项目名称":"昆明市公安局西山分局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"昆明市公安局西山分局","项目金额":"74.6800 万元","金额万元":"74.68","承建中标单位":"浙江凡双科技股份有限公司","中标公告时间":"2025年10月16日","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"固定式反制/防御设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202510/t20251016_25519531.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-16","核验备注":"按项目地/采购人修正，供应商所在地不参与归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0121","省份":"云南","省内城市区域":"昆明","项目名称":"昆明市无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"(略)","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年10月16日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://yn.bidcenter.com.cn/zbcontent-384156006-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-16","核验备注":"按项目地/采购人修正，供应商所在地不参与归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0145","省份":"浙江","省内城市区域":"杭州","项目名称":"杭州市低空综合管理服务平台20公共安防管理端开发服务采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"杭州低空产业发展有限公司","项目金额":"458.0000 万元","金额万元":"458.0","承建中标单位":"浙江众合科技股份有限公司","中标公告时间":"2025-10-14","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"低空综合管理服务平台2.0公共安防管理端开发服务","设备类型清单":"系统平台/管控软件","设备数量清单":"低空综合管理服务平台2.0公共安防管理端开发服务：1项服务","来源链接":"https://www.anfangzhaobiao.com/qiye/zjzhkjgfyxgs/","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-14","核验备注":"用户补充的低空平台竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0148","省份":"福建","省内城市区域":"厦门","项目名称":"厦门低空综合管理服务平台及一网统飞运营平台项目","主需求类别":"日常巡防需求","兼具需求类别":"园区运营需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"厦门低空经济管理服务有限公司","项目金额":"1757.1800 万元","金额万元":"1757.18","承建中标单位":"中科星图股份有限公司、厦门兆翔智能科技有限公司联合体","中标公告时间":"2025-10-13","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.anfangzb.com/view/16400/J7ZW3JkBg7S5K-635DSh.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-13","核验备注":"用户补充的城市级低空平台竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0144","省份":"安徽","省内城市区域":"合肥","项目名称":"机场公安局无人机侦测反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"安徽省公安厅机场公安局","项目金额":"96.0000 万元","金额万元":"96.0","承建中标单位":"杰能科世智能安全科技（杭州）有限公司","中标公告时间":"2025-10-11","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"车载无人机侦测解码设备；车载无人机定向反制设备","设备类型清单":"侦测探测设备；侦测反制装备/设备","设备数量清单":"车载无人机侦测解码设备：2套；车载无人机定向反制设备：1套","来源链接":"https://yzb.caigou2003.com/detail/1977004058623344640","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-11","核验备注":"用户补充的机场公安竞品中标样本；按中标单位为检索主体补入主库","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0136","省份":"浙江","省内城市区域":"台州","项目名称":"天台县公安局无人机侦测打击系统项目第二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"天台县公安局","项目金额":"203.0312 万元","金额万元":"203.0312","承建中标单位":"中国联合网络通信有限公司台州市分公司","中标公告时间":"2025-10-10","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测打击系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zjtt.gov.cn/art/2025/10/10/art_1229796762_59184273.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-10-10","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0073","省份":"陕西","省内城市区域":"石泉","项目名称":"石泉县公安局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"合同公告","发包采购单位":"石泉县公安局","项目金额":"16.8800 万元","金额万元":"16.88","承建中标单位":"公开信息未披露","中标公告时间":"2025年09月30日","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/cjgg/202509/t20250930_25447729.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-09-30","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0091","省份":"未识别","省内城市区域":"未识别","项目名称":"******","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"186.0000 万元","金额万元":"186","承建中标单位":"公开信息未披露","中标公告时间":"2025年09月23日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.chinamae.com/purchases/567ae03600cb204b61a6bdc2ff593907.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-09-23","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除；同项目合并（2条公告）","同组公告数":2,"同组来源数":1},{"项目ID":"LA-2025-0070","省份":"山西","省内城市区域":"太原","项目名称":"太原市晋阳公寓无人机反制系统二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"合同公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年9月19日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://sxs.bidcenter.com.cn/zbcontent-380003709-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-09-19","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0112","省份":"新疆","省内城市区域":"昌吉","项目名称":"无人机反制设备第二批采购项目","主需求类别":"园区运营需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"昌吉回族自治州公安局","项目金额":"158.7800 万元","金额万元":"158.78","承建中标单位":"公开信息未披露","中标公告时间":"2025年09月18日","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202509/t20250918_25371641.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-09-18","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0098","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制设备第二批采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年9月17日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/newscontent-379582703-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-09-17","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0050","省份":"辽宁","省内城市区域":"抚顺","项目名称":"采购无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"抚顺市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"安徽金龙泰安安全设备有限公司","中标公告时间":"2025年8月27日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bid110.com/view/105/5sd16pgBVX3Ep-cz3XON.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-27","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[山东]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0018","省份":"广东","省内城市区域":"深圳","项目名称":"龙华分局购置十五运无人机反制设备采购项目","主需求类别":"重大活动保障需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"深圳市公安局龙华分局","项目金额":"95.5000 万元","金额万元":"95.5","承建中标单位":"江门市亿豪警用装备科技有限公司","中标公告时间":"2025-08-21","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.szyd11.com/tender/win/detail?TenderId=16753","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-21","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0056","省份":"内蒙古","省内城市区域":"康巴什","项目名称":"康巴什区中轴线无人机反制系统建设项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"鄂尔多斯市公安局康巴什分局","项目金额":"380.3522 万元","金额万元":"380.3522","承建中标单位":"中移系统集成有限公司","中标公告时间":"2025-08-21","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zcbx.xyz/index.php?v=show\u0026cid=93\u0026id=654079","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-21","核验备注":"人工核验补充；待回溯内蒙古政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0161","省份":"四川","省内城市区域":"成都高新","项目名称":"高新公安分局2025年度低空警务实战场景应用建设项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"成都市公安局高新技术产业开发区分局","项目金额":"324.3180 万元","金额万元":"324.318","承建中标单位":"四川中移通信技术工程有限公司","中标公告时间":"2025-08-18","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://jy.scltzb.com/html/eltzb/jiaoyixinxi/jieguogonggao/1957344575933603842.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-18","核验备注":"项目名称深度检索补入；低空警务实战场景应用样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0099","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制器材竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年08月14日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制器材","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/article/73683688","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-14","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0022","省份":"贵州","省内城市区域":"贵阳","项目名称":"贵阳市无人机反制设备竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年8月12日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://gz.bidcenter.com.cn/zbcontent-373871343-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-08-12","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0031","省份":"黑龙江","省内城市区域":"未识别","项目名称":"某部无人机及反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年7月31日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://hlj.bidcenter.com.cn/zbcontent-370836117-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-31","核验备注":"修正：原发包采购单位字段误入“受业主委托”平台语，按项目标题更正为某部","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0142","省份":"宁夏","省内城市区域":"银川","项目名称":"银川市公安局WRJGZ装备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"银川市公安局","项目金额":"59.8000 万元","金额万元":"59.8","承建中标单位":"杰能科世智能安全科技（杭州）有限公司","中标公告时间":"2025-07-29","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"WRJGZ装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"WRJGZ装备：1项","来源链接":"https://www.ccgp-ningxia.gov.cn/public/NXGPPNEW/dynamic/contents/SXCGGG/ZHBGG/content.jsp?cid=2013\u0026id=8b80b27b9821ef38019854d615231cb9\u0026sid=1\u0026type=ZB","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-29","核验备注":"竞品驱动补充；直中标案例","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0085","省份":"四川","省内城市区域":"泸州","项目名称":"泸州军分区民兵反无人机排装备器材采购项目","主需求类别":"应急处置需求","兼具需求类别":"敏感目标防护需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"泸州市应急管理局","项目金额":"134.4444 万元","金额万元":"134.4444","承建中标单位":"成都构玩居游乐设备有限公司","中标公告时间":"2025-07-29","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机频谱侦测设备；固定式无人机反制设备；察打一体无人机反制设备；便携式察打一体反制设备；手持式无人机反制设备；无人机智能管控平台；终端；无人机1；无人机2；DIY穿越机","设备类型清单":"侦测探测设备；固定式反制/防御设备；察打一体侦测反制设备；便携/手持反制设备；系统平台/管控软件；配套计算/显示终端；配套无人机/训练靶机","设备数量清单":"无人机频谱侦测设备：2套；固定式无人机反制设备：2套；察打一体无人机反制设备：1套；便携式察打一体反制设备：2套；手持式无人机反制设备：4套；无人机智能管控平台：1套；终端：3台；无人机1：2台；无人机2：2台；DIY穿越机：2台","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20250729/8a69ce2d984c25900198500cbd1c06b7.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-29","核验备注":"按项目地/采购人修正，供应商所在地不参与城市判断","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0100","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制枪采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年07月29日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制枪","设备类型清单":"便携/手持反制设备","设备数量清单":"","来源链接":"https://www.qianlima.com/bid-526557419.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-29","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0068","省份":"山西","省内城市区域":"介休","项目名称":"介休市公安局无人机及无人机反制设备采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"介休市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年7月16日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://shanxi.bidizhaobiao.com/info-651819174.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-16","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0084","省份":"四川","省内城市区域":"成都","项目名称":"成都世运会无人机无线电反制设备管控服务项目","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"成都市无线电监测站","项目金额":"114.9000 万元","金额万元":"114.9","承建中标单位":"天维讯达（四川）科技有限公司","中标公告时间":"2025-07-10","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机无线电反制设备管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机无线电反制设备管控服务：1项服务","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20250710/8a69cb7697ee71240197f26715345e73.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-07-10","核验备注":"用户提供官方链接补充；公告原文项目名称为“成都世运会无人机无线电反制设备管控服务项目”，以官方公告为准","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0026","省份":"河北","省内城市区域":"唐山","项目名称":"陡河水库无人机反制系统双盲评审公开招标","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"唐山市陡河水库事务中心","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年6月19日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-362127167-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-06-19","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0101","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制设备采购","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年6月10日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/newscontent-360279871-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-06-10","核验备注":"脱敏或转载信息不足，未强行归省；同项目合并（2条公告）","同组公告数":2,"同组来源数":1},{"项目ID":"LA-2025-0093","省份":"未识别","省内城市区域":"未识别","项目名称":"采购无人机反制设备竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"...","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年6月8日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://rl.zhaobiao.cn/succeed_v_dfb78bc391885e3ad7dad921b06ddd6a.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (521)。","排序日期文本":"2025-06-08","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0135","省份":"浙江","省内城市区域":"台州","项目名称":"天台县公安局无人机侦测打击系统项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"天台县公安局","项目金额":"164.0000 万元","金额万元":"164","承建中标单位":"中国移动通信集团浙江有限公司台州分公司","中标公告时间":"2025-05-26","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测打击系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.zjtt.gov.cn/art/2025/5/26/art_1229796762_59180589.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-05-26","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0113","省份":"新疆","省内城市区域":"达坂城","项目名称":"达坂城区无人机反制系统竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"24.3000 万元","金额万元":"24.3","承建中标单位":"公开信息未披露","中标公告时间":"2025年5月23日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://xj.bidcenter.com.cn/zbcontent-356752206-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-05-23","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0159","省份":"广东","省内城市区域":"茂名","项目名称":"广东省茂名监狱低空域智能警戒巡防系统采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"敏感目标防护需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"广东省茂名监狱","项目金额":"425.5200 万元","金额万元":"425.52","承建中标单位":"中国电信股份有限公司广东分公司","中标公告时间":"2025-05-22","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://gdgpo.czt.gd.gov.cn/freecms/site/gd/ggxx/info/2025/8a7e6fc396d4b9610196e214d7bf710f.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-05-22","核验备注":"项目名称深度检索补入；司法监狱低空域智能警戒巡防系统样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0059","省份":"宁夏","省内城市区域":"石嘴山","项目名称":"石嘴山市公安局无人机教培警务应用及反制项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"石嘴山市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"宁夏中宇网安科技有限公司","中标公告时间":"2025-05-09","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机教培、警务应用及反制项目","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bbda.com/bidList/k1295","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-05-09","核验备注":"补充检索新增；待回溯宁夏政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0007","省份":"福建","省内城市区域":"未识别","项目名称":"无人机反制定位设备采购项目采购结果公示福建招标网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年4月3日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://fj.bidcenter.com.cn/zbcontent-347248109-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-04-03","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0117","省份":"新疆","省内城市区域":"乌鲁木齐","项目名称":"无人机反制系统采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"28.8000 万元","金额万元":"28.8","承建中标单位":"新疆乾元商贸有限公司","中标公告时间":"2025-03-28","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制系统","设备类型清单":"察打一体侦测反制设备","设备数量清单":"","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202503/t20250328_24369730.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-03-28","核验备注":"人工核验补充；同项目合并（2条公告）","同组公告数":2,"同组来源数":1},{"项目ID":"LA-2025-0160","省份":"广东","省内城市区域":"广州","项目名称":"广东警官学院无人机数智低空警务工程实训教学平台建设项目二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"广东警官学院","项目金额":"135.0069 万元","金额万元":"135.0069","承建中标单位":"广州成至智能机器科技有限公司","中标公告时间":"2025-03-10","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://gdgpo.czt.gd.gov.cn/freecms/site/gd/ggxx/info/2025/8a7edac09573cf4201957ae65f634c5f.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-03-10","核验备注":"项目名称深度检索补入；低空警务实训平台样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0131","省份":"浙江","省内城市区域":"定海","项目名称":"定海区无人机反制系统竞价成交公告浙江招标网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年3月10日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://zj.bidcenter.com.cn/zbcontent-351328614-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-03-10","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0137","省份":"浙江","省内城市区域":"未识别","项目名称":"无人机反制系统","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"...","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年3月10日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://zj.bidizhaobiao.com/info-599355455.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-03-10","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0111","省份":"新疆","省内城市区域":"巴音郭楞","项目名称":"无人机反制设备采购竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"新疆维吾尔自治区巴音郭楞某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"新疆轩志信息科技有限公司","中标公告时间":"2025年02月25日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.jianyu360.cn/article/bdprivate/BVrMiE7ZXMBZQ4oJCc7NCMKH3FlXU8OWRYgKyMjBwJVeXZ1IApcB%2BA%3D.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-02-25","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[新疆]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0152","省份":"西藏","省内城市区域":"昌都","项目名称":"昌都市公安局采购低空安全反无人机系统项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"昌都市公安局","项目金额":"212.9000 万元","金额万元":"212.9","承建中标单位":"中国电信集团有限公司昌都分公司","中标公告时间":"2025-01-29","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.ccgp-xizang.gov.cn/freecms/site/xizang/ggxx/info/2025/8a7eb882948a40300194bdc599a22e17.html","来源链接状态":"暂打不开","来源链接说明":"The operation has timed out.","排序日期文本":"2025-01-29","核验备注":"项目名称深度检索补入；低空安全反无人机系统直相关样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0151","省份":"湖北","省内城市区域":"十堰","项目名称":"十堰市低空综合管理服务平台第一期建设项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务类/软硬件结合","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"十堰产城融合投资发展集团有限公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"鸢飞科技（上海）有限公司","中标公告时间":"2025-01-20","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.hbbidcloud.cn/shiyan/jyxx/004005/004005001/20250120/d0905e3d-3bf5-4f55-9d78-409fa4bba3ad.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2025-01-20","核验备注":"项目名称深度检索补入；城市级低空综合管理服务平台样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0052","省份":"辽宁","省内城市区域":"未识别","项目名称":"无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年01月17日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.qianlima.com/bid-481110012.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-01-17","核验备注":"修正：原发包采购单位字段误入评审确认语，公开摘要未识别采购主体","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0092","省份":"未识别","省内城市区域":"未识别","项目名称":"某部无人机反制装备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年1月8日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhaobiaoziyuan.com/detail/677e4b19044491747fb1370a.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-01-08","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2025-0124","省份":"云南","省内城市区域":"未识别","项目名称":"某部无人机反制装备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"46.3286 万元","金额万元":"46.3286","承建中标单位":"中国联合网络通信有限公司西双版纳傣族自治州分公司","中标公告时间":"2025年1月8日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制装备","设备类型清单":"侦测探测设备；侦测反制装备/设备","设备数量清单":"","来源链接":"https://yn.zhiliaobiaoxun.com/article/49584401","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-01-08","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[云南]；同项目合并（3条公告）","同组公告数":3,"同组来源数":2},{"项目ID":"LA-2025-0066","省份":"山东","省内城市区域":"未识别","项目名称":"无人机反制设备租赁服务","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"合同公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年1月3日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制/低空管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制/低空管控服务：1项服务","来源链接":"https://sd.bidizhaobiao.com/info-579941578.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2025-01-03","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0087","省份":"未识别","省内城市区域":"未识别","项目名称":"某单位便携式无人机反制枪","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月25日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"反制枪","设备类型清单":"便携/手持反制设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-331919403-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-25","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0013","省份":"广东","省内城市区域":"珠海横琴","项目名称":"横琴粤澳深度合作区公安局重大活动安保无人机防控服务政府采购项目","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"横琴粤澳深度合作区公安局","项目金额":"157.2875 万元","金额万元":"157.2875","承建中标单位":"中国移动通信集团广东有限公司珠海分公司","中标公告时间":"2024-12-18","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"重大活动安保无人机防控服务","设备类型清单":"服务/租赁","设备数量清单":"重大活动安保无人机防控服务：1项服务","来源链接":"https://hengqin.gd.gov.cn/gkmlpt/content/4/4617/post_4617550.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-18","核验备注":"补充检索新增；重大活动保障类","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0120","省份":"云南","省内城市区域":"未识别","项目名称":"某部无人机反制装备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中国联合网络通信有限公司西双版纳傣族自治州分公司","中标公告时间":"2024年12月18日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.jianyu360.cn/article/bdprivate/BGFMiE8dnNJYQgxNF47NCMKH3FlXU8OWRYgPBk3CgJVQ3R1JwpcCG0%3D.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-18","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[云南]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0062","省份":"山东","省内城市区域":"东营","项目名称":"东营机场无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"东营机场","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月9日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://sd.bidizhaobiao.com/info-567616680.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-09","核验备注":"修正：原发包采购单位字段误入整段转载摘要，按项目名称和摘要中明确主体更正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0064","省份":"山东","省内城市区域":"禹城","项目名称":"禹城市公安局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"禹城市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"山东品美信息科技有限公司","中标公告时间":"2024年12月6日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-329016404-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-06","核验备注":"修正：原发包采购单位字段误入整段采招网转载摘要，按摘要中明确采购主体更正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0089","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月6日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://m.bidcenter.com.cn/news-4-327448124.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-06","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0029","省份":"黑龙江","省内城市区域":"未识别","项目名称":"某部无人机反制系统采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"福建灵信信息科技有限公司","中标公告时间":"2024年12月5日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://hlj.bidizhaobiao.com/info-565506186.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-05","核验备注":"继承原库并规则复核；标题为中标/成交结果，阶段修正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0001","省份":"安徽","省内城市区域":"池州","项目名称":"安徽铁塔池州市分公司无人机反制服务项目第二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"安徽铁塔池州市分公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月3日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制/低空管控服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制/低空管控服务：1项服务","来源链接":"http://ah.bidizhaobiao.com/info-564361601.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-03","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0083","省份":"四川","省内城市区域":"绵阳","项目名称":"绵阳市公安局经济技术开发区分局无人机反制设备","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"绵阳市公安局经济技术开发区分局","项目金额":"34.3000 万元","金额万元":"34.3","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月03日","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/cjgg/202412/t20241203_23775431.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-12-03","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0039","省份":"江苏","省内城市区域":"未识别","项目名称":"太湖之鹰无人机及反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年11月26日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://stock.stockstar.com/RB2024112600036112.shtml","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-11-26","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0128","省份":"浙江","省内城市区域":"海盐","项目名称":"海盐县公安局无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"海盐县公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年11月20日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://zj.bidizhaobiao.com/info-557598739.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-11-20","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0080","省份":"上海","省内城市区域":"长宁","项目名称":"2024年度至2025年度长宁公安分局无人机侦测反制设备租赁项目","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"上海市公安局长宁分局","项目金额":"99.0000 万元","金额万元":"99.0","承建中标单位":"上海新世纪科技有限公司","中标公告时间":"2024-11-11","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制设备租赁服务","设备类型清单":"服务/租赁","设备数量清单":"无人机侦测反制设备租赁服务：1项服务","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/cjgg/202411/t20241111_23584081.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-11-11","核验备注":"用户提供官方链接补充；重大活动保障/公安租赁服务打包项目","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0040","省份":"江苏","省内城市区域":"无锡","项目名称":"无锡市公安局梁溪分局无人机反制系统采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"无锡市公安局梁溪分局","项目金额":"56.1000 万元","金额万元":"56.1","承建中标单位":"无锡蓝天翱翔智能科技有限公司","中标公告时间":"2024-11-08","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.fdzb119.com/zhaobiao/123745.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2024-11-08","核验备注":"人工核验补充；待回溯江苏政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0130","省份":"浙江","省内城市区域":"舟山","项目名称":"无人机侦测反制设备采购重新招标","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"43.5400 万元","金额万元":"43.54","承建中标单位":"中国电信股份有限公司舟山分公司","中标公告时间":"2024-11-02","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备","设备类型清单":"侦测探测设备","设备数量清单":"","来源链接":"https://www.zgggzy.com/jieguo/show.php?itemid=30831","来源链接状态":"暂打不开","来源链接说明":"The operation has timed out.","排序日期文本":"2024-11-02","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0082","省份":"四川","省内城市区域":"成都","项目名称":"成都市公安局无人机反制装备采购项目二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"成都市公安局","项目金额":"607.0000 万元","金额万元":"607.0","承建中标单位":"成都鸿安泰达科技发展有限公司","中标公告时间":"2024-10-16","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20241016/8a69ce909271d3f20192937b363d1071.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-10-16","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0109","省份":"新疆","省内城市区域":"乌什","项目名称":"乌什县公安局购买无人机反制装备采购项目二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"合同公告","发包采购单位":"乌什县公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年9月27日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://xinjiang.zhaobiao.cn/succeed_v_100563878.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (521)。","排序日期文本":"2024-09-27","核验备注":"修正：原发包采购单位字段误入项目标题和转载摘要，按明确采购主体更正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0028","省份":"黑龙江","省内城市区域":"大兴安岭","项目名称":"大兴安岭边境管理支队无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"大兴安岭边境管理支队","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年9月19日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://hlj.bidizhaobiao.com/info-532368962.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-09-19","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0037","省份":"江苏","省内城市区域":"泰州","项目名称":"泰州市公安局巡特警支队无人机侦测反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"泰州市公安局（机关）","项目金额":"78.8000 万元","金额万元":"78.8","承建中标单位":"广州华警安防科技发展有限公司","中标公告时间":"2024-09-12","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"固定式无人机侦测反制设备","设备类型清单":"固定式反制/防御设备","设备数量清单":"","来源链接":"https://czj.taizhou.gov.cn/tzzfcgw/cgxx/sjcgxx/zbcjjggg/cjgg/art/2024/art_b69d7a2834914873a79ded08916bbd97.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-09-12","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0158","省份":"江西","省内城市区域":"南昌","项目名称":"南昌市公安局低空安全及反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"南昌市公安局","项目金额":"124.6600 万元","金额万元":"124.66","承建中标单位":"江西浩德实业有限公司","中标公告时间":"2024-09-12","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://ccgp-jiangxi.gov.cn/web/jyxx/002006/002006006/20240912/0ef6daf0-bd09-42e4-b230-ea89b23c316e.html","来源链接状态":"暂打不开","来源链接说明":"基础连接已经关闭: 未能为 SSL/TLS 安全通道建立信任关系。","排序日期文本":"2024-09-12","核验备注":"项目名称深度检索补入；低空安全及反制设备直相关样本","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0108","省份":"新疆","省内城市区域":"未识别","项目名称":"无人机反制设备竞价","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年9月11日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://rl.zhaobiao.cn/succeed_v_630b3f8e3205b4b7bf2a1f67c810efa3.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (521)。","排序日期文本":"2024-09-11","核验备注":"修正：原发包采购单位为“--”，规范为公开信息未披露；同项目合并（3条公告）","同组公告数":3,"同组来源数":1},{"项目ID":"LA-2024-0011","省份":"广东","省内城市区域":"深圳","项目名称":"福田公安分局无人机反制装备和防护装备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"深圳市公安局福田分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年8月30日","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202408/t20240830_23040118.htm","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2024-08-30","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0012","省份":"广东","省内城市区域":"未识别","项目名称":"某单位采购无人机反制设备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024-08-30","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/detail/448113967b2E1A03245c.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-08-30","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0129","省份":"浙江","省内城市区域":"绍兴","项目名称":"绍兴市公安局上虞区分局无人机反制设备采购项目第二次","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"绍兴市公安局上虞区分局","项目金额":"50.0000 万元","金额万元":"50","承建中标单位":"苏州璟鞍科技有限公司","中标公告时间":"2024-08-08","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.fdzb119.com/zhaobiao/111762.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-08-08","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0038","省份":"江苏","省内城市区域":"未识别","项目名称":"2024年无人机侦测反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024-07-29","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.zhiliaobiaoxun.com/detail/444740462b2E5CE70DEa.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-07-29","核验备注":"依据项目名/采购人/证据摘要从[北京]校正为[江苏]","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0036","省份":"江苏","省内城市区域":"常州","项目名称":"常州市公安局2024年无人机侦测反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"常州市公安局","项目金额":"193.9000 万元","金额万元":"193.9","承建中标单位":"南京金护警用装备有限公司","中标公告时间":"2024-07-29","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://zfcg.changzhou.gov.cn/html/ns/class_fscg_zbgg/898718001419495.html","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (403) 已禁止。","排序日期文本":"2024-07-29","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0063","省份":"山东","省内城市区域":"济南","项目名称":"济南市公安局特巡警支队无人机反制设备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"济南市公安局特巡警支队","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年7月18日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-298684773-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-07-18","核验备注":"修正：原发包采购单位字段重复拼入项目标题，已保留明确采购主体","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0090","省份":"未识别","省内城市区域":"未识别","项目名称":"无人机反制设施检测系统项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年7月2日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/news-294800126-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-07-02","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0110","省份":"新疆","省内城市区域":"新疆维吾尔自治区","项目名称":"某单位无人机反制系统采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"某单位","项目金额":"32.8000 万元","金额万元":"32.8","承建中标单位":"星际控股集团有限公司","中标公告时间":"2024年05月28日","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制系统","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202405/t20240528_22217790.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-05-28","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0035","省份":"吉林","省内城市区域":"未识别","项目名称":"无人机反制设备中标结果采招网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"48.2800 万元","金额万元":"48.28","承建中标单位":"公开信息未披露","中标公告时间":"2024年5月13日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/newscontent-284812772-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-05-13","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0079","省份":"上海","省内城市区域":"青浦","项目名称":"上海市公安局青浦分局无人机反制阵地系统租赁服务","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"上海市公安局青浦分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024-05-10","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制阵地系统租赁服务","设备类型清单":"服务/租赁","设备数量清单":"无人机反制阵地系统租赁服务：1项服务","来源链接":"https://www.ode119.com/zhaobiao/89312.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-05-10","核验备注":"漏检补充；阵地租赁/活动保障能力项目，待回溯上海政府采购原文","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0088","省份":"未识别","省内城市区域":"未识别","项目名称":"特警大队无人机反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年04月08日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.qianlima.com/bid-412879753.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-04-08","核验备注":"脱敏或转载信息不足，未强行归省；原表北京值已剔除","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2024-0005","省份":"北京","省内城市区域":"北京","项目名称":"无人机反制系统中标成交结果公示采招网","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"105.0000 万元","金额万元":"105","承建中标单位":"理工全盛(北京)科技有限公司","中标公告时间":"2024年2月1日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机侦测反制系统/平台","设备类型清单":"系统平台/管控软件","设备数量清单":"","来源链接":"https://www.bidcenter.com.cn/newscontent-271172616-4.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2024-02-01","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0061","省份":"山东","省内城市区域":"山亭","项目名称":"山亭公安分局无人机反制装备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"山亭公安分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2023年12月22日","年份":"2023","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","设备名称清单":"无人机反制装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://m.bidcenter.com.cn/newsrili-4-265755663.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-12-22","核验备注":"修正：原发包采购单位字段误入转载标题和关注语，按摘要可识别主体更正","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0081","省份":"四川","省内城市区域":"成都","项目名称":"某部无人机反制设备采购","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"28.9000 万元","金额万元":"28.9","承建中标单位":"四川省商投信息技术有限责任公司","中标公告时间":"2023年12月22日","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/zygg/zbgg/202312/t20231222_21326133.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-12-22","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0141","省份":"安徽","省内城市区域":"黄山","项目名称":"反无人机系统设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"某部","项目金额":"51.0000 万元","金额万元":"51.0","承建中标单位":"合肥御悟信息科技有限公司","中标公告时间":"2023-11-10","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"反无人机系统设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"反无人机系统设备：1套","来源链接":"https://ggzy.huangshan.gov.cn/TPBidder/frame/fui/js/widgets/ewebeditor/uploadfile/20231110155451345.pdf","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-11-10","核验备注":"竞品驱动补充；品牌命中上海特金","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0008","省份":"甘肃","省内城市区域":"兰州","项目名称":"兰州市公安局无人机反制设备购置","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"兰州市公安局","项目金额":"64.8000 万元","金额万元":"64.8","承建中标单位":"公开信息未披露","中标公告时间":"2023年09月14日","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202309/t20230914_20704879.htm","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-09-14","核验备注":"继承原库并规则复核","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0127","省份":"浙江","省内城市区域":"温州","项目名称":"温州奥体中心安保专项无人机反制设备采购项目","主需求类别":"重大活动保障需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"温州市龙湾区体育事业发展中心","项目金额":"98.0000 万元","金额万元":"98","承建中标单位":"中国联合网络通信有限公司温州市分公司","中标公告时间":"2023-08-21","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://ggzyjy-eweb.wenzhou.gov.cn/art/2023/8/21/art_1229678301_28546.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-08-21","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0126","省份":"浙江","省内城市区域":"温州","项目名称":"瑞安市公安局便携式无人机防御反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","项目类型":"侦测反制系统/平台","项目阶段":"中标/成交结果","发包采购单位":"瑞安市公安局","项目金额":"102.1000 万元","金额万元":"102.1","承建中标单位":"中国联合网络通信有限公司温州市分公司","中标公告时间":"2023-07-17","年份":"2023","来源等级":"B-公开转载/行业平台","字段完整度":"完整","设备名称清单":"无人机防御反制设备","设备类型清单":"便携/手持反制设备","设备数量清单":"","来源链接":"https://www.fdzb119.com/zhaobiao/70037.html","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-07-17","核验备注":"继承原库并规则复核；专项样本原文为成交/中标结果页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0054","省份":"内蒙古","省内城市区域":"鄂尔多斯","项目名称":"鄂尔多斯市公安局采购无人机侦测反制设备项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"鄂尔多斯市公安局","项目金额":"126.2000 万元","金额万元":"126.2","承建中标单位":"河北疆来科技有限公司","中标公告时间":"2023-06-30","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机侦测反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"https://www.ordosggzyjy.org.cn/TPFront/InfoDetail/?InfoID=48b84f25-1b20-4e52-87f4-e31b90bbd6bb\u0026CategoryNum=005002003","来源链接状态":"暂打不开","来源链接说明":"The operation has timed out.","排序日期文本":"2023-06-30","核验备注":"人工核验补充","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0140","省份":"陕西","省内城市区域":"西安","项目名称":"西安市公安局4G无人机侦测反制设备采购项目","主需求类别":"日常巡防需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"西安市公安局（本级）","项目金额":"41.5000 万元","金额万元":"41.5","承建中标单位":"北京瑞达恩科技股份有限公司","中标公告时间":"2023-06-09","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无线电反制设备","设备类型清单":"侦测反制装备/设备","设备数量清单":"无线电反制设备：1项","来源链接":"https://www.ccgp-shaanxi.gov.cn/gpx-bid-file/610101/gpx-bidcore/2023/6/9/8a69c9318844861201889f17dfae3f55.pdf?accessCode=cc4f1dda7e0ed63045957911cd1e5379","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-06-09","核验备注":"竞品驱动补充；直中标案例","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0125","省份":"浙江","省内城市区域":"杭州","项目名称":"浙江工商大学文体中心亚运手球馆无人机反制预警设备租赁服务","主需求类别":"重大活动保障需求","兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"浙江工商大学","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2023-05-24","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","设备名称清单":"无人机反制预警设备租赁服务","设备类型清单":"服务/租赁","设备数量清单":"无人机反制预警设备租赁服务：1项服务","来源链接":"https://cgzx.zjgsu.edu.cn/4738/list35.psp","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-05-24","核验备注":"漏检补充；亚运场馆显性重大活动保障项目，列表页可证实成交公告存在但金额/供应商需继续回溯详情页","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0071","省份":"陕西","省内城市区域":"延安","项目名称":"延安市公安局采购无人机反制枪及租赁无人机反制阵地项目","主需求类别":"重大活动保障需求","兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","项目类型":"侦测反制服务/租赁","项目阶段":"中标/成交结果","发包采购单位":"延安市公安局","项目金额":"202.0000 万元","金额万元":"202.0","承建中标单位":"西安宇航者创新科技有限公司","中标公告时间":"2023-03-17","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","设备名称清单":"无人机反制枪；无人机反制阵地租赁","设备类型清单":"便携/手持反制设备；服务/租赁","设备数量清单":"","来源链接":"https://www.ccgp-shaanxi.gov.cn/gpx-bid-file/610601/gpx-bidcore/2023/3/17/8a69c883865ceb1d0186eecd493c4bad.pdf?accessCode=e0771c16fa46abf11b4fd6cbb9a6e929","来源链接状态":"可打开","来源链接说明":"HTTP 200","排序日期文本":"2023-03-17","核验备注":"漏检补充；阵地租赁/活动保障能力项目","同组公告数":1,"同组来源数":1},{"项目ID":"LA-2023-0086","省份":"未识别","省内城市区域":"未识别","项目名称":"基站式无人机反制设备采购项目","主需求类别":"敏感目标防护需求","兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","项目类型":"侦测反制装备","项目阶段":"中标/成交结果","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2023年2月10日","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"待复核","设备名称清单":"无人机侦测反制设备/装备","设备类型清单":"侦测反制装备/设备","设备数量清单":"","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/zbgg/202302/t20230210_19438686.htm","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (404) 未找到。","排序日期文本":"2023-02-10","核验备注":"脱敏或转载信息不足，未强行归省","同组公告数":1,"同组来源数":1}];
+    const PROVINCES = [{"省份":"浙江","中标项目数":"17","完整记录数":"9","较完整记录数":"6","待复核记录数":"2","官方来源记录数":"6","可解析金额项目数":"10","可解析金额合计万元":"2368.5034","设备明细较完整项目数":"1","设备部分明细项目数":"1","设备仅项目级推断项目数":"15"},{"省份":"内蒙古","中标项目数":"9","完整记录数":"4","较完整记录数":"4","待复核记录数":"1","官方来源记录数":"5","可解析金额项目数":"6","可解析金额合计万元":"1945.107","设备明细较完整项目数":"1","设备部分明细项目数":"0","设备仅项目级推断项目数":"8"},{"省份":"福建","中标项目数":"3","完整记录数":"1","较完整记录数":"1","待复核记录数":"1","官方来源记录数":"0","可解析金额项目数":"1","可解析金额合计万元":"1757.18","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"3"},{"省份":"四川","中标项目数":"9","完整记录数":"6","较完整记录数":"3","待复核记录数":"0","官方来源记录数":"7","可解析金额项目数":"7","可解析金额合计万元":"1313.8134","设备明细较完整项目数":"1","设备部分明细项目数":"1","设备仅项目级推断项目数":"7"},{"省份":"广东","中标项目数":"11","完整记录数":"5","较完整记录数":"5","待复核记录数":"1","官方来源记录数":"5","可解析金额项目数":"5","可解析金额合计万元":"1145.2744","设备明细较完整项目数":"0","设备部分明细项目数":"3","设备仅项目级推断项目数":"8"},{"省份":"甘肃","中标项目数":"5","完整记录数":"3","较完整记录数":"2","待复核记录数":"0","官方来源记录数":"1","可解析金额项目数":"5","可解析金额合计万元":"1013.5144","设备明细较完整项目数":"2","设备部分明细项目数":"0","设备仅项目级推断项目数":"3"},{"省份":"江苏","中标项目数":"11","完整记录数":"5","较完整记录数":"4","待复核记录数":"2","官方来源记录数":"2","可解析金额项目数":"5","可解析金额合计万元":"421.2789","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"11"},{"省份":"陕西","中标项目数":"9","完整记录数":"2","较完整记录数":"5","待复核记录数":"2","官方来源记录数":"4","可解析金额项目数":"5","可解析金额合计万元":"378.52","设备明细较完整项目数":"1","设备部分明细项目数":"1","设备仅项目级推断项目数":"7"},{"省份":"安徽","中标项目数":"6","完整记录数":"3","较完整记录数":"3","待复核记录数":"0","官方来源记录数":"2","可解析金额项目数":"4","可解析金额合计万元":"320.5","设备明细较完整项目数":"2","设备部分明细项目数":"2","设备仅项目级推断项目数":"2"},{"省份":"云南","中标项目数":"6","完整记录数":"4","较完整记录数":"2","待复核记录数":"0","官方来源记录数":"1","可解析金额项目数":"4","可解析金额合计万元":"282.1372","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"6"},{"省份":"河北","中标项目数":"2","完整记录数":"1","较完整记录数":"1","待复核记录数":"0","官方来源记录数":"0","可解析金额项目数":"1","可解析金额合计万元":"279.5","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"2"},{"省份":"新疆","中标项目数":"12","完整记录数":"2","较完整记录数":"6","待复核记录数":"4","官方来源记录数":"3","可解析金额项目数":"4","可解析金额合计万元":"244.68","设备明细较完整项目数":"0","设备部分明细项目数":"1","设备仅项目级推断项目数":"11"},{"省份":"江西","中标项目数":"4","完整记录数":"2","较完整记录数":"2","待复核记录数":"0","官方来源记录数":"1","可解析金额项目数":"3","可解析金额合计万元":"227.61","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"4"},{"省份":"辽宁","中标项目数":"4","完整记录数":"1","较完整记录数":"2","待复核记录数":"1","官方来源记录数":"0","可解析金额项目数":"1","可解析金额合计万元":"224.985","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"4"},{"省份":"西藏","中标项目数":"1","完整记录数":"1","较完整记录数":"0","待复核记录数":"0","官方来源记录数":"1","可解析金额项目数":"1","可解析金额合计万元":"212.9","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"1"},{"省份":"未识别","中标项目数":"22","完整记录数":"0","较完整记录数":"0","待复核记录数":"22","官方来源记录数":"1","可解析金额项目数":"1","可解析金额合计万元":"186","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"22"},{"省份":"黑龙江","中标项目数":"5","完整记录数":"1","较完整记录数":"4","待复核记录数":"0","官方来源记录数":"0","可解析金额项目数":"1","可解析金额合计万元":"157.8189","设备明细较完整项目数":"0","设备部分明细项目数":"0","设备仅项目级推断项目数":"5"},{"省份":"重庆","中标项目数":"2","完整记录数":"1","较完整记录数":"1","待复核记录数":"0","官方来源记录数":"0","可解析金额项目数":"2","可解析金额合计万元":"107.8","设备明细较完整项目数":"0","设备部分明细项目数":"1","设备仅项目级推断项目数":"1"}];
+    const DEMANDS = [{"需求类别":"日常巡防需求","项目数":"109","官方来源记录数":"24","可解析金额项目数":"43","可解析金额合计万元":"8349.0683","主要省份":"未识别(18)、新疆(12)、浙江(11)、内蒙古(6)、江苏(6)"},{"需求类别":"敏感目标防护需求","项目数":"39","官方来源记录数":"11","可解析金额项目数":"19","可解析金额合计万元":"2878.141","主要省份":"广东(6)、黑龙江(4)、江苏(4)、云南(4)、内蒙古(3)"},{"需求类别":"重大活动保障需求","项目数":"12","官方来源记录数":"7","可解析金额项目数":"7","可解析金额合计万元":"934.1875","主要省份":"浙江(3)、上海(2)、广东(2)、安徽(1)、四川(1)"},{"需求类别":"园区运营需求","项目数":"4","官方来源记录数":"1","可解析金额项目数":"3","可解析金额合计万元":"814.54","主要省份":"新疆(2)、甘肃(1)、江苏(1)"},{"需求类别":"应急处置需求","项目数":"1","官方来源记录数":"1","可解析金额项目数":"1","可解析金额合计万元":"134.4444","主要省份":"四川(1)"}];
+    const EQUIPMENT = [{"设备类型":"侦测反制装备/设备","明细行数":"87","涉及项目数":"86"},{"设备类型":"系统平台/管控软件","明细行数":"55","涉及项目数":"55"},{"设备类型":"服务/租赁","明细行数":"13","涉及项目数":"13"},{"设备类型":"便携/手持反制设备","明细行数":"7","涉及项目数":"7"},{"设备类型":"侦测探测设备","明细行数":"7","涉及项目数":"7"},{"设备类型":"察打一体侦测反制设备","明细行数":"4","涉及项目数":"3"},{"设备类型":"固定式反制/防御设备","明细行数":"4","涉及项目数":"4"},{"设备类型":"配套无人机/训练靶机","明细行数":"3","涉及项目数":"1"},{"设备类型":"配套计算/显示终端","明细行数":"1","涉及项目数":"1"}];
+    const CAPABILITIES = [{"能力形态":"硬件设备/装备","项目数":84,"可解析金额万元":3451.28},{"能力形态":"软硬件综合/系统平台","项目数":54,"可解析金额万元":8442.46},{"能力形态":"服务/租赁/咨询","项目数":21,"可解析金额万元":826.37},{"能力形态":"服务类/软硬件结合","项目数":6,"可解析金额万元":390.28}];
+    const YEARS = [{"年份":"2023","项目数":11,"可解析金额万元":714.5},{"年份":"2024","项目数":34,"可解析金额万元":1630.67},{"年份":"2025","项目数":92,"可解析金额万元":7087.28},{"年份":"2026","项目数":28,"可解析金额万元":3677.93}];
+    const PRICE_BANDS = [{"区间":"50万元以下","项目数":19},{"区间":"50-100万元","项目数":16},{"区间":"100-200万元","项目数":18},{"区间":"200-500万元","项目数":16},{"区间":"500万元以上","项目数":4}];
+    const SUPPLIERS = [{"中标单位":"杰能科世智能安全科技（杭州）有限公司","项目数":4,"金额万元":817.96,"涉及省份":"宁夏、安徽、甘肃"},{"中标单位":"中国联合网络通信有限公司西双版纳傣族自治州分公司","项目数":4,"金额万元":138.99,"涉及省份":"云南"},{"中标单位":"浙江众合科技股份有限公司","项目数":2,"金额万元":1197.88,"涉及省份":"浙江"},{"中标单位":"中国联合网络通信有限公司温州市分公司","项目数":2,"金额万元":200.1,"涉及省份":"浙江"},{"中标单位":"四川中移通信技术工程有限公司","项目数":2,"金额万元":394.27,"涉及省份":"四川"},{"中标单位":"新疆乾元商贸有限公司","项目数":2,"金额万元":57.6,"涉及省份":"新疆"},{"中标单位":"中国电信股份有限公司舟山分公司","项目数":1,"金额万元":43.54,"涉及省份":"浙江"},{"中标单位":"中国移动通信集团浙江有限公司舟山分公司","项目数":1,"金额万元":302.27,"涉及省份":"浙江"},{"中标单位":"中国移动通信集团浙江有限公司丽水分公司","项目数":1,"金额万元":0,"涉及省份":"浙江"},{"中标单位":"中国移动通信集团浙江有限公司台州分公司","项目数":1,"金额万元":164,"涉及省份":"浙江"},{"中标单位":"中国联合网络通信有限公司台州市分公司","项目数":1,"金额万元":203.03,"涉及省份":"浙江"},{"中标单位":"苏州璟鞍科技有限公司","项目数":1,"金额万元":50,"涉及省份":"浙江"},{"中标单位":"成都构玩居游乐设备有限公司","项目数":1,"金额万元":134.44,"涉及省份":"四川"},{"中标单位":"天维讯达（四川）科技有限公司","项目数":1,"金额万元":114.9,"涉及省份":"四川"},{"中标单位":"成都鸿安泰达科技发展有限公司","项目数":1,"金额万元":607,"涉及省份":"四川"},{"中标单位":"星际控股集团有限公司","项目数":1,"金额万元":32.8,"涉及省份":"新疆"},{"中标单位":"浙江凡双科技股份有限公司","项目数":1,"金额万元":74.68,"涉及省份":"云南"},{"中标单位":"新疆尚维飞创电子科技有限公司","项目数":1,"金额万元":0,"涉及省份":"新疆"},{"中标单位":"新疆轩志信息科技有限公司","项目数":1,"金额万元":0,"涉及省份":"新疆"},{"中标单位":"中虎****公司","项目数":1,"金额万元":40,"涉及省份":"重庆"}];
+    const BUYER_CATEGORIES = [{"主体类别":"公安司法与公共安全","项目数":70,"可解析金额万元":7886.32,"代表发包单位":"黄山市公安局黄山分局、宣城市公安局、兰州市公安局"},{"主体类别":"未披露/转载脱敏","项目数":48,"可解析金额万元":856.11,"代表发包单位":""},{"主体类别":"军队/涉密脱敏单位","项目数":25,"可解析金额万元":443.73,"代表发包单位":"某部、某单位、泸州市应急管理局"},{"主体类别":"企业园区/高校科研/运营主体","项目数":11,"可解析金额万元":3610.82,"代表发包单位":"安徽铁塔池州市分公司、连云港腾云低空智联科技有限公司、浙江工商大学"},{"主体类别":"机场交通能源等敏感基础设施","项目数":8,"可解析金额万元":100.5,"代表发包单位":"甘肃煤田地质局综合普查队、中国南方电网有限责任公司/南方电网供应链集团有限公司、台山核电合营有限公司/中广核相关单位"},{"主体类别":"政府部门及事业单位","项目数":2,"可解析金额万元":212.9,"代表发包单位":"成都市无线电监测站、温州市龙湾区体育事业发展中心"},{"主体类别":"其他可识别主体","项目数":1,"可解析金额万元":0,"代表发包单位":"武汉东湖新技术开发区分局"}];
+    const BUYER_CATEGORY_DETAILS = [{"主体类别":"企业园区/高校科研/运营主体","项目数":11,"单位数":9,"单位列表":["安徽铁塔池州市分公司","杭州低空产业发展有限公司","杭州临安智瀚大数据科技有限公司","兰州新区科技创新发展管理有限公司","连云港腾云低空智联科技有限公司","厦门低空经济管理服务有限公司","十堰产城融合投资发展集团有限公司","浙江工商大学","中国铁塔股份有限公司遂宁市分公司"],"项目示例":["安徽铁塔池州市分公司 无人机反制 服务项目(第二次)( 中标公告","杭州市低空综合管理服务平台2.0公共安防管理端开发服务采购项目","兰州新区低空飞行设施设备建设项目（低空安全监管平台项目）","连云港腾云低空智联低空安防试验示范基地无人机反制装置零部件采购项目","临安区低空综合治理应用集成（一期）项目","厦门低空综合管理服务平台及一网统飞运营平台项目"]},{"主体类别":"未披露/转载脱敏","项目数":48,"单位数":0,"单位列表":[],"项目示例":["******","2024年无人机侦测反制设备采购项目中标公告","2026年无人机反制设备租赁服务","保德县 无人机反制设备 采购 中标公告","采购 无人机反制 设备竞价 成交公告","车载 无人机反制 系统改装 中标公告"]},{"主体类别":"公安司法与公共安全","项目数":70,"单位数":66,"单位列表":["安徽省公安厅机场公安局","保德县公安局","昌都市公安局","昌吉回族自治州公安局","常州市公安局","成都市公安局","成都市公安局高新技术产业开发区分局","崇仁县公安局","大兴安岭边境管理支队","鄂尔多斯市公安局","鄂尔多斯市公安局康巴什分局","鄂托克旗公安局","丰林县公安局","抚顺市公安局","甘肃省公安厅机场公安局","赣江新区公安局","广东警官学院","广东省茂名监狱","贵阳市公安局","贵州省黔东南苗族侗族自治州公安局","海盐县公安局","杭州市公安局临安区分局","横琴粤澳深度合作区公安局","黄山市公安局黄山分局","惠州市公安局大亚湾经济技术开发区分局","济南市公安局特巡警支队","江苏省龙潭监狱","介休市公安局","克州GAJ（特警支队）","昆明市公安局","昆明市公安局西山分局","兰州市公安局","丽水市公安局","连云港市公安局","林西县公安局","泸县公安局","绵阳市公安局经济技术开发区分局","南昌市公安局","秦皇岛市公安局","瑞安市公安局","山亭公安分局","上海市公安局青浦分局","上海市公安局长宁分局","绍兴市公安局上虞区分局","深圳市公安局福田分局","深圳市公安局龙华分局","深圳市公安局罗湖分局","沈阳铁路公安局","石泉县公安局","石嘴山市公安局","绥化市公安局","泰州市公安局（机关）","天台县公安局","铜川市公安局","乌什县公安局","无锡市公安局梁溪分局","西安市公安局（本级）","宣城市公安局","延安市公安局","伊金霍洛旗公安局","银川市公安局","禹城市公安局","浙江警官职业学院","重庆市公安局江北区分局","舟山市公安局普陀区分局","准格尔旗公安局"],"项目示例":["2024年度至2025年度长宁公安分局无人机侦测反制设备租赁项目","保德县公安局无人机反制设备采购结果公告","采购无人机反制设备结果公告","昌都市公安局采购低空安全反无人机系统项目","常州市公安局2024年无人机侦测反制设备采购项目","成都市公安局无人机反制装备采购项目（二次）"]},{"主体类别":"机场交通能源等敏感基础设施","项目数":8,"单位数":7,"单位列表":["兵团第二单位","东营机场","甘肃煤田地质局综合普查队","台山核电合营有限公司/中广核相关单位","唐山市陡河水库事务中心","西安咸阳国际机场股份有限公司","中国南方电网有限责任公司/南方电网供应链集团有限公司"],"项目示例":["东部电厂固定式 无人机反制 防御系统设备采购( 中标公告","东营机场无人机反制设备采购项目","陡河水库 无人机反制系统 双盲评审公开招标 中标公告","甘肃煤田地质局综合普查队固定式无人机侦测反制系统中标公告","南方电网公司2025年第三批无人机设备及相关附件框架采购项目（固定式无人机主动防御系统、便携式无人机反制装置）","台山核电低空防御系统相关设备采购成交项目"]},{"主体类别":"军队/涉密脱敏单位","项目数":25,"单位数":4,"单位列表":["泸州市应急管理局","某部","某单位","新疆维吾尔自治区巴音郭楞某单位"],"项目示例":["•某部 无人机反制 装备采购项目 中标 结果 公告","定海区 无人机反制 系统竞价 成交 公告-浙江招标网 2025年3月10日","反无人机系统设备采购项目","呼和浩特市某单位 无人机反制 设备采购项目 成交公告","泸州军分区民兵反无人机排装备器材采购项目","墨玉县某单位 无人机 及 反制 设备二次 中标 结果-采招网 2025年12月17日"]},{"主体类别":"其他可识别主体","项目数":1,"单位数":1,"单位列表":["武汉东湖新技术开发区分局"],"项目示例":["武汉东湖新技术开发区分局光谷马拉松无人机反制租赁服务项目"]},{"主体类别":"政府部门及事业单位","项目数":2,"单位数":2,"单位列表":["成都市无线电监测站","温州市龙湾区体育事业发展中心"],"项目示例":["成都世运会无人机无线电反制设备管控服务项目","温州奥体中心安保专项-无人机反制设备采购项目"]}];
+    const BUYER_TOPS = [{"发包采购单位":"某部","项目数":9,"省份":"黑龙江、内蒙古、四川、云南、安徽","代表项目":"某部 无人机反制 系统采购项目( 中标公告"},{"发包采购单位":"某单位","项目数":8,"省份":"江苏、青海、未识别、新疆、浙江","代表项目":"某单位 无人机反制 设备采购项目(中标 公告"},{"发包采购单位":"天台县公安局","项目数":2,"省份":"浙江","代表项目":"天台县公安局无人机侦测打击系统项目"},{"发包采购单位":"中国铁塔股份有限公司遂宁市分公司","项目数":2,"省份":"四川","代表项目":"中国铁塔股份有限公司遂宁市分公司2025年低空安全态势感知监管平台服务与无人机监测反制设备采购项目（标段1：平台服务）"},{"发包采购单位":"海盐县公安局","项目数":1,"省份":"浙江","代表项目":"海盐县公安局 无人机反制 设备采购项目( 中标公告"},{"发包采购单位":"温州市龙湾区体育事业发展中心","项目数":1,"省份":"浙江","代表项目":"温州奥体中心安保专项-无人机反制设备采购项目"},{"发包采购单位":"浙江工商大学","项目数":1,"省份":"浙江","代表项目":"浙江工商大学文体中心亚运手球馆无人机反制预警设备租赁服务"},{"发包采购单位":"瑞安市公安局","项目数":1,"省份":"浙江","代表项目":"瑞安市公安局便携式无人机防御反制设备采购项目"},{"发包采购单位":"丽水市公安局","项目数":1,"省份":"浙江","代表项目":"丽水市公安局丽水机场低空防御服务项目合同"},{"发包采购单位":"舟山市公安局普陀区分局","项目数":1,"省份":"浙江","代表项目":"舟山市公安局普陀区分局无人机低空反制设备采购合同"},{"发包采购单位":"绍兴市公安局上虞区分局","项目数":1,"省份":"浙江","代表项目":"绍兴市公安局上虞区分局无人机反制设备采购项目（第二次）"},{"发包采购单位":"浙江警官职业学院","项目数":1,"省份":"浙江","代表项目":"浙江警官职业学院监狱无人机探测与反制实训系统建设项目"}];
+    const TOP_AMOUNT = [{"省份":"福建","省内城市区域":"厦门","项目名称":"厦门低空综合管理服务平台及一网统飞运营平台项目","主需求类别":"日常巡防需求","项目金额":"1757.1800 万元","金额万元":"1757.18","承建中标单位":"中科星图股份有限公司、厦门兆翔智能科技有限公司联合体","中标公告时间":"2025-10-13","来源等级":"B-公开转载/行业平台","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://www.anfangzb.com/view/16400/J7ZW3JkBg7S5K-635DSh.html"},{"省份":"浙江","省内城市区域":"杭州临安","项目名称":"临安区低空综合治理应用集成（一期）项目","主需求类别":"日常巡防需求","项目金额":"739.8800 万元","金额万元":"739.88","承建中标单位":"浙江众合科技股份有限公司","中标公告时间":"2025-12-15","来源等级":"B-公开转载/行业平台","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://stock.stockstar.com/RB2025121800016028.shtml"},{"省份":"四川","省内城市区域":"成都","项目名称":"成都市公安局无人机反制装备采购项目（二次）","主需求类别":"日常巡防需求","项目金额":"607.0000 万元","金额万元":"607.0","承建中标单位":"成都鸿安泰达科技发展有限公司","中标公告时间":"2024-10-16","来源等级":"A-官方公告/公共资源","设备名称清单":"无人机反制装备","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20241016/8a69ce909271d3f20192937b363d1071.html"},{"省份":"甘肃","省内城市区域":"兰州新区","项目名称":"兰州新区低空飞行设施设备建设项目（低空安全监管平台项目）","主需求类别":"园区运营需求","项目金额":"566.1600 万元","金额万元":"566.16","承建中标单位":"杰能科世智能安全科技（杭州）有限公司","中标公告时间":"2026-03-25","来源等级":"B-公开转载/行业平台","设备名称清单":"低空安全监管平台","来源链接":"https://www.bbda.com/bidList/k1295"},{"省份":"内蒙古","省内城市区域":"鄂尔多斯准格尔旗","项目名称":"准格尔旗公安低空数字警务项目（2026年采购）","主需求类别":"日常巡防需求","项目金额":"485.8614 万元","金额万元":"485.8614","承建中标单位":"鄂尔多斯市低空经济开发有限公司","中标公告时间":"2026-04-09","来源等级":"A-官方公告/公共资源","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202604/t20260409_26380092.htm"},{"省份":"浙江","省内城市区域":"杭州","项目名称":"杭州市低空综合管理服务平台2.0公共安防管理端开发服务采购项目","主需求类别":"日常巡防需求","项目金额":"458.0000 万元","金额万元":"458.0","承建中标单位":"浙江众合科技股份有限公司","中标公告时间":"2025-10-14","来源等级":"B-公开转载/行业平台","设备名称清单":"低空综合管理服务平台2.0公共安防管理端开发服务","来源链接":"https://www.anfangzhaobiao.com/qiye/zjzhkjgfyxgs/"},{"省份":"广东","省内城市区域":"茂名","项目名称":"广东省茂名监狱低空域智能警戒巡防系统采购项目","主需求类别":"敏感目标防护需求","项目金额":"425.5200 万元","金额万元":"425.52","承建中标单位":"中国电信股份有限公司广东分公司","中标公告时间":"2025-05-22","来源等级":"A-官方公告/公共资源","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://gdgpo.czt.gd.gov.cn/freecms/site/gd/ggxx/info/2025/8a7e6fc396d4b9610196e214d7bf710f.html"},{"省份":"内蒙古","省内城市区域":"鄂尔多斯伊金霍洛旗","项目名称":"伊金霍洛旗公安局低空数字警务设备采购项目","主需求类别":"日常巡防需求","项目金额":"394.8986 万元","金额万元":"394.8986","承建中标单位":"公开信息未披露","中标公告时间":"2026-04-14","来源等级":"A-官方公告/公共资源","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://www.ccgp-neimenggu.gov.cn/gpx-bid-file/ZF_JGBM_000001/150627/2026/2/19/402881e29f1bab8b019f2a3a764e1b5d/gpx-bidconfirm/402881d2a2e2034d01a329e464d50142.pdf?accessCode=f9e54e286d0c95a3ed97db6c0119d409"},{"省份":"内蒙古","省内城市区域":"康巴什","项目名称":"康巴什区中轴线无人机反制系统建设项目","主需求类别":"敏感目标防护需求","项目金额":"380.3522 万元","金额万元":"380.3522","承建中标单位":"中移系统集成有限公司","中标公告时间":"2025-08-21","来源等级":"B-公开转载/行业平台","设备名称清单":"无人机反制系统","来源链接":"https://www.zcbx.xyz/index.php?v=show\u0026cid=93\u0026id=654079"},{"省份":"广东","省内城市区域":"深圳","项目名称":"深圳市公安局罗湖分局2025年下半年分局无人机及侦测反制设备采购项目（重新招标）","主需求类别":"敏感目标防护需求","项目金额":"331.9600 万元","金额万元":"331.96","承建中标单位":"中科星图股份有限公司","中标公告时间":"2026-01-19","来源等级":"B-公开转载/行业平台","设备名称清单":"无人机侦测反制设备/装备","来源链接":"https://www.aamshanghai.com/jiangsu-yancheng-low-drone-bidding.html"},{"省份":"四川","省内城市区域":"成都高新","项目名称":"高新公安分局2025年度低空警务实战场景应用建设项目","主需求类别":"日常巡防需求","项目金额":"324.3180 万元","金额万元":"324.318","承建中标单位":"四川中移通信技术工程有限公司","中标公告时间":"2025-08-18","来源等级":"A-官方公告/公共资源","设备名称清单":"无人机侦测反制系统/平台","来源链接":"https://jy.scltzb.com/html/eltzb/jiaoyixinxi/jieguogonggao/1957344575933603842.html"},{"省份":"浙江","省内城市区域":"普陀","项目名称":"舟山市公安局普陀区分局无人机低空反制设备采购合同","主需求类别":"敏感目标防护需求","项目金额":"302.2722 万元","金额万元":"302.2722","承建中标单位":"中国移动通信集团浙江有限公司舟山分公司","中标公告时间":"2026-01-23","来源等级":"B-公开转载/行业平台","设备名称清单":"无人机低空反制设备","来源链接":"https://www.bbda.com/bidList/k1295"}];
+    const MAJOR_ACTIVITY = [{"展示分组":"服务/租赁相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"广西","省内城市区域":"钦州","项目名称":"钦州市某单位采购 无人机反制设备 ( 中标公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"广西正阳科技发展有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://gx.bidizhaobiao.com/info-736635266.html","证据摘要":"钦州市某单位采购 无人机反制设备 ( 中标公告 )-广西招标网 2025年12月1日 - 一、项目名称:钦州市某单位采购 无人机 反制设备.广西正阳科技发展有限公司商务条款响应售后服务中 中标 供应商提供24小时售后服务,自接到故障通知后一小... gx.bidizhaobiao.com 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"服务/租赁相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"贵州","省内城市区域":"贵阳","项目名称":"贵阳市公安局无人机反制设备采购项目","发包采购单位":"贵阳市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年5月7日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.okcis.cn/20260507-n3-20260507234734360225.html","证据摘要":"公开转载结果页摘要显示项目为无人机反制设备采购，中标结果发布时间2026年5月7日，采购主体可识别为贵阳市公安局；金额和中标单位未披露。","来源链接状态":"暂打不开","来源链接说明":"远程服务器返回错误: (403) 已禁止。"},{"展示分组":"服务/租赁相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"江西","省内城市区域":"崇仁","项目名称":"崇仁县公安局无人机反制设备采购项目","发包采购单位":"崇仁县公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年4月1日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.ixbang.com/bid/detail/3C831D33919D937FC2E8DA122B0151D4.html","证据摘要":"销邦招标平台转载结果显示：关于无人机反制设备采购项目中选结果的公告，在线选取采购单位为崇仁县公安局，发布时间2026年4月1日。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"服务/租赁相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"陕西","省内城市区域":"石泉","项目名称":"石泉县公安局无人机反制设备采购项目中标（成交）结果公告","发包采购单位":"石泉县公安局","项目金额":"16.8800 万元","金额万元":"16.88","承建中标单位":"公开信息未披露","中标公告时间":"2025年09月30日","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","来源链接":"http://www.ccgp.gov.cn/cggg/dfgg/cjgg/202509/t20250930_25447729.htm","证据摘要":"石泉县公安局 无人机反制设备 采购项目 中标 (成交)结果 公告 2025年9月30日 - 合同包号 合同包名称 代理服务费金额(万元) 收取对象 1 石泉县公安局 无人机反制设备 采购项目 0.3 中标 (成交)供应商 七、 公告 期限.石泉县公安局无... www.ccgp.gov.cn 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"服务/租赁相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"陕西","省内城市区域":"西安咸阳","项目名称":"西安咸阳国际机场股份有限公司无人机反制车租赁项目","发包采购单位":"西安咸阳国际机场股份有限公司","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年1月5日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bidcenter.com.cn/news-398824934-4.html","证据摘要":"采招网转载结果公示显示：西安咸阳国际机场股份有限公司无人机反制车租赁项目，发布时间2026年1月5日；公开摘要未披露中标单位和金额。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"服务/租赁相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"新疆","省内城市区域":"乌鲁木齐","项目名称":"无人机反制系统采购项目","发包采购单位":"某单位","项目金额":"28.8000 万元","金额万元":"28.8","承建中标单位":"新疆乾元商贸有限公司","中标公告时间":"2025-03-28","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202503/t20250328_24369730.htm","证据摘要":"中国政府采购网中标公告披露：行政区域新疆维吾尔自治区，总中标金额28.8万元，服务名称为无人机探测防御察打一体化平台。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"服务/租赁相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"浙江","省内城市区域":"丽水","项目名称":"丽水市公安局丽水机场低空防御服务项目合同","发包采购单位":"丽水市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"中国移动通信集团浙江有限公司丽水分公司","中标公告时间":"2025-12-11","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bbda.com/bidList/k1295","证据摘要":"公开招投标信息披露：丽水机场低空防御服务项目合同，供应商中国移动浙江丽水分公司。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"安徽","省内城市区域":"宣城","项目名称":"宣城市公安局低空安全管控装备租赁服务采购项目","发包采购单位":"宣城市公安局","项目金额":"167.5000 万元","金额万元":"167.5","承建中标单位":"安徽省通航无人机服务有限公司","中标公告时间":"2026-05-06","年份":"2026","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://ggzyjy.xuancheng.gov.cn/xcspfront/zfcg/017001/017001004/20260506/31e1b449-bf7d-4768-b057-13340e9fabcc.html","证据摘要":"宣城市公共资源交易中心成交结果公告披露：低空安全管控装备租赁服务，成交金额1675000元；需求文本含日常工作及重大活动补充保障服务。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"广东","省内城市区域":"珠海横琴","项目名称":"横琴粤澳深度合作区公安局重大活动安保无人机防控服务政府采购项目","发包采购单位":"横琴粤澳深度合作区公安局","项目金额":"157.2875 万元","金额万元":"157.2875","承建中标单位":"中国移动通信集团广东有限公司珠海分公司","中标公告时间":"2024-12-18","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://hengqin.gd.gov.cn/gkmlpt/content/4/4617/post_4617550.html","证据摘要":"广东政府公开页面披露：重大活动安保无人机防控服务，中标供应商中国移动广东珠海分公司，中标金额1,572,875.00元。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"日常巡防需求","软硬件属性":"硬件设备/装备","省份":"广东","省内城市区域":"深圳","项目名称":"龙华分局购置十五运无人机反制设备采购项目","发包采购单位":"深圳市公安局龙华分局","项目金额":"95.5000 万元","金额万元":"95.5","承建中标单位":"江门市亿豪警用装备科技有限公司","中标公告时间":"2025-08-21","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"完整","来源链接":"https://www.szyd11.com/tender/win/detail?TenderId=16753","证据摘要":"公开招标代理结果页披露：龙华分局购置十五运无人机反制设备采购项目，中标单位江门市亿豪警用装备科技有限公司。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"湖北","省内城市区域":"武汉","项目名称":"武汉东湖新技术开发区分局光谷马拉松无人机反制租赁服务项目","发包采购单位":"武汉东湖新技术开发区分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"武汉优一硕智能应用科技有限公司","中标公告时间":"2025-10-20","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bbda.com/bidList/k1295","证据摘要":"公开招投标信息披露：光谷马拉松无人机反制租赁服务，供应商武汉优一硕智能应用科技有限公司。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"湖南","省内城市区域":"长沙","项目名称":"长沙市公安局天心分局警保卫大队关于无人机反制服务的竞价竞价成交公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年01月28日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","来源链接":"https://www.chinamae.com/purchases/e6acdaa5c2b53548354b67324ab1c7e8.html","证据摘要":"长沙市公安局天心分局警保卫大队关于 无人机反制 服务的竞价竞价 成交公告 2026年1月28日 - 序号 标的 名称 品牌 规格型号 数量 单价(元) 成交 金额(元) 报价明细 1 无人机 反制服务 - - 39天 1278.00 49842.00 需求响应: 无人机 反制服务.衡阳市南... www.chinamae.com 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"陕西","省内城市区域":"延安","项目名称":"延安市公安局采购无人机反制枪及租赁无人机反制阵地项目","发包采购单位":"延安市公安局","项目金额":"202.0000 万元","金额万元":"202.0","承建中标单位":"西安宇航者创新科技有限公司","中标公告时间":"2023-03-17","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://www.ccgp-shaanxi.gov.cn/gpx-bid-file/610601/gpx-bidcore/2023/3/17/8a69c883865ceb1d0186eecd493c4bad.pdf?accessCode=e0771c16fa46abf11b4fd6cbb9a6e929","证据摘要":"陕西政府采购PDF披露：采购无人机反制枪及租赁无人机反制阵地，中标供应商西安宇航者创新科技有限公司，中标总价2020000元。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"上海","省内城市区域":"长宁","项目名称":"2024年度至2025年度长宁公安分局无人机侦测反制设备租赁项目","发包采购单位":"上海市公安局长宁分局","项目金额":"99.0000 万元","金额万元":"99.0","承建中标单位":"上海新世纪科技有限公司","中标公告时间":"2024-11-11","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://www.ccgp.gov.cn/cggg/dfgg/cjgg/202411/t20241111_23584081.htm","证据摘要":"中国政府采购网成交公告披露：项目编号CTCG0110-2024-4873，总成交金额99万元；服务名称为2024年度至2025年度长宁公安分局无人机侦测反制设备租赁项目，服务期限合同签订后一年。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"上海","省内城市区域":"青浦","项目名称":"上海市公安局青浦分局无人机反制阵地系统租赁服务","发包采购单位":"上海市公安局青浦分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024-05-10","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.ode119.com/zhaobiao/89312.html","证据摘要":"公开转载中标公告披露：上海市公安局青浦分局无人机反制阵地系统租赁服务的中标（成交）结果公告。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"服务/租赁/咨询","省份":"四川","省内城市区域":"成都","项目名称":"成都世运会无人机无线电反制设备管控服务项目","发包采购单位":"成都市无线电监测站","项目金额":"114.9000 万元","金额万元":"114.9","承建中标单位":"天维讯达（四川）科技有限公司","中标公告时间":"2025-07-10","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20250710/8a69cb7697ee71240197f26715345e73.html","证据摘要":"四川公共资源交易/四川政府采购中标公告披露：项目编号N5101012025000978，中标金额1,149,000.00元；采购标的为无人机无线电反制设备管控服务，服务范围为完成成都世运会相关工作。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","省份":"浙江","省内城市区域":"温州","项目名称":"温州奥体中心安保专项-无人机反制设备采购项目","发包采购单位":"温州市龙湾区体育事业发展中心","项目金额":"98.0000 万元","金额万元":"98","承建中标单位":"中国联合网络通信有限公司温州市分公司","中标公告时间":"2023-08-21","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://ggzyjy-eweb.wenzhou.gov.cn/art/2023/8/21/art_1229678301_28546.html","证据摘要":"温州市公共资源交易网：投标报价980000元，采购人为温州市龙湾区体育事业发展中心","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"服务/租赁/咨询","省份":"浙江","省内城市区域":"杭州","项目名称":"浙江工商大学文体中心亚运手球馆无人机反制预警设备租赁服务","发包采购单位":"浙江工商大学","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2023-05-24","年份":"2023","来源等级":"A-官方公告/公共资源","字段完整度":"较完整","来源链接":"https://cgzx.zjgsu.edu.cn/4738/list35.psp","证据摘要":"浙江工商大学采购中心中标公告列表披露：浙江工商大学文体中心亚运手球馆无人机反制预警设备租赁服务成交结果公告，项目编号0625-23218448。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"文本显性样本","原主需求类别":"重大活动保障需求","原兼具需求类别":"敏感目标防护需求","软硬件属性":"硬件设备/装备","省份":"浙江","省内城市区域":"柯桥","项目名称":"柯桥区 无人机反制设备 采购 中标 成交结果 公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年11月21日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","来源链接":"https://zj.bidcenter.com.cn/zbcontent-390623194-4.html","证据摘要":"柯桥区 无人机反制设备 采购 中标 成交结果 公告 -浙江招标网 2025年11月21日 - 二、项目名称: (略) (略) (略) 无人机 反制设备采购.1.各参加政府采购活动的供应商认为该 中标 /成交结果和采购过程等使自己的权益受到损害的,可以自本 公 ... zj.bidcenter.com.cn 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","省份":"安徽","省内城市区域":"黄山","项目名称":"黄山市公安局黄山分局H2LPro手持式无人机探测定位设备采购项目","发包采购单位":"黄山市公安局黄山分局","项目金额":"6.0000 万元","金额万元":"6.0","承建中标单位":"公开信息未披露","中标公告时间":"2026-02-02","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bbda.com/bidList/k1295","证据摘要":"公开招投标信息披露：华诺星空H2LPro手持式无人机探测定位设备，成交金额60000元。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","省份":"北京","省内城市区域":"石景山","项目名称":"无人机领域综合科研专项-无人机学院实验室建设采购项目","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"北京君锋泰业科技有限公司","中标公告时间":"2025-11-21","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bbda.com/bidList/k1295","证据摘要":"公开招投标信息披露：项目含低空防御管控平台、无人机管制干扰枪等，中标单位北京君锋泰业科技有限公司。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","省份":"广东","省内城市区域":"惠州","项目名称":"惠州市公安局大亚湾经济技术开发区分局大亚湾石化区天海地一体化综合防控系统建设项目（第二次）","发包采购单位":"惠州市公安局大亚湾经济技术开发区分局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025-12-15","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.bbda.com/bidList/k1295","证据摘要":"公开招投标信息披露：标的含低空防御雷达显控软件、无人机防御察打一体机等。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"日常巡防需求","软硬件属性":"软硬件综合/系统平台","省份":"江苏","省内城市区域":"泰州","项目名称":"泰州市公安局巡特警支队无人机侦测反制设备采购项目","发包采购单位":"泰州市公安局（机关）","项目金额":"78.8000 万元","金额万元":"78.8","承建中标单位":"广州华警安防科技发展有限公司","中标公告时间":"2024-09-12","年份":"2024","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://czj.taizhou.gov.cn/tzzfcgw/cgxx/sjcgxx/zbcjjggg/cjgg/art/2024/art_b69d7a2834914873a79ded08916bbd97.html","证据摘要":"泰州市政府采购网成交公告披露：固定式无人机侦测反制设备，中标/成交金额788000元。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","省份":"江苏","省内城市区域":"连云港","项目名称":"连云港市公安局车载式无人机反制系统购买中标公告","发包采购单位":"连云港市公安局","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2026年4月3日","年份":"2026","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.zhiliaobiaoxun.com/article/95096299","证据摘要":"连云港市公安局车载式 无人机反制系统 购买 中标公告 2026年4月3日 - 项目名称: 连云港市公安局车载式 无人机反制系统 购买 中标公告 招标公司: 连云港市公安局 中标公司: 江苏丰东信息科技有限公司 采购标的物: 车载式 无人 ... www.zhiliaobiaoxun.com 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"敏感目标防护需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","省份":"山东","省内城市区域":"东营","项目名称":"东营机场无人机反制设备采购项目","发包采购单位":"东营机场","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年12月9日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://sd.bidizhaobiao.com/info-567616680.html","证据摘要":"山东招标网转载成交公告显示：项目名称为东营机场无人机反制设备采购项目，项目编号SDYT2024-089#，公告日期2024年12月9日。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"应急处置需求","原兼具需求类别":"敏感目标防护需求","软硬件属性":"软硬件综合/系统平台","省份":"四川","省内城市区域":"泸州","项目名称":"泸州军分区民兵反无人机排装备器材采购项目","发包采购单位":"泸州市应急管理局","项目金额":"134.4444 万元","金额万元":"134.4444","承建中标单位":"成都构玩居游乐设备有限公司","中标公告时间":"2025-07-29","年份":"2025","来源等级":"A-官方公告/公共资源","字段完整度":"完整","来源链接":"https://ggzyjy.sc.gov.cn/jyxx/002002/002002003/20250729/8a69ce2d984c25900198500cbd1c06b7.html","证据摘要":"四川省公共资源交易信息网：中标金额1344444元，含频谱侦测、固定式反制、察打一体、便携式反制和智能管控平台","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","省份":"未识别","省内城市区域":"未识别","项目名称":"特警大队无人机反制设备采购项目成交公告","发包采购单位":"公开信息未披露","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2024年04月08日","年份":"2024","来源等级":"B-公开转载/行业平台","字段完整度":"待复核","来源链接":"https://www.qianlima.com/bid-412879753.html","证据摘要":"特警大队 无人机反制 设备采购项目 成交公告 -千里马招标网 2024年4月8日 - 二、项目 名称 :特警大队 无人机 反制设备采购项目. 成交 金额:832000.00元 大写(捌拾叁万贰仟元整)... www.qianlima.com 反馈","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"园区运营需求","原兼具需求类别":"敏感目标防护需求；日常巡防需求","软硬件属性":"软硬件综合/系统平台","省份":"新疆","省内城市区域":"未识别","项目名称":"无人机反制系统及无人机机场式巡逻系统采购项目","发包采购单位":"兵团第二单位","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"公开信息未披露","中标公告时间":"2025年10月30日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://www.chinabiddingzb.com/read-670286095.html","证据摘要":"公开转载结果页摘要显示：无人机反制系统及无人机机场式巡逻系统采购项目，中标（成交）结果公告，发布时间2025年10月30日，采购主体摘要为兵团第二单位。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"硬件设备/装备","省份":"新疆","省内城市区域":"克州","项目名称":"克州GAJ（特警支队）无人机反制侦测相关设备采购项目","发包采购单位":"克州GAJ（特警支队）","项目金额":"公开信息未披露","金额万元":"","承建中标单位":"新疆尚维飞创电子科技有限公司","中标公告时间":"2025年12月1日","年份":"2025","来源等级":"B-公开转载/行业平台","字段完整度":"较完整","来源链接":"https://xj.bidizhaobiao.com/info-599920271.html","证据摘要":"新疆招标网转载合同摘要显示：克州GAJ（特警支队）无人机反制侦测相关设备采购项目合同，供应商为新疆尚维飞创电子科技有限公司。","来源链接状态":"可打开","来源链接说明":"HTTP 200"},{"展示分组":"装备/平台相关样本","原主需求类别":"日常巡防需求","原兼具需求类别":"无明显兼具类别","软硬件属性":"软硬件综合/系统平台","省份":"浙江","省内城市区域":"温州","项目名称":"瑞安市公安局便携式无人机防御反制设备采购项目","发包采购单位":"瑞安市公安局","项目金额":"102.1000 万元","金额万元":"102.1","承建中标单位":"中国联合网络通信有限公司温州市分公司","中标公告时间":"2023-07-17","年份":"2023","来源等级":"B-公开转载/行业平台","字段完整度":"完整","来源链接":"https://www.fdzb119.com/zhaobiao/70037.html","证据摘要":"公开转载：投标总价1021000元，含手提式侦测定位、多用途反制、穿越机反制、便携式侦测反制和管控平台","来源链接状态":"可打开","来源链接说明":"HTTP 200"}];
+    const BUYER_DETAIL_CATEGORIES = ['企业园区/高校科研/运营主体', '政府部门及事业单位'];
+
+    function num(v) { const n = Number(v || 0); return Number.isFinite(n) ? n : 0; }
+    function maxOf(arr, key) { return Math.max(1, ...arr.map(x => num(x[key]))); }
+    function esc(v) {
+      return String(v || '').replace(/[&<>"']/g, function(ch) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]);
+      });
+    }
+    function sourceMeta(level) {
+      const text = String(level || '');
+      if (text.startsWith('A')) return {label:'A 官方', cls:'official'};
+      if (text.startsWith('B')) return {label:'B 转载', cls:'reprint'};
+      return {label:'未披露', cls:'hidden'};
+    }
+    function dateScore(x) {
+      const text = String(x.排序日期文本 || x.中标公告时间 || '');
+      const m = text.match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+      if (!m) return 0;
+      return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).getTime();
+    }
+    function sourceLinkHtml(x, fullLabel = false) {
+      const url = String(x.来源链接 || '').trim();
+      const state = String(x.来源链接状态 || '');
+      const reason = esc(x.来源链接说明 || '');
+      if (!url) return '<span class="source-link blocked" title="未提供来源链接">无链接</span>';
+      if (state === '可打开') {
+        return '<a class="source-link open" href="' + esc(url) + '" target="_blank" rel="noopener">' + (fullLabel ? '打开来源' : '打开') + '</a>';
+      }
+      return '<span class="source-link blocked" title="' + reason + '">暂打不开</span>';
+    }
+    function barRows(el, arr, labelKey, valueKey, opts = {}) {
+      const max = maxOf(arr, valueKey);
+      el.innerHTML = arr.map((x, i) => {
+        const value = num(x[valueKey]);
+        const cls = opts.palette === 'warm' ? 'amber' : opts.palette === 'violet' ? 'violet' : '';
+        const rowClass = 'bar-row' + (opts.drillable ? ' drillable' : '');
+        return '<div class="' + rowClass + '" data-label="' + esc(x[labelKey]) + '"><div title="' + esc(x[labelKey]) + '">' + esc(x[labelKey]) +
+          '</div><div class="bar-track"><div class="bar-fill ' + cls + '" style="width:' +
+          Math.max(3, value / max * 100) + '%"></div></div><div>' +
+          (opts.money ? value.toFixed(1) : value) + '</div></div>';
+      }).join('');
+    }
+    function groupStats(rows, key) {
+      const map = new Map();
+      rows.forEach(x => {
+        const label = String(x[key] || '未披露');
+        const item = map.get(label) || {label: label, count: 0, amount: 0};
+        item.count += 1;
+        item.amount += num(x.金额万元);
+        map.set(label, item);
+      });
+      return [...map.values()].sort((a, b) => b.count - a.count || b.amount - a.amount || String(a.label).localeCompare(String(b.label), 'zh-CN'));
+    }
+    function chipsHtml(rows, key, limit = 4, emptyText = '未披露') {
+      const items = groupStats(rows, key).slice(0, limit);
+      return items.length ? items.map(x => '<span class="chip">' + esc(x.label) + ' · ' + x.count + '项</span>').join('') : '<span class="chip">' + esc(emptyText) + '</span>';
+    }
+    function projectListHtml(rows, limit = 6) {
+      return rows.slice(0, limit).map(x => (
+        '<li><strong>' + esc(x.项目名称) + '</strong><div class="table-muted">' +
+        esc(x.省份) + ' · ' + esc(x.中标公告时间) + ' · ' + esc(x.项目金额) + ' · ' + esc(x.承建中标单位) + '</div></li>'
+      )).join('');
+    }
+    function sumAmount(rows) {
+      return rows.reduce((sum, x) => sum + num(x.金额万元), 0);
+    }
+    function bindRowDrilldown(containerSelector, onActivate) {
+      document.querySelectorAll(containerSelector + ' .bar-row').forEach(row => {
+        const label = row.dataset.label || row.querySelector('div')?.textContent?.trim();
+        if (!label) return;
+        row.classList.add('drillable');
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        const activate = () => onActivate(label, row);
+        row.addEventListener('click', activate);
+        row.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
+          }
+        });
+      });
+    }
+    function bindCellDrilldown(containerSelector, onActivate) {
+      document.querySelectorAll(containerSelector + ' .province-cell').forEach(cell => {
+        const label = cell.dataset.label || cell.querySelector('strong')?.textContent?.trim();
+        if (!label) return;
+        cell.classList.add('drillable');
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('tabindex', '0');
+        const activate = () => onActivate(label, cell);
+        cell.addEventListener('click', activate);
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
+          }
+        });
+      });
+    }
+    function renderBuyerDetail(category) {
+      const panel = document.getElementById('buyerDrilldown');
+      const badge = document.getElementById('buyerDrillBadge');
+      const item = BUYER_CATEGORY_DETAILS.find(x => x.主体类别 === category);
+      if (!item) {
+        panel.innerHTML = '先点左侧或右侧对应条形，我会把该类发包单位和代表项目展开。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#buyerCategoryBars .bar-row').forEach(row => row.classList.remove('active'));
+        return;
+      }
+      const units = (item.单位列表 || []).map(u => '<span class="chip">' + esc(u) + '</span>').join('');
+      const examples = (item.项目示例 || []).map(p => '<li>' + esc(p) + '</li>').join('');
+      panel.innerHTML = '<div class="drill-grid">' +
+        '<div><div class="mini">具体单位</div><div class="chip-list">' + units + '</div></div>' +
+        '<div><div class="mini">代表项目</div><ul class="drill-list">' + examples + '</ul></div>' +
+      '</div>';
+      badge.textContent = item.主体类别 + ' · ' + num(item.单位数) + ' 个单位';
+      document.querySelectorAll('#buyerCategoryBars .bar-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.label === category);
+      });
+      document.querySelectorAll('#buyerTopBars .bar-row').forEach(row => row.classList.remove('active'));
+    }
+    function renderBuyerUnitDetail(unit) {
+      const panel = document.getElementById('buyerDrilldown');
+      const badge = document.getElementById('buyerDrillBadge');
+      const rows = PROJECTS.filter(x => x.发包采购单位 === unit);
+      if (!rows.length) {
+        panel.innerHTML = '先点左侧或右侧对应条形，我会把该类发包单位和代表项目展开。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#buyerTopBars .bar-row').forEach(row => row.classList.remove('active'));
+        return;
+      }
+      const provinces = [...new Set(rows.map(x => x.省份).filter(Boolean))].slice(0, 4);
+      const examples = rows.slice(0, 6).map(x => (
+        '<li><strong>' + esc(x.项目名称) + '</strong><div class="table-muted">' +
+        esc(x.省份) + ' · ' + esc(x.项目金额) + ' · ' + esc(x.中标公告时间) + '</div></li>'
+      )).join('');
+      const amount = rows.reduce((sum, x) => sum + num(x.金额万元), 0).toFixed(2);
+      panel.innerHTML = '<div class="drill-grid">' +
+        '<div><div class="mini">覆盖省份</div><div class="chip-list">' + (provinces.length ? provinces.map(v => '<span class="chip">' + esc(v) + '</span>').join('') : '<span class="chip">未披露</span>') + '</div></div>' +
+        '<div><div class="mini">代表项目</div><ul class="drill-list">' + examples + '</ul></div>' +
+      '</div>';
+      badge.textContent = unit + ' · ' + rows.length + ' 项 · ' + amount + ' 万元';
+      document.querySelectorAll('#buyerTopBars .bar-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.label === unit);
+      });
+      document.querySelectorAll('#buyerCategoryBars .bar-row').forEach(row => row.classList.remove('active'));
+    }
+    function renderDemandDetail(category) {
+      const panel = document.getElementById('demandDrilldown');
+      const badge = document.getElementById('demandDrillBadge');
+      const rows = PROJECTS.filter(x => x.主需求类别 === category).slice().sort((a, b) => dateScore(b) - dateScore(a));
+      if (!rows.length) {
+        panel.innerHTML = '先点任一需求类别，我会把该场景下的项目展开给你看。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#demandBars .bar-row, #demandAmountBars .bar-row').forEach(row => row.classList.remove('active'));
+        return;
+      }
+      const amount = sumAmount(rows).toFixed(2);
+      const provinces = chipsHtml(rows, '省份', 5);
+      const examples = projectListHtml(rows, 6);
+      panel.innerHTML = '<div class="drill-grid">' +
+        '<div><div class="mini">覆盖省份</div><div class="chip-list">' + provinces + '</div></div>' +
+        '<div><div class="mini">代表项目</div><ul class="drill-list">' + examples + '</ul></div>' +
+      '</div>';
+      badge.textContent = category + ' · ' + rows.length + ' 项 · ' + amount + ' 万元';
+      document.querySelectorAll('#demandBars .bar-row, #demandAmountBars .bar-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.label === category);
+      });
+    }
+    function renderRegionDetail(province) {
+      const panel = document.getElementById('regionDrilldown');
+      const badge = document.getElementById('regionDrillBadge');
+      const rows = PROJECTS.filter(x => x.省份 === province).slice().sort((a, b) => dateScore(b) - dateScore(a));
+      if (!rows.length) {
+        panel.innerHTML = '先点任一省份，我会展开该省的项目明细。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#provinceMatrix .province-cell, #provinceBars .bar-row').forEach(node => node.classList.remove('active'));
+        return;
+      }
+      const amount = sumAmount(rows).toFixed(2);
+      const demandChips = chipsHtml(rows, '主需求类别', 5);
+      const examples = projectListHtml(rows, 6);
+      panel.innerHTML = '<div class="drill-grid">' +
+        '<div><div class="mini">主需求结构</div><div class="chip-list">' + demandChips + '</div></div>' +
+        '<div><div class="mini">代表项目</div><ul class="drill-list">' + examples + '</ul></div>' +
+      '</div>';
+      badge.textContent = province + ' · ' + rows.length + ' 项 · ' + amount + ' 万元';
+      document.querySelectorAll('#provinceMatrix .province-cell, #provinceBars .bar-row').forEach(node => {
+        node.classList.toggle('active', (node.dataset.label || node.querySelector('strong')?.textContent?.trim()) === province);
+      });
+    }
+    function renderEquipmentDetail(label, mode) {
+      const panel = document.getElementById('equipmentDrilldown');
+      const badge = document.getElementById('equipmentDrillBadge');
+      const rows = PROJECTS.filter(x => {
+        if (mode === '能力形态') return String(x.软硬件属性 || '') === label;
+        return String(x.设备类型清单 || '').indexOf(label) !== -1;
+      }).slice().sort((a, b) => dateScore(b) - dateScore(a));
+      if (!rows.length) {
+        panel.innerHTML = '先点任一设备类型或能力形态，我会把对应项目列出来。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#equipmentBars .bar-row, #capabilityBars .bar-row').forEach(node => node.classList.remove('active'));
+        return;
+      }
+      const amount = sumAmount(rows).toFixed(2);
+      const provinceChips = chipsHtml(rows, '省份', 5);
+      const examples = projectListHtml(rows, 6);
+      panel.innerHTML = '<div class="drill-grid">' +
+        '<div><div class="mini">覆盖省份</div><div class="chip-list">' + provinceChips + '</div></div>' +
+        '<div><div class="mini">代表项目</div><ul class="drill-list">' + examples + '</ul></div>' +
+      '</div>';
+      badge.textContent = mode + ' · ' + label + ' · ' + rows.length + ' 项 · ' + amount + ' 万元';
+      document.querySelectorAll('#equipmentBars .bar-row').forEach(node => {
+        node.classList.toggle('active', (node.dataset.label || '') === label && mode !== '能力形态');
+      });
+      document.querySelectorAll('#capabilityBars .bar-row').forEach(node => {
+        node.classList.toggle('active', (node.dataset.label || '') === label && mode === '能力形态');
+      });
+    }
+    function bindBuyerDrilldown() {
+      const rows = document.querySelectorAll('#buyerCategoryBars .bar-row');
+      rows.forEach(row => {
+        const label = row.dataset.label || row.querySelector('div')?.textContent?.trim();
+        if (BUYER_DETAIL_CATEGORIES.includes(label)) {
+          row.classList.add('drillable');
+          row.setAttribute('role', 'button');
+          row.setAttribute('tabindex', '0');
+          row.title = '点击查看' + label + '的具体单位';
+          const activate = () => renderBuyerDetail(label);
+          row.addEventListener('click', activate);
+          row.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              activate();
+            }
+          });
+        }
+      });
+    }
+    function bindBuyerTopDrilldown() {
+      const rows = document.querySelectorAll('#buyerTopBars .bar-row');
+      rows.forEach(row => {
+        const label = row.dataset.label || row.querySelector('div')?.textContent?.trim();
+        if (label) {
+          row.classList.add('drillable');
+          row.setAttribute('role', 'button');
+          row.setAttribute('tabindex', '0');
+          row.title = '点击查看' + label + '的项目清单';
+          const activate = () => renderBuyerUnitDetail(label);
+          row.addEventListener('click', activate);
+          row.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              activate();
+            }
+          });
+        }
+      });
+    }
+    function renderMajorDetail(target) {
+      const panel = document.getElementById('majorDrilldown');
+      const badge = document.getElementById('majorDrillBadge');
+      const levelMap = {
+        all: '全部相关样本',
+        '文本显性样本': '文本显性样本',
+        '服务/租赁相关样本': '服务/租赁相关样本',
+        '装备/平台相关样本': '装备/平台相关样本'
+      };
+      const rows = (target === 'all' ? MAJOR_ACTIVITY : MAJOR_ACTIVITY.filter(x => x.展示分组 === target))
+        .slice()
+        .sort((a, b) => dateScore(b) - dateScore(a));
+      if (!rows.length) {
+        panel.innerHTML = '点击上方标签，查看项目字段和证据摘要。';
+        badge.textContent = '等待选择';
+        document.querySelectorAll('#activity .kpi.drillable').forEach(card => card.classList.remove('active'));
+        return;
+      }
+      const cards = rows.slice(0, 8).map(x => {
+        const amount = esc(x.项目金额 || '公开信息未披露');
+        const org = esc(x.发包采购单位 || '公开信息未披露');
+        const time = esc(x.中标公告时间 || '公开信息未披露');
+        const source = esc(x.来源等级 || '未披露');
+        const evidence = esc(x.证据摘要 || '公开信息未披露');
+        const link = sourceLinkHtml(x, true);
+        return '<article class="activity-card">' +
+          '<div class="activity-title">' + esc(x.项目名称) + '</div>' +
+          '<div class="activity-meta">' +
+            '<span>' + esc(x.展示分组) + '</span>' +
+            '<span>' + esc(x.省份) + '</span>' +
+            '<span>' + esc(x.省内城市区域) + '</span>' +
+            '<span>' + time + '</span>' +
+          '</div>' +
+          '<div class="activity-org">' + org + ' · ' + amount + ' · ' + source + '</div>' +
+          '<div class="activity-reason">证据：' + evidence + '</div>' +
+          '<div class="activity-actions">' + link + '</div>' +
+        '</article>';
+      }).join('');
+      panel.innerHTML = '<div class="activity-drill">' +
+        '<div class="activity-summary"><div class="mini">当前筛选 ' + rows.length + ' 条。卡片仅展示公开字段和证据摘要，不将相关样本写成实际用途。</div></div>' +
+        '<div class="activity-list">' + cards + '</div>' +
+      '</div>';
+      badge.textContent = levelMap[target] + ' · ' + rows.length + ' 条';
+      document.querySelectorAll('#activity .kpi.drillable').forEach(card => {
+        card.classList.toggle('active', (card.dataset.majorTarget || 'all') === target);
+      });
+    }
+    function initBars() {
+      barRows(document.getElementById('demandBars'), DEMANDS, '需求类别', '项目数', {drillable:true});
+      barRows(document.getElementById('demandAmountBars'), DEMANDS, '需求类别', '可解析金额合计万元', {money:true, palette:'warm', drillable:true});
+      barRows(document.getElementById('provinceBars'), PROVINCES.slice(0, 12), '省份', '可解析金额合计万元', {palette:'violet', money:true, drillable:true});
+      barRows(document.getElementById('equipmentBars'), EQUIPMENT, '设备类型', '明细行数', {drillable:true});
+      barRows(document.getElementById('capabilityBars'), CAPABILITIES, '能力形态', '项目数', {palette:'warm', drillable:true});
+      barRows(document.getElementById('supplierBars'), SUPPLIERS.slice(0, 12), '中标单位', '项目数', {palette:'violet'});
+      barRows(document.getElementById('buyerCategoryBars'), BUYER_CATEGORIES, '主体类别', '项目数', {palette:'warm'});
+      barRows(document.getElementById('buyerTopBars'), BUYER_TOPS, '发包采购单位', '项目数', {palette:'violet'});
+      bindBuyerDrilldown();
+      bindBuyerTopDrilldown();
+      bindRowDrilldown('#demandBars', (label) => renderDemandDetail(label));
+      bindRowDrilldown('#demandAmountBars', (label) => renderDemandDetail(label));
+      bindRowDrilldown('#provinceBars', (label) => renderRegionDetail(label));
+      bindRowDrilldown('#equipmentBars', (label) => renderEquipmentDetail(label, '设备类型'));
+      bindRowDrilldown('#capabilityBars', (label) => renderEquipmentDetail(label, '能力形态'));
+      renderDemandDetail(DEMANDS[0]?.['需求类别'] || DEMANDS[0]?.需求类别 || '');
+      renderEquipmentDetail(EQUIPMENT[0]?.['设备类型'] || EQUIPMENT[0]?.设备类型 || '', '设备类型');
+      renderMajorDetail('all');
+    }
+    function initMatrix() {
+      const amountMax = maxOf(PROVINCES, '可解析金额合计万元');
+      const matrix = document.getElementById('provinceMatrix');
+      matrix.innerHTML = PROVINCES.map(p => {
+        const v = num(p.中标项目数);
+        const alpha = .08 + num(p.可解析金额合计万元) / amountMax * .55;
+        return '<div class="province-cell" data-label="' + esc(p.省份) + '" style="background:rgba(85,230,165,' + alpha +
+          '); border-color:rgba(85,230,165,' + (.16 + alpha) + ');"><strong>' + esc(p.省份) +
+          '</strong><span>金额 ' + num(p.可解析金额合计万元).toFixed(1) + ' 万 · ' + v + ' 项</span></div>';
+      }).join('');
+      bindCellDrilldown('#provinceMatrix', (label) => renderRegionDetail(label));
+      renderRegionDetail(PROVINCES[0]?.省份 || '');
+    }
+    function unique(arr, key) { return [...new Set(arr.map(x => x[key]).filter(Boolean))].sort(); }
+    function fillFilters() {
+      const province = document.getElementById('provinceFilter');
+      const demand = document.getElementById('demandFilter');
+      const year = document.getElementById('yearFilter');
+      unique(PROJECTS, '省份').forEach(v => province.insertAdjacentHTML('beforeend', '<option value="' + esc(v) + '">' + esc(v) + '</option>'));
+      unique(PROJECTS, '主需求类别').forEach(v => demand.insertAdjacentHTML('beforeend', '<option value="' + esc(v) + '">' + esc(v) + '</option>'));
+      unique(PROJECTS, '年份').forEach(v => year.insertAdjacentHTML('beforeend', '<option value="' + esc(v) + '">' + esc(v) + '</option>'));
+    }
+    function renderTable() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const p = document.getElementById('provinceFilter').value;
+      const d = document.getElementById('demandFilter').value;
+      const y = document.getElementById('yearFilter').value;
+      const rows = PROJECTS.filter(x => {
+        const text = [x.项目名称, x.发包采购单位, x.承建中标单位, x.设备名称清单, x.省份].join(' ').toLowerCase();
+        return (!q || text.includes(q)) && (!p || x.省份 === p) && (!d || x.主需求类别 === d) && (!y || x.年份 === y);
+      })
+        .sort((a, b) => dateScore(b) - dateScore(a) || num(b.金额万元) - num(a.金额万元) || String(a.项目名称 || '').localeCompare(String(b.项目名称 || ''), 'zh-CN'))
+        .slice(0, 260);
+      document.getElementById('projectTable').innerHTML = rows.map(x => {
+        const meta = sourceMeta(x.来源等级);
+        const link = sourceLinkHtml(x);
+        const groupBadge = num(x.同组公告数) > 1 ? '<span class="table-tag">同组' + num(x.同组公告数) + '条公告</span>' : '';
+        const sourceCount = num(x.同组来源数) > 1 ? '<span class="source-count">+' + num(x.同组来源数) + '源</span>' : '';
+        return '<tr>' +
+          '<td><div class="table-main">' + esc(x.省份) + '</div><div class="table-muted">' + esc(x.省内城市区域) + '</div></td>' +
+          '<td><div class="table-main">' + esc(x.项目名称) + '</div><div class="table-muted">' + esc(x.发包采购单位) + '</div>' + groupBadge + '</td>' +
+          '<td><div>' + esc(x.主需求类别) + '</div><div class="table-muted">' + esc(x.软硬件属性) + '</div></td>' +
+          '<td>' + esc(x.项目金额) + '</td>' +
+          '<td>' + esc(x.承建中标单位) + '</td>' +
+          '<td>' + esc(x.中标公告时间) + '</td>' +
+          '<td><div>' + esc(x.设备名称清单) + '</div><div class="table-muted">' + esc(x.设备数量清单) + '</div></td>' +
+          '<td title="' + esc(x.来源等级) + '"><div class="source-cell"><span class="source-pill ' + meta.cls + '">' + meta.label + '</span>' + link + sourceCount + '</div></td>' +
+        '</tr>';
+      }).join('');
+    }
+    initBars();
+    initMatrix();
+    fillFilters();
+    renderTable();
+    renderBuyerDetail(null);
+    ['searchInput','provinceFilter','demandFilter','yearFilter'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderTable);
+      document.getElementById(id).addEventListener('change', renderTable);
+    });
+    document.querySelectorAll('#activity .kpi.drillable').forEach(card => {
+      const target = card.dataset.majorTarget || 'all';
+      card.addEventListener('click', () => renderMajorDetail(target));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          renderMajorDetail(target);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

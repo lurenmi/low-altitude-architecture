@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <radialGradient id="glow" cx="56%" cy="38%" r="62%">
+      <stop offset="0" stop-color="#53e0d2" stop-opacity=".72"/>
+      <stop offset=".34" stop-color="#5bb8ff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#06131f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131f"/>
+      <stop offset=".48" stop-color="#0a2435"/>
+      <stop offset="1" stop-color="#123126"/>
+    </linearGradient>
+    <linearGradient id="building" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5bb8ff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#0b1825" stop-opacity=".95"/>
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="900" fill="url(#sky)"/>
+  <rect width="1400" height="900" fill="url(#glow)"/>
+  <g opacity=".24" stroke="#53e0d2" stroke-width="1">
+    <path d="M0 190H1400M0 290H1400M0 390H1400M0 490H1400M0 590H1400M0 690H1400"/>
+    <path d="M130 0V900M260 0V900M390 0V900M520 0V900M650 0V900M780 0V900M910 0V900M1040 0V900M1170 0V900M1300 0V900"/>
+  </g>
+  <g transform="translate(790 355)" fill="none" stroke="#53e0d2">
+    <circle r="86" opacity=".72"/>
+    <circle r="164" opacity=".42"/>
+    <circle r="242" opacity=".20"/>
+    <path d="M0 0L224 -82" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M170 420C360 300 520 310 690 420S1040 560 1230 380" fill="none" stroke="#53e0d2" stroke-width="5" stroke-dasharray="18 18" opacity=".68"/>
+  <path d="M230 505C420 395 580 420 730 520S1020 650 1200 510" fill="none" stroke="#ffcc66" stroke-width="3" stroke-dasharray="12 14" opacity=".55"/>
+  <g transform="translate(690 310)">
+    <line x1="-124" y1="0" x2="124" y2="0" stroke="#eef7f8" stroke-width="11" stroke-linecap="round" opacity=".9"/>
+    <line x1="0" y1="-78" x2="0" y2="78" stroke="#eef7f8" stroke-width="10" stroke-linecap="round" opacity=".82"/>
+    <rect x="-48" y="-24" width="96" height="48" rx="24" fill="#e7fbff"/>
+    <circle cx="-140" cy="-82" r="43" fill="none" stroke="#eef7f8" stroke-width="12"/>
+    <circle cx="140" cy="-82" r="43" fill="none" stroke="#eef7f8" stroke-width="12"/>
+    <circle cx="-140" cy="82" r="43" fill="none" stroke="#eef7f8" stroke-width="12"/>
+    <circle cx="140" cy="82" r="43" fill="none" stroke="#eef7f8" stroke-width="12"/>
+    <circle cx="0" cy="0" r="9" fill="#53e0d2"/>
+  </g>
+  <g opacity=".92">
+    <rect x="0" y="660" width="1400" height="240" fill="#06111c"/>
+    <rect x="80" y="545" width="75" height="355" rx="10" fill="url(#building)"/>
+    <rect x="176" y="615" width="94" height="285" rx="10" fill="url(#building)"/>
+    <rect x="304" y="500" width="104" height="400" rx="10" fill="url(#building)"/>
+    <rect x="438" y="592" width="80" height="308" rx="10" fill="url(#building)"/>
+    <rect x="552" y="465" width="124" height="435" rx="10" fill="url(#building)"/>
+    <rect x="714" y="620" width="98" height="280" rx="10" fill="url(#building)"/>
+    <rect x="842" y="525" width="112" height="375" rx="10" fill="url(#building)"/>
+    <rect x="984" y="585" width="85" height="315" rx="10" fill="url(#building)"/>
+    <rect x="1102" y="490" width="124" height="410" rx="10" fill="url(#building)"/>
+    <rect x="1260" y="635" width="86" height="265" rx="10" fill="url(#building)"/>
+  </g>
+  <g opacity=".62" fill="#53e0d2">
+    <circle cx="333" cy="436" r="7"/><circle cx="790" cy="355" r="8"/><circle cx="1110" cy="430" r="6"/>
+    <circle cx="575" cy="405" r="5"/><circle cx="965" cy="505" r="5"/>
+  </g>
+  <ellipse cx="704" cy="836" rx="410" ry="52" fill="#53e0d2" opacity=".16" filter="url(#blur)"/>
+</svg>

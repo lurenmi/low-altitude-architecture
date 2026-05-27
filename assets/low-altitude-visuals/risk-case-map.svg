@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06131f"/>
+      <stop offset=".58" stop-color="#142331"/>
+      <stop offset="1" stop-color="#2b171c"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000" flood-opacity=".45"/></filter>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)"/>
+  <g opacity=".18" stroke="#53e0d2">
+    <path d="M0 170H1400M0 310H1400M0 450H1400M0 590H1400M0 730H1400"/>
+    <path d="M160 0V900M320 0V900M480 0V900M640 0V900M800 0V900M960 0V900M1120 0V900M1280 0V900"/>
+  </g>
+  <path d="M245 520C310 390 450 306 585 350C704 388 710 500 830 535C955 572 1050 470 1165 358" fill="none" stroke="#53e0d2" stroke-width="5" stroke-dasharray="16 18" opacity=".65"/>
+  <g filter="url(#shadow)">
+    <path d="M320 230L430 205L535 260L654 236L780 292L900 262L1050 345L1120 480L1040 590L870 648L710 606L578 656L430 610L318 520L240 390Z" fill="#0d2d3d" stroke="#5bb8ff" stroke-width="3" opacity=".86"/>
+    <path d="M430 205L470 360L654 236L710 606L900 262L870 648" fill="none" stroke="#53e0d2" opacity=".22"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="800">
+    <g fill="#ff5d6c">
+      <circle cx="380" cy="412" r="13"/><circle cx="486" cy="334" r="13"/><circle cx="612" cy="468" r="13"/><circle cx="728" cy="384" r="13"/><circle cx="828" cy="520" r="13"/>
+      <circle cx="934" cy="408" r="13"/><circle cx="1024" cy="488" r="13"/><circle cx="540" cy="560" r="13"/><circle cx="770" cy="602" r="13"/><circle cx="1110" cy="350" r="13"/>
+    </g>
+    <g fill="#eef7f8" font-size="24">
+      <text x="110" y="110">非法破解飞控案例热区</text>
+      <text x="110" y="150" fill="#aac1c2" font-size="18">破解限高、禁飞区、电子围栏与飞控参数，风险呈服务化扩散</text>
+    </g>
+    <g>
+      <rect x="942" y="92" width="330" height="150" rx="30" fill="#07131f" opacity=".78" stroke="#ff5d6c"/>
+      <text x="978" y="152" fill="#ffcc66" font-size="44">10 起</text>
+      <text x="978" y="196" fill="#eef7f8" font-size="24">公安部公开典型案例</text>
+    </g>
+    <g>
+      <rect x="942" y="270" width="330" height="150" rx="30" fill="#07131f" opacity=".78" stroke="#53e0d2"/>
+      <text x="978" y="330" fill="#53e0d2" font-size="44">270+ 台</text>
+      <text x="978" y="374" fill="#eef7f8" font-size="24">公开披露破解数量口径</text>
+    </g>
+  </g>
+  <g stroke="#ff5d6c" opacity=".40" fill="none">
+    <circle cx="728" cy="384" r="62"/><circle cx="728" cy="384" r="116"/><circle cx="486" cy="334" r="82"/><circle cx="1024" cy="488" r="96"/>
+  </g>
+</svg>

@@ -1,0 +1,1930 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>无人机侦测分析平台演示</title>
+  <style>
+    :root{
+      --bg0:#05040b;
+      --bg1:#0f0b1e;
+      --bg2:#15102a;
+      --panel:#18152c;
+      --panel-strong:#201b38;
+      --panel-soft:rgba(24,21,44,.84);
+      --line:rgba(213,196,255,.12);
+      --line-strong:rgba(213,196,255,.24);
+      --text:#faf7ff;
+      --muted:#ddd2f3;
+      --dim:#8e84ab;
+      --violet:#ba90ff;
+      --violet-2:#8c66ff;
+      --cyan:#71e5ff;
+      --cyan-2:#33b8ff;
+      --pink:#ff94dc;
+      --green:#77efb5;
+      --amber:#ffd86a;
+      --red:#ff748f;
+      --shadow:0 24px 80px rgba(0,0,0,.36);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--text);
+      font:14px/1.65 "Microsoft YaHei","PingFang SC","Segoe UI",Arial,sans-serif;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(186,144,255,.20), transparent 20rem),
+        radial-gradient(circle at 84% 10%, rgba(113,229,255,.14), transparent 18rem),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 48%, var(--bg2) 100%);
+      overflow-x:hidden;
+    }
+    button{font:inherit;color:inherit}
+    a{color:inherit;text-decoration:none}
+    .bg-canvas{
+      position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.78;
+    }
+    .grid-bg{
+      position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.16;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:44px 44px;
+      mask-image:linear-gradient(180deg, rgba(0,0,0,.96), transparent 92%);
+    }
+    .glow{
+      position:fixed;z-index:0;pointer-events:none;border-radius:50%;
+      filter:blur(80px);opacity:.38;mix-blend-mode:screen;
+    }
+    .glow.g1{top:-10rem;left:-8rem;width:32rem;height:32rem;background:radial-gradient(circle, rgba(186,144,255,.6), transparent 70%)}
+    .glow.g2{top:7rem;right:-11rem;width:30rem;height:30rem;background:radial-gradient(circle, rgba(113,229,255,.45), transparent 70%)}
+    .glow.g3{bottom:-13rem;left:28%;width:34rem;height:34rem;background:radial-gradient(circle, rgba(255,148,220,.25), transparent 68%)}
+
+    header{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:blur(18px);
+      background:rgba(7,6,15,.84);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar,
+    .shell{
+      width:min(1560px, calc(100vw - 32px));
+      margin:0 auto;
+    }
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 0;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-mark{
+      width:34px;height:34px;border-radius:12px;flex:0 0 auto;
+      background:linear-gradient(135deg, rgba(186,144,255,.98), rgba(113,229,255,.88));
+      box-shadow:0 0 28px rgba(186,144,255,.32);
+      position:relative;overflow:hidden;
+    }
+    .brand-mark::before,.brand-mark::after{
+      content:"";position:absolute;inset:8px;border-radius:9px;border:1.4px solid rgba(255,255,255,.82);transform:rotate(45deg);
+    }
+    .brand-mark::after{inset:13px;border-radius:6px;opacity:.88}
+    .brand h1{
+      margin:0;font-size:18px;letter-spacing:.05em;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .brand p{margin:2px 0 0;color:#e6dcf8;font-size:12px}
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-btn,.cta-btn,.ghost-btn,.chip-btn,.tiny-btn,.icon-btn{
+      border:0;cursor:pointer;color:var(--text);
+      transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease;
+    }
+    .nav-btn,.ghost-btn,.tiny-btn{
+      padding:10px 14px;border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .nav-btn.active,.nav-btn:hover,.ghost-btn:hover,.tiny-btn:hover,.tiny-btn.active{
+      transform:translateY(-1px);
+      background:rgba(186,144,255,.12);
+      border-color:rgba(186,144,255,.36);
+      box-shadow:0 12px 28px rgba(0,0,0,.18);
+    }
+    .cta-btn{
+      padding:11px 16px;border-radius:14px;font-weight:800;color:#150d23;
+      background:linear-gradient(135deg, rgba(186,144,255,.98), rgba(113,229,255,.92));
+      box-shadow:0 14px 34px rgba(113,229,255,.16), 0 0 36px rgba(186,144,255,.14);
+    }
+    .cta-btn:hover,.chip-btn:hover{transform:translateY(-2px)}
+    .live-strip{
+      display:grid;grid-template-columns:repeat(3, minmax(76px,auto));gap:10px;
+      padding:10px 12px;border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .live-item{display:flex;flex-direction:column;gap:2px}
+    .live-item b{font-size:18px;line-height:1}
+    .live-item span{font-size:11px;color:var(--muted)}
+
+    .shell{position:relative;z-index:1;padding:18px 0 34px}
+    .page{display:none;animation:fadeUp .45s ease both}
+    .page.active{display:block}
+    .panel{
+      position:relative;overflow:hidden;
+      background:linear-gradient(180deg, rgba(28,24,50,.94), rgba(17,14,32,.92));
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+    .panel::before{
+      content:"";position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(135deg, rgba(255,255,255,.08), transparent 28%, transparent 72%, rgba(113,229,255,.06));
+    }
+    .panel::after{
+      content:"";position:absolute;inset:-1px auto auto -38%;
+      width:42%;height:2px;pointer-events:none;
+      background:linear-gradient(90deg, transparent, rgba(113,229,255,.58), transparent);
+      animation:scan 7s linear infinite;
+    }
+    .section-head{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .section-head h2,.section-head h3{margin:0;font-size:20px;letter-spacing:.02em}
+    .section-head p{margin:0;color:#d8cfee;font-size:12px}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      color:var(--cyan);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      background:rgba(113,229,255,.08);border:1px solid rgba(113,229,255,.14);
+    }
+    .mini-tag{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 10px;border-radius:999px;font-size:12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#efeaff;
+    }
+    .soft-text{color:var(--muted)}
+    #chainSection,#paramSection{scroll-margin-top:110px}
+
+    .home-grid{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:18px;
+      align-items:start;
+    }
+    .intro-panel,.flow-panel,.chain-panel,.detail-panel,.param-panel,
+    .map-panel,.summary-panel,.theme-panel,.device-panel,.analysis-panel,.arch-panel{
+      padding:18px;
+    }
+    .intro-metrics{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;
+    }
+    .metric-card{
+      padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .metric-card b{display:block;font-size:26px;line-height:1.05}
+    .metric-card span{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+
+    .flow-stage{
+      position:relative;height:420px;border-radius:24px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(113,229,255,.10), transparent 22%),
+        radial-gradient(circle at 50% 50%, rgba(186,144,255,.10), transparent 52%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .flow-grid{
+      position:absolute;inset:0;pointer-events:none;opacity:.35;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size:34px 34px;
+    }
+    .flow-stage svg{
+      position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+    }
+    .core-drone{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:180px;height:180px;border-radius:40px;
+      background:linear-gradient(180deg, rgba(186,144,255,.18), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 46px rgba(186,144,255,.16), inset 0 0 34px rgba(255,255,255,.05);
+      display:grid;place-items:center;text-align:center;padding:16px;
+    }
+    .drone-shape{
+      position:absolute;top:20px;left:50%;transform:translateX(-50%);
+      width:58px;height:58px;
+    }
+    .drone-shape i,.drone-shape::before,.drone-shape::after{
+      content:"";position:absolute;inset:50%;transform:translate(-50%,-50%);
+      background:rgba(255,255,255,.86);box-shadow:0 0 18px rgba(113,229,255,.32);
+    }
+    .drone-shape i{width:18px;height:18px;border-radius:50%}
+    .drone-shape::before{width:58px;height:3px;border-radius:999px}
+    .drone-shape::after{width:3px;height:58px;border-radius:999px}
+    .core-drone h3{margin:48px 0 0;font-size:18px}
+    .core-drone p{margin:8px 0 0;color:var(--muted);font-size:12px}
+    .system-node{
+      position:absolute;
+      width:142px;min-height:72px;padding:12px 12px 11px;
+      border-radius:18px;border:1px solid rgba(255,255,255,.10);
+      background:rgba(12,10,24,.68);
+      color:var(--text);text-align:left;
+      box-shadow:0 12px 30px rgba(0,0,0,.26);
+      cursor:pointer;
+    }
+    .system-node:hover,.system-node.active{
+      transform:translateY(-2px);
+      border-color:rgba(186,144,255,.42);
+      background:rgba(186,144,255,.16);
+    }
+    .system-node b{display:block;font-size:14px}
+    .system-node span{display:block;margin-top:4px;color:#e9e0fa;font-size:11px;line-height:1.45}
+    .system-node.n1{top:28px;left:40px}
+    .system-node.n2{top:28px;right:40px}
+    .system-node.n3{top:174px;left:18px}
+    .system-node.n4{top:174px;right:18px}
+    .system-node.n5{bottom:28px;left:40px}
+    .system-node.n6{bottom:28px;right:40px}
+    .flow-foot{
+      display:flex;gap:10px;flex-wrap:wrap;margin-top:12px
+    }
+
+    .chain-panel{grid-column:1 / -1}
+    .chain-grid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;
+    }
+    .chain-card{
+      color:var(--text);
+      padding:14px 14px 12px;border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      cursor:pointer;
+      transition:transform .22s ease,border-color .22s ease,background .22s ease;
+    }
+    .chain-card:hover,.chain-card.active{
+      transform:translateY(-2px);
+      border-color:rgba(186,144,255,.36);
+      background:linear-gradient(180deg, rgba(186,144,255,.16), rgba(255,255,255,.04));
+    }
+    .chain-top{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px
+    }
+    .chain-top h4{margin:0;font-size:15px;color:#f7f3ff;text-shadow:0 1px 8px rgba(0,0,0,.36)}
+    .chain-no{
+      width:30px;height:30px;display:grid;place-items:center;border-radius:10px;font-weight:900;color:#140d22;
+      background:linear-gradient(135deg, rgba(186,144,255,.95), rgba(113,229,255,.92));
+    }
+    .chain-card p{margin:0;color:#e9e0fa;font-size:12px;line-height:1.55}
+
+    .detail-wrap{
+      display:grid;grid-template-columns:1fr;gap:18px;
+      grid-column:1 / -1;
+    }
+    .detail-header{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap
+    }
+    .detail-header h3{margin:0;font-size:24px}
+    .detail-header p{margin:8px 0 0;color:var(--muted)}
+    .signal-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      background:rgba(113,229,255,.08);border:1px solid rgba(113,229,255,.16);color:var(--cyan);
+      font-size:12px;font-weight:700;
+    }
+    .detail-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;
+    }
+    .info-box{
+      padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .info-box h4{
+      margin:0 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#f1edff;
+    }
+    .chip-wrap,.maker-wrap,.device-chip-wrap,.evidence-wrap{
+      display:flex;flex-wrap:wrap;gap:8px
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 10px;border-radius:999px;font-size:12px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+    }
+    .chip b{color:var(--cyan)}
+    .hardware-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;
+    }
+    .chip-btn{
+      width:100%;text-align:left;color:var(--text);
+      padding:12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .chip-btn:hover,.chip-btn.active{
+      border-color:rgba(113,229,255,.34);
+      background:linear-gradient(180deg, rgba(113,229,255,.12), rgba(255,255,255,.04));
+      box-shadow:0 12px 30px rgba(113,229,255,.10);
+    }
+    .chip-btn strong{display:block;font-size:13px}
+    .chip-btn small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}
+    .maker-box{
+      margin-top:12px;padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(186,144,255,.14), rgba(255,255,255,.03));
+      border:1px solid rgba(186,144,255,.18);
+    }
+    .maker-box p{margin:0 0 10px;color:var(--muted)}
+    .maker-wrap span{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 10px;border-radius:999px;font-size:12px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+    }
+
+    .algo-entry{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .algo-entry p{margin:0;color:#e8e0f8}
+
+    .type-toggle{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;
+    }
+    .type-btn{
+      padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.05);color:var(--text);
+      cursor:pointer;
+    }
+    .type-btn.active{
+      border-color:rgba(113,229,255,.34);
+      background:rgba(113,229,255,.14);
+      box-shadow:0 10px 24px rgba(113,229,255,.10);
+    }
+    .hw-grid{
+      margin-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;
+    }
+    .hw-btn{
+      width:100%;text-align:left;padding:12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      color:var(--text);cursor:pointer;
+    }
+    .hw-btn.active,.hw-btn:hover{
+      border-color:rgba(186,144,255,.35);
+      background:linear-gradient(180deg, rgba(186,144,255,.14), rgba(255,255,255,.03));
+    }
+    .hw-btn b{display:block;font-size:13px}
+    .hw-btn span{display:block;margin-top:4px;color:#ddd2f3;font-size:11px}
+    .cost-box{
+      margin-top:10px;padding:14px;border-radius:16px;
+      background:linear-gradient(180deg, rgba(113,229,255,.12), rgba(255,255,255,.03));
+      border:1px solid rgba(113,229,255,.18);
+    }
+    .cost-box p{margin:0 0 8px;color:#e8dff8}
+    .cost-box .cost{
+      font-size:18px;font-weight:800;color:#fff7d1;
+      text-shadow:0 0 16px rgba(255,216,106,.24);
+    }
+    .cost-toggle{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;
+    }
+    .cost-btn{
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);color:var(--text);cursor:pointer;
+      font-size:12px;
+    }
+    .cost-btn.active{
+      border-color:rgba(255,216,106,.42);
+      background:rgba(255,216,106,.14);
+      box-shadow:0 8px 18px rgba(255,216,106,.12);
+    }
+
+    .algo-layout{
+      display:grid;grid-template-columns:.88fr 1.12fr;gap:18px;
+    }
+    .algo-list{
+      display:grid;gap:10px;
+    }
+    .algo-param-btn{
+      width:100%;text-align:left;padding:12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      color:var(--text);cursor:pointer;
+    }
+    .algo-param-btn.active,.algo-param-btn:hover{
+      border-color:rgba(113,229,255,.34);
+      background:linear-gradient(180deg, rgba(113,229,255,.14), rgba(255,255,255,.03));
+    }
+    .algo-param-btn b{display:block;font-size:14px}
+    .algo-param-btn span{display:block;margin-top:4px;color:#ded4f2;font-size:12px}
+    .algo-detail{
+      padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .algo-detail h3{margin:0 0 10px;font-size:22px}
+    .algo-block{margin-top:10px}
+    .algo-block h4{margin:0 0 8px;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+
+    .arch-panel{grid-column:1 / -1}
+    .arch-stack{
+      display:grid;gap:10px;margin-top:10px;
+    }
+    .arch-layer{
+      position:relative;padding:14px 16px 12px;border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      overflow:hidden;
+    }
+    .arch-layer::after{
+      content:"";position:absolute;inset:auto 14px 0 14px;height:2px;
+      background:linear-gradient(90deg, rgba(113,229,255,.0), rgba(113,229,255,.36), rgba(186,144,255,.0));
+    }
+    .arch-layer h4{margin:0;color:#f9f6ff;font-size:16px}
+    .arch-layer p{margin:6px 0 0;color:#e8e0f8;font-size:12px}
+    .arch-arrow{
+      width:18px;height:18px;margin:0 auto;
+      border-left:2px solid rgba(113,229,255,.45);
+      border-bottom:2px solid rgba(113,229,255,.45);
+      transform:rotate(-45deg);
+    }
+
+    .warning-layout{
+      display:grid;
+      grid-template-columns:1.36fr .84fr;
+      gap:18px;
+      align-items:start;
+    }
+    .side-stack{
+      display:grid;gap:18px;
+    }
+    .analysis-panel{grid-column:1 / -1}
+    .map-head{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .map-head p{margin:0;color:var(--muted)}
+    .map-tools{display:flex;gap:8px;flex-wrap:wrap}
+    .city-map{
+      position:relative;height:660px;border-radius:24px;overflow:hidden;
+      background:#09111f;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .city-map svg{
+      position:absolute;inset:0;width:100%;height:100%;
+    }
+    .map-overlay,.map-incidents,.map-labels,.map-legend{
+      position:absolute;inset:0;
+    }
+    .map-overlay,.map-incidents,.map-labels{pointer-events:none}
+    .map-site,.map-incident,.zone-label{
+      position:absolute;pointer-events:auto;
+    }
+    .zone-label{
+      padding:6px 10px;border-radius:12px;
+      background:rgba(6,9,18,.86);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fefbff;font-size:13px;font-weight:800;
+      box-shadow:0 10px 22px rgba(0,0,0,.34);
+      text-shadow:0 1px 6px rgba(0,0,0,.7);
+    }
+    .map-site{
+      width:28px;height:28px;border-radius:12px;border:1px solid rgba(255,255,255,.16);
+      background:linear-gradient(180deg, rgba(19,27,44,.96), rgba(9,12,22,.94));
+      display:grid;place-items:center;color:var(--text);
+      box-shadow:0 10px 26px rgba(0,0,0,.28);
+      transform:translate(-50%,-50%);
+    }
+    .map-site::before{
+      content:"";position:absolute;inset:-6px;border-radius:16px;
+      border:1px solid rgba(113,229,255,.12);opacity:.6;
+    }
+    .map-site span{position:relative;z-index:1;font-size:12px;font-weight:900}
+    .map-site.radio span{color:var(--cyan)}
+    .map-site.radar span{color:var(--amber)}
+    .map-site.eo span{color:var(--pink)}
+    .map-site.rid span{color:var(--green)}
+    .map-site.fusion span{color:var(--violet)}
+    .map-site.active,.map-site:hover{
+      border-color:rgba(113,229,255,.42);
+      box-shadow:0 0 0 4px rgba(113,229,255,.12), 0 14px 30px rgba(0,0,0,.34);
+    }
+    .coverage-ring{
+      position:absolute;transform:translate(-50%,-50%);
+      border-radius:50%;border:1px dashed rgba(113,229,255,.18);
+      background:radial-gradient(circle, rgba(113,229,255,.08), transparent 70%);
+      pointer-events:none;
+    }
+    .coverage-ring.dim{opacity:.35}
+    .coverage-ring.warn{border-color:rgba(255,116,143,.22);background:radial-gradient(circle, rgba(255,116,143,.08), transparent 70%)}
+    .map-incident{
+      width:20px;height:20px;border-radius:50%;
+      transform:translate(-50%,-50%);
+      border:2px solid rgba(255,255,255,.9);
+      background:var(--red);
+      box-shadow:0 0 22px rgba(255,116,143,.42);
+    }
+    .map-incident::before,.map-incident::after{
+      content:"";position:absolute;inset:-10px;border-radius:50%;
+      border:1px solid rgba(255,116,143,.28);animation:pulse 3s ease-out infinite;
+    }
+    .map-incident::after{animation-delay:1s}
+    .map-incident.low{background:var(--amber);box-shadow:0 0 22px rgba(255,216,106,.34)}
+    .map-incident.low::before,.map-incident.low::after{border-color:rgba(255,216,106,.26)}
+    .map-incident.medium{background:var(--pink);box-shadow:0 0 22px rgba(255,148,220,.34)}
+    .map-incident.medium::before,.map-incident.medium::after{border-color:rgba(255,148,220,.26)}
+    .map-incident.hidden{opacity:.18;filter:grayscale(.2)}
+    .map-incident.active{
+      box-shadow:0 0 0 6px rgba(255,255,255,.08), 0 0 32px rgba(255,116,143,.48);
+      z-index:2;
+    }
+    .map-legend{
+      display:flex;align-items:flex-end;justify-content:space-between;
+      padding:16px;pointer-events:none;
+    }
+    .legend-box,.map-kpi{
+      pointer-events:auto;
+      padding:12px 14px;border-radius:16px;
+      background:rgba(8,10,18,.72);
+      border:1px solid rgba(255,255,255,.09);
+      box-shadow:0 10px 28px rgba(0,0,0,.26);
+      backdrop-filter:blur(10px);
+    }
+    .legend-box{display:flex;gap:8px;flex-wrap:wrap;max-width:68%}
+    .legend-chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+    }
+    .legend-chip i{width:9px;height:9px;border-radius:50%}
+    .map-kpi{
+      min-width:220px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+    }
+    .map-kpi b{display:block;font-size:22px;line-height:1;color:#fbf8ff}
+    .map-kpi span{display:block;margin-top:4px;color:#d9d0ec;font-size:11px}
+
+    .summary-box{
+      padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .summary-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;
+    }
+    .summary-grid .metric-card b{font-size:24px}
+    .summary-text{
+      margin-top:12px;padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(113,229,255,.10), rgba(255,255,255,.03));
+      border:1px solid rgba(113,229,255,.14);
+    }
+    .summary-text h4{margin:0 0 8px;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+    .summary-text p{margin:0;color:#efeaff}
+    .theme-list,.device-list{display:grid;gap:10px}
+    .theme-card,.device-card{
+      padding:14px;border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      cursor:pointer;
+      transition:transform .22s ease,border-color .22s ease,background .22s ease;
+    }
+    .theme-card:hover,.theme-card.active,.device-card:hover,.device-card.active{
+      transform:translateY(-2px);
+      border-color:rgba(186,144,255,.34);
+      background:linear-gradient(180deg, rgba(186,144,255,.14), rgba(255,255,255,.04));
+    }
+    .theme-top,.device-top{
+      display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .theme-top h4,.device-top h4{margin:0;font-size:14px}
+    .theme-card p,.device-card p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+    .level-tag,.status-tag{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+    }
+    .level-tag.high{color:#ffd7de;background:rgba(255,116,143,.10);border-color:rgba(255,116,143,.18)}
+    .level-tag.medium{color:#ffeccc;background:rgba(255,216,106,.10);border-color:rgba(255,216,106,.18)}
+    .level-tag.low{color:#fff2d3;background:rgba(255,190,88,.08);border-color:rgba(255,190,88,.16)}
+    .status-tag.online{color:#dfffee;background:rgba(119,239,181,.10);border-color:rgba(119,239,181,.18)}
+    .status-tag.busy{color:#fff0cb;background:rgba(255,216,106,.10);border-color:rgba(255,216,106,.18)}
+    .status-tag.alert{color:#ffe0e8;background:rgba(255,116,143,.10);border-color:rgba(255,116,143,.18)}
+    .bar{
+      height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:12px;
+    }
+    .bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg, var(--violet), var(--cyan))}
+
+    .analysis-top{
+      display:grid;grid-template-columns:1.08fr .92fr;gap:14px;align-items:start
+    }
+    .analysis-block{
+      padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .analysis-block h4{
+      margin:0 0 10px;font-size:14px;letter-spacing:.10em;text-transform:uppercase;
+    }
+    .step-list{display:grid;gap:10px}
+    .step{
+      display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;
+      padding:12px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    }
+    .step i{
+      width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(186,144,255,.95), rgba(113,229,255,.92));
+      color:#130c21;font-style:normal;font-weight:900;
+    }
+    .step b{display:block;margin-bottom:4px;font-size:13px}
+    .step span{display:block;color:var(--muted);font-size:12px}
+
+    .modal{
+      position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
+      padding:20px;background:rgba(6,5,12,.64);backdrop-filter:blur(10px);
+    }
+    .modal.show{display:flex}
+    .modal-card{
+      width:min(960px, calc(100vw - 28px));
+      border-radius:24px;padding:18px;
+      background:linear-gradient(180deg, rgba(27,23,48,.96), rgba(13,11,23,.94));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+      animation:scaleIn .24s ease both;
+    }
+    .modal-head{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px
+    }
+    .modal-head h3{margin:8px 0 0;font-size:28px}
+    .icon-btn{
+      width:42px;height:42px;border-radius:14px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+      font-size:20px;line-height:1;
+    }
+    .modal-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;
+    }
+    .modal-box{
+      padding:14px;border-radius:18px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    }
+    .modal-box h4{
+      margin:0 0 10px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;
+    }
+    .modal-box p{margin:0;color:var(--muted)}
+
+    .toast{
+      position:fixed;right:18px;bottom:18px;z-index:50;
+      max-width:min(90vw, 360px);
+      padding:12px 14px;border-radius:16px;
+      background:rgba(15,12,26,.94);border:1px solid rgba(113,229,255,.18);
+      box-shadow:0 16px 44px rgba(0,0,0,.34);
+      color:#f4f0ff;font-size:12px;
+      opacity:0;transform:translateY(16px);pointer-events:none;
+      transition:opacity .22s ease,transform .22s ease;
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    .footer-note{
+      margin:18px 0 0;text-align:center;color:var(--dim);font-size:12px;
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(12px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    @keyframes scaleIn{
+      from{opacity:0;transform:scale(.97) translateY(8px)}
+      to{opacity:1;transform:scale(1) translateY(0)}
+    }
+    @keyframes scan{
+      0%{left:-42%}
+      100%{left:110%}
+    }
+    @keyframes pulse{
+      0%{transform:scale(.86);opacity:.8}
+      100%{transform:scale(1.45);opacity:0}
+    }
+
+    @media (max-width: 1360px){
+      .home-grid,.warning-layout,.detail-wrap,.analysis-top{grid-template-columns:1fr}
+      .chain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .detail-grid,.hardware-grid,.summary-grid,.hw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .intro-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .algo-layout{grid-template-columns:1fr}
+      .city-map{height:580px}
+    }
+    @media (max-width: 900px){
+      .topbar{flex-direction:column;align-items:stretch}
+      .top-actions,.live-strip{justify-content:stretch}
+      .chain-grid,.detail-grid,.hardware-grid,.summary-grid,.intro-metrics,.hw-grid{grid-template-columns:1fr}
+      .flow-stage{height:530px}
+      .system-node{width:132px}
+      .system-node.n1{top:20px;left:18px}
+      .system-node.n2{top:20px;right:18px}
+      .system-node.n3{top:178px;left:8px}
+      .system-node.n4{top:178px;right:8px}
+      .system-node.n5{bottom:20px;left:18px}
+      .system-node.n6{bottom:20px;right:18px}
+      .city-map{height:520px}
+      .legend-box{max-width:100%}
+      .map-legend{flex-direction:column;align-items:stretch;gap:10px}
+      .map-kpi{min-width:0}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+      .bg-canvas,.grid-bg,.glow{display:none}
+    }
+  </style>
+</head>
+<body>
+  <canvas class="bg-canvas" id="bgCanvas"></canvas>
+  <div class="grid-bg"></div>
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div class="glow g3"></div>
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div>
+          <h1>低空无人机侦测分析平台 Demo</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="nav-btn active" data-page="home">驾驶舱</button>
+        <button class="nav-btn" data-page="algorithm">算法层</button>
+        <button class="cta-btn" data-page="warning">进入地图预警平台</button>
+        <div class="live-strip">
+          <div class="live-item"><b data-count="6">0</b><span>运行链路</span></div>
+          <div class="live-item"><b data-count="8">0</b><span>核心参数</span></div>
+          <div class="live-item"><b data-count="7">0</b><span>侦测站点</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="page active" id="page-home">
+      <div class="home-grid">
+        <div class="panel intro-panel">
+          <div class="eyebrow">UAV DETECTION COCKPIT</div>
+          <div class="intro-metrics">
+            <div class="metric-card"><b data-count="18">0</b><span>链路与参数关联点</span></div>
+            <div class="metric-card"><b data-count="14">0</b><span>侦测/反制硬件类别</span></div>
+            <div class="metric-card"><b data-count="5">0</b><span>多源分析主题</span></div>
+          </div>
+        </div>
+
+        <div class="panel flow-panel">
+          <div class="section-head">
+            <div>
+              <h2>运行链路可视化</h2>
+              <p>点节点即切换链路重点与硬件。</p>
+            </div>
+            <span class="mini-tag">节点联动</span>
+          </div>
+          <div class="flow-stage">
+            <div class="flow-grid"></div>
+            <svg viewBox="0 0 800 420" aria-hidden="true">
+              <defs>
+                <linearGradient id="lineGlow" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#71e5ff" stop-opacity=".18"/>
+                  <stop offset="100%" stop-color="#ba90ff" stop-opacity=".28"/>
+                </linearGradient>
+              </defs>
+              <path d="M170 72 C250 120, 280 160, 320 182" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+              <path d="M630 72 C550 120, 520 160, 480 182" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+              <path d="M148 210 C232 208, 286 208, 320 208" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+              <path d="M652 210 C568 208, 514 208, 480 208" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+              <path d="M170 350 C252 304, 284 264, 320 234" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+              <path d="M630 350 C548 304, 516 264, 480 234" stroke="url(#lineGlow)" stroke-width="2" fill="none"/>
+            </svg>
+            <div class="core-drone">
+              <div class="drone-shape"><i></i></div>
+              <h3>无人机运行链</h3>
+              <p>频谱、轨迹、热源、图像、身份五类信号可联动。</p>
+            </div>
+            <button class="system-node n1" data-link="power"><b>动力供能</b><span>热特征 / 声纹</span></button>
+            <button class="system-node n2" data-link="control"><b>遥控数传</b><span>频谱 / 测向</span></button>
+            <button class="system-node n3" data-link="nav"><b>导航定位</b><span>轨迹 / 越界</span></button>
+            <button class="system-node n4" data-link="payload"><b>任务载荷</b><span>图像 / 目标属性</span></button>
+            <button class="system-node n5" data-link="link"><b>空地通信</b><span>RID / 5G-A</span></button>
+            <button class="system-node n6" data-link="ground"><b>地面站机库</b><span>行为 / 闭环</span></button>
+          </div>
+          <div class="flow-foot">
+            <span class="mini-tag">高价值参数：遥控频段、Remote ID、高度/速度</span>
+            <span class="mini-tag">硬件类型：无线电、雷达、光电、通感、反制</span>
+          </div>
+        </div>
+
+        <div class="panel chain-panel" id="chainSection">
+          <div class="section-head">
+            <div>
+              <h2>运行链路总览</h2>
+              <p>每条链路只保留关键点。</p>
+            </div>
+            <span class="mini-tag">点击切换剖面</span>
+          </div>
+          <div class="chain-grid" id="chainGrid"></div>
+        </div>
+
+        <div class="detail-wrap">
+          <div class="panel detail-panel" id="linkDetail"></div>
+          <div class="panel param-panel">
+            <div class="section-head">
+              <div>
+                <h2>算法层入口</h2>
+                <p>参数体系独立一页。</p>
+              </div>
+              <span class="mini-tag">参数专题</span>
+            </div>
+            <div class="algo-entry">
+              <p>侦测技术 · 协同参数 · 关联侦测/反制硬件 · 应用场景</p>
+              <button class="cta-btn" data-page="algorithm">进入算法层</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel arch-panel" id="architectureSection">
+          <div class="section-head">
+            <div>
+              <h2>平台架构图</h2>
+              <p>六层结构一图展示。</p>
+            </div>
+            <span class="mini-tag">架构总览</span>
+          </div>
+          <div class="arch-stack">
+            <div class="arch-layer">
+              <h4>基础设施层</h4>
+              <p>低空雷达、光电、无线电、Remote ID、5G-A、边缘节点、专网链路</p>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-layer">
+              <h4>侦测算法层</h4>
+              <p>频谱识别、航迹重建、目标检测、行为识别、融合定位、风险评分</p>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-layer">
+              <h4>数据服务层</h4>
+              <p>实时流处理、时空数据仓、特征库、规则引擎、告警服务、接口网关</p>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-layer">
+              <h4>平台功能层</h4>
+              <p>态势总览、预警研判、设备管理、事件处置、联动反制、审计留痕</p>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-layer">
+              <h4>应用场景层</h4>
+              <p>城市巡防、园区防控、机场净空、应急保障、重大活动安保</p>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-layer">
+              <h4>用户层</h4>
+              <p>监管单位、运营单位、指挥中心、保障团队、第三方协同单位</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-warning">
+      <div class="warning-layout">
+        <div class="panel map-panel">
+          <div class="map-head">
+            <div>
+              <div class="eyebrow">MAP-FIRST WARNING DEMO</div>
+              <h2 style="margin:14px 0 8px;font-size:30px">侦测分析预警平台</h2>
+              <p>地图主视角：站点、走廊、事件一屏联动。</p>
+            </div>
+            <div class="map-tools">
+              <button class="tiny-btn" data-map-filter="all">全部主题</button>
+              <button class="tiny-btn" data-map-filter="radio">无线电</button>
+              <button class="tiny-btn" data-map-filter="radar">雷达/通感</button>
+              <button class="tiny-btn" data-map-filter="behavior">行为分析</button>
+              <button class="tiny-btn" data-map-reset>重置视图</button>
+            </div>
+          </div>
+
+          <div class="city-map">
+            <svg viewBox="0 0 1000 660" aria-hidden="true">
+              <defs>
+                <linearGradient id="mapBg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#0a1020"/>
+                  <stop offset="100%" stop-color="#0f1730"/>
+                </linearGradient>
+                <linearGradient id="waterGlow" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#14324d"/>
+                  <stop offset="100%" stop-color="#0e2438"/>
+                </linearGradient>
+                <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#33b8ff" flood-opacity=".18"/>
+                </filter>
+              </defs>
+              <rect width="1000" height="660" fill="url(#mapBg)"/>
+              <g opacity=".16">
+                <path d="M0 84 H1000M0 168 H1000M0 252 H1000M0 336 H1000M0 420 H1000M0 504 H1000M0 588 H1000" stroke="#ffffff"/>
+                <path d="M84 0 V660M168 0 V660M252 0 V660M336 0 V660M420 0 V660M504 0 V660M588 0 V660M672 0 V660M756 0 V660M840 0 V660M924 0 V660" stroke="#ffffff"/>
+              </g>
+              <path d="M0 470 C120 430, 220 420, 310 448 C410 480, 520 520, 650 506 C766 492, 868 424, 1000 398 L1000 660 L0 660 Z" fill="url(#waterGlow)" opacity=".96"/>
+              <g opacity=".92">
+                <path d="M88 124 L274 108 L352 188 L318 282 L164 304 L80 222 Z" fill="#17273f" stroke="#304864"/>
+                <path d="M318 120 L506 108 L580 180 L552 288 L388 306 L318 236 Z" fill="#1a2b44" stroke="#355170"/>
+                <path d="M584 104 L790 112 L864 194 L826 298 L642 306 L570 228 Z" fill="#16253c" stroke="#304864"/>
+                <path d="M110 338 L284 320 L352 390 L316 482 L128 500 L76 426 Z" fill="#1b2d49" stroke="#355170"/>
+                <path d="M360 328 L532 320 L610 392 L566 492 L386 512 L332 434 Z" fill="#192a43" stroke="#34506f"/>
+                <path d="M622 326 L848 312 L920 396 L882 510 L694 522 L606 438 Z" fill="#16243a" stroke="#304762"/>
+              </g>
+              <g fill="none" opacity=".95" filter="url(#softGlow)">
+                <path d="M40 164 C170 138, 280 130, 408 162 C560 198, 676 196, 960 132" stroke="#a981ff" stroke-width="4"/>
+                <path d="M66 278 C188 258, 294 246, 448 278 C572 304, 702 302, 946 248" stroke="#7fe6ff" stroke-width="4"/>
+                <path d="M112 394 C236 378, 374 372, 516 392 C658 414, 766 404, 940 366" stroke="#8edcff" stroke-width="3.4"/>
+                <path d="M258 76 C232 178, 218 262, 246 340 C278 430, 332 490, 378 544" stroke="#6dc9ff" stroke-width="3"/>
+                <path d="M744 82 C710 182, 694 252, 716 332 C742 428, 784 500, 818 552" stroke="#b38eff" stroke-width="3"/>
+                <path d="M420 106 C404 180, 394 248, 410 336 C424 418, 462 500, 520 562" stroke="#d5b4ff" stroke-width="2.8"/>
+              </g>
+              <g fill="none" opacity=".5">
+                <path d="M86 155 C220 144, 314 150, 430 176 C594 214, 716 212, 936 150" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="8 10"/>
+                <path d="M86 288 C220 270, 316 276, 446 302 C588 332, 720 330, 940 270" stroke="#ffffff" stroke-width="1.1" stroke-dasharray="8 10"/>
+                <path d="M118 404 C246 388, 360 388, 496 414 C650 444, 766 434, 944 388" stroke="#ffffff" stroke-width="1.1" stroke-dasharray="8 10"/>
+              </g>
+            </svg>
+
+            <div class="map-overlay" id="mapSiteLayer"></div>
+            <div class="map-incidents" id="mapIncidentLayer"></div>
+            <div class="map-labels" id="mapLabelLayer">
+              <div class="zone-label" style="left:13%;top:13%;">北部物流走廊</div>
+              <div class="zone-label" style="left:42%;top:16%;">城市主控区</div>
+              <div class="zone-label" style="left:72%;top:16%;">东部机场联络带</div>
+              <div class="zone-label" style="left:20%;top:54%;">工业园巡检片区</div>
+              <div class="zone-label" style="left:48%;top:56%;">综合运营区</div>
+              <div class="zone-label" style="left:77%;top:58%;">滨江防控带</div>
+            </div>
+
+            <div class="map-legend">
+              <div class="legend-box">
+                <span class="legend-chip"><i style="background:var(--cyan)"></i>无线电站</span>
+                <span class="legend-chip"><i style="background:var(--amber)"></i>低空雷达</span>
+                <span class="legend-chip"><i style="background:var(--pink)"></i>光电站</span>
+                <span class="legend-chip"><i style="background:var(--green)"></i>RID / 通感</span>
+                <span class="legend-chip"><i style="background:var(--red)"></i>告警事件</span>
+              </div>
+              <div class="map-kpi">
+                <div><b id="mapRiskCount">0</b><span>当前主题告警</span></div>
+                <div><b id="mapSiteCount">0</b><span>关联站点</span></div>
+                <div><b id="mapOnlineCount">0</b><span>在线设备</span></div>
+                <div><b id="mapFusionCount">0</b><span>融合证据链</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="panel summary-panel">
+            <div class="section-head">
+              <div>
+                <h2>预警结论</h2>
+                <p>只展示可处置结论。</p>
+              </div>
+              <span class="mini-tag">动态更新</span>
+            </div>
+            <div class="summary-grid">
+              <div class="metric-card"><b id="riskHigh">0</b><span>高风险事件</span></div>
+              <div class="metric-card"><b id="riskPending">0</b><span>待复核事件</span></div>
+              <div class="metric-card"><b id="riskClosed">36</b><span>已闭环处置</span></div>
+              <div class="metric-card"><b id="riskDevices">0</b><span>关联站点</span></div>
+            </div>
+            <div class="summary-text">
+              <h4 id="summaryTitle">当前主题结论</h4>
+              <p id="summaryText"></p>
+            </div>
+          </div>
+
+          <div class="panel theme-panel">
+            <div class="section-head">
+              <div>
+                <h2>分析主题</h2>
+                <p>点主题，同步地图与过程。</p>
+              </div>
+              <span class="mini-tag">地图联动</span>
+            </div>
+            <div class="theme-list" id="themeList"></div>
+          </div>
+
+          <div class="panel device-panel">
+            <div class="section-head">
+              <div>
+                <h2>侦测设备列表</h2>
+                <p>站点化展示，点击可定位。</p>
+              </div>
+              <span class="mini-tag">点击定位</span>
+            </div>
+            <div class="device-list" id="deviceList"></div>
+          </div>
+        </div>
+
+        <div class="panel analysis-panel" id="themeDetail"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-algorithm">
+      <div class="panel">
+        <div class="section-head" style="padding:18px 18px 0">
+          <div>
+            <h2>算法层参数体系</h2>
+            <p>点击参数查看技术链路。</p>
+          </div>
+          <span class="mini-tag">侦测技术 × 协同参数 × 硬件 × 场景</span>
+        </div>
+        <div class="algo-layout" style="padding:18px">
+          <div class="algo-list" id="algoParamList"></div>
+          <div class="algo-detail" id="algoDetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">纯前端演示页 · 页面已改为更高对比度、地图主视角和侦测/反制硬件表达</div>
+  </main>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script>
+    const linkData = [
+      {
+        id: 'power',
+        title: '动力供能链',
+        brief: '热特征、声纹、推力波动',
+        desc: '动力链重点看热斑、声纹、推力波动。',
+        focus: ['热特征识别', '声纹建模', '续航衰减判断'],
+        detectable: ['热斑温升', '声纹频谱', '推力波动'],
+        detectionHardware: [
+          { name:'热成像云台', vendors:['FLIR','Hikmicro','海康威视','大华股份'], cost:'18-45 万/套' },
+          { name:'声学阵列', vendors:['Rohde & Schwarz','GRAS','Brüel & Kjær','国产声阵列厂商'], cost:'25-80 万/套' },
+          { name:'周界光电球机', vendors:['海康威视','大华股份','宇视科技','华为机器视觉'], cost:'6-20 万/套' }
+        ],
+        counterHardware: [
+          { name:'定向干扰器', vendors:['国产反制厂商','中电科体系厂商','地方安防厂商'], cost:'30-90 万/套' },
+          { name:'便携压制枪', vendors:['国产反制厂商','警用装备厂商'], cost:'8-25 万/套' }
+        ],
+        conclusion:'夜巡、周界、起降点布防'
+      },
+      {
+        id: 'nav',
+        title: '导航定位链',
+        brief: '航迹、高度、返航、越界',
+        desc: '导航链重点看航迹、越界、返航偏差。',
+        focus: ['轨迹重建', '越界判定', '返航行为识别'],
+        detectable: ['高度/速度', '航向变化', '轨迹曲率'],
+        detectionHardware: [
+          { name:'低空监视雷达', vendors:['中电科','航天科工','莱斯信息','国产低空雷达厂商'], cost:'80-300 万/站' },
+          { name:'5G-A 通感基站', vendors:['华为','中兴通讯','爱立信','诺基亚'], cost:'60-180 万/站' },
+          { name:'Remote ID 接收网关', vendors:['移远通信','u-blox','Telit','国产 RID 网关厂商'], cost:'3-12 万/套' }
+        ],
+        counterHardware: [
+          { name:'围栏联动反制台', vendors:['国产反制厂商','行业集成商'], cost:'20-70 万/套' },
+          { name:'自动拦截策略引擎', vendors:['华为','新华三','本地方案商'], cost:'35-120 万/套' }
+        ],
+        conclusion:'走廊监管、围栏越界、返航判别'
+      },
+      {
+        id: 'control',
+        title: '遥控数传链',
+        brief: '频谱、测向、协议特征',
+        desc: '遥控数传链是黑飞早发现主入口。',
+        focus: ['频谱占用识别', '方位测向交汇', '协议族识别'],
+        detectable: ['遥控频段', '跳频规律', 'RSSI 变化'],
+        detectionHardware: [
+          { name:'无线电侦测站', vendors:['Rohde & Schwarz','Keysight','中电科','国产频谱侦测厂商'], cost:'35-120 万/站' },
+          { name:'测向天线阵列', vendors:['Rohde & Schwarz','Tallysman','Laird','国产测向设备厂商'], cost:'20-60 万/套' }
+        ],
+        counterHardware: [
+          { name:'便携反制枪', vendors:['国产反制厂商','中电科体系厂商','地方安防集成商'], cost:'8-25 万/套' },
+          { name:'固定式压制设备', vendors:['国产反制厂商','行业安防厂商'], cost:'45-150 万/站' }
+        ],
+        conclusion:'黑飞发现、近距压制、处置前确认'
+      },
+      {
+        id: 'payload',
+        title: '任务载荷链',
+        brief: '图像、吊舱、行为属性',
+        desc: '载荷链用于目标确认与取证。',
+        focus: ['目标确认', '图像取证', '任务属性判断'],
+        detectable: ['吊舱转向', '图像特征', '机体外形'],
+        detectionHardware: [
+          { name:'长焦光电转台', vendors:['海康威视','大华股份','宇视科技','华为机器视觉'], cost:'15-60 万/套' },
+          { name:'热成像吊舱', vendors:['FLIR','Hikmicro','大立科技','国产光电吊舱厂商'], cost:'20-90 万/套' },
+          { name:'AI 识别边缘盒', vendors:['华为','浪潮','新华三','英伟达生态厂商'], cost:'6-28 万/套' }
+        ],
+        counterHardware: [
+          { name:'光电联动压制台', vendors:['国产反制厂商','本地系统集成商'], cost:'30-100 万/套' },
+          { name:'诱骗式反制模块', vendors:['国产反制厂商','警用装备厂商'], cost:'25-80 万/套' }
+        ],
+        conclusion:'取证、行为确认、异常复核'
+      },
+      {
+        id: 'link',
+        title: '空地通信链',
+        brief: 'RID、专网、链路切换',
+        desc: '空地通信链聚焦身份核验与云边融合。',
+        focus: ['身份核验', '链路切换识别', '状态上报完整性'],
+        detectable: ['Remote ID', '链路时延', '广播完整度'],
+        detectionHardware: [
+          { name:'Remote ID 接收网关', vendors:['移远通信','u-blox','Telit','国产 RID 网关厂商'], cost:'3-12 万/套' },
+          { name:'5G-A 通感基站', vendors:['华为','中兴通讯','爱立信','诺基亚'], cost:'60-180 万/站' },
+          { name:'边缘融合网关', vendors:['华为','新华三','浪潮','锐捷网络'], cost:'8-30 万/套' }
+        ],
+        counterHardware: [
+          { name:'链路阻断控制器', vendors:['国产反制厂商','专网设备厂商'], cost:'25-90 万/套' },
+          { name:'身份黑白名单网关', vendors:['华为','新华三','本地安全厂商'], cost:'15-55 万/套' }
+        ],
+        conclusion:'身份比对、云边协同接入'
+      },
+      {
+        id: 'ground',
+        title: '地面站机库链',
+        brief: '任务流转、回库、处置闭环',
+        desc: '地面站机库链聚焦任务关联与处置闭环。',
+        focus: ['任务关联', '回库行为核验', '反制联动留痕'],
+        detectable: ['起降时间', '回库状态', '处置动作'],
+        detectionHardware: [
+          { name:'联动指挥控制台', vendors:['华为','中兴通讯','新华三','浪潮'], cost:'12-50 万/套' },
+          { name:'回库状态采集终端', vendors:['海康威视','大华股份','行业集成商'], cost:'4-16 万/套' }
+        ],
+        counterHardware: [
+          { name:'车载反制平台', vendors:['国产反制厂商','地方警用装备厂商','中电科体系厂商'], cost:'80-280 万/车' },
+          { name:'固定式干扰设备', vendors:['国产反制厂商','专网设备厂商','行业安防厂商'], cost:'45-150 万/站' }
+        ],
+        conclusion:'侦测-确认-反制-留痕闭环'
+      }
+    ];
+
+    const paramData = [
+      {
+        name: '遥控频段',
+        note: '黑飞早发现',
+        tech: '宽带频谱扫描 + 跳频识别 + 协议比对',
+        synergy: ['RSSI 变化', '跳频规律', '带宽占用', '时隙特征'],
+        detectHardware: ['无线电侦测站', '测向天线阵列'],
+        counterHardware: ['便携反制枪', '固定式压制设备'],
+        scenes: ['机场净空', '重大活动安保', '城市核心区巡防']
+      },
+      {
+        name: '图传频段',
+        note: '图传活动识别',
+        tech: '频谱占用 + 码流特征识别',
+        synergy: ['码率波动', '链路时延', '带宽占用', '调制方式'],
+        detectHardware: ['无线电侦测站', '长焦光电转台', '边缘融合网关'],
+        counterHardware: ['定向干扰器', '链路阻断控制器'],
+        scenes: ['园区防控', '周界防护', '重点目标取证']
+      },
+      {
+        name: 'Remote ID',
+        note: '身份快速核验',
+        tech: 'RID 广播解析 + 身份一致性校验',
+        synergy: ['身份标识', '位置', '航向', '时间戳'],
+        detectHardware: ['Remote ID 接收网关', '边缘融合网关'],
+        counterHardware: ['身份黑白名单网关', '围栏联动反制台'],
+        scenes: ['合规监管', '任务核验', '城市低空运营管理']
+      },
+      {
+        name: '高度 / 速度',
+        note: '越界风险判断',
+        tech: '航迹跟踪 + 速度突变检测 + 风险分级',
+        synergy: ['航向', '轨迹曲率', '加速度', '地理围栏'],
+        detectHardware: ['低空监视雷达', '5G-A 通感基站', '边缘融合网关'],
+        counterHardware: ['围栏联动反制台', '固定式干扰设备'],
+        scenes: ['低空走廊监管', '围栏越界告警', '应急保障']
+      },
+      {
+        name: '航向 / 姿态',
+        note: '异常机动识别',
+        tech: '姿态变化规则比对 + 行为识别',
+        synergy: ['速度', '高度', '返航状态', '轨迹曲率'],
+        detectHardware: ['低空监视雷达', '长焦光电转台', 'AI 识别边缘盒'],
+        counterHardware: ['诱骗式反制模块', '车载反制平台'],
+        scenes: ['异常盘旋识别', '返航偏差分析', '多机行为研判']
+      },
+      {
+        name: '热源特征',
+        note: '夜间目标识别',
+        tech: '热斑分布 + 持续温升检测',
+        synergy: ['声纹', '悬停时间', '目标大小', '周界位置'],
+        detectHardware: ['热成像云台', '热成像吊舱', '周界光电球机'],
+        counterHardware: ['光电联动压制台', '定向干扰器'],
+        scenes: ['夜巡防控', '周界巡检', '暗光环境取证']
+      },
+      {
+        name: '声纹特征',
+        note: '低空近距补盲',
+        tech: '桨叶/电机声纹提取 + 机型匹配',
+        synergy: ['热源特征', '目标方位', '高度变化', '风场噪声'],
+        detectHardware: ['声学阵列', 'AI 识别边缘盒'],
+        counterHardware: ['便携反制枪', '车载反制平台'],
+        scenes: ['城区近距预警', '遮挡区补盲', '机型识别']
+      },
+      {
+        name: '起降 / 回库状态',
+        note: '运营闭环校验',
+        tech: '任务下发、回收状态、处置留痕三项校验',
+        synergy: ['时间戳', '机库状态', '告警工单', '处置动作'],
+        detectHardware: ['联动指挥控制台', '回库状态采集终端'],
+        counterHardware: ['固定式干扰设备', '车载反制平台'],
+        scenes: ['机库监管', '处置闭环审计', '运营绩效分析']
+      }
+    ];
+
+    const siteData = [
+      { id:'north-radio', name:'北塔无线电站', type:'radio', x:17, y:22, icon:'R', range:20, status:'online', role:'黑飞频谱发现', tags:['2.4G/5.8G','测向'], vendor:'R&S / 国产频谱设备' },
+      { id:'west-radar', name:'西侧低空雷达', type:'radar', x:22, y:48, icon:'L', range:24, status:'online', role:'远距轨迹补盲', tags:['航迹','高度'], vendor:'中电科 / 国产低空雷达' },
+      { id:'center-fusion', name:'中心融合节点', type:'fusion', x:49, y:41, icon:'F', range:16, status:'online', role:'多源融合分析', tags:['规则引擎','证据链'], vendor:'华为 / 新华三 / 浪潮' },
+      { id:'east-eo', name:'东部光电站', type:'eo', x:78, y:33, icon:'O', range:18, status:'busy', role:'目标确认取证', tags:['可见光','热像'], vendor:'海康 / 大华 / FLIR' },
+      { id:'south-rid', name:'南侧 RID 网关', type:'rid', x:61, y:64, icon:'I', range:18, status:'online', role:'身份核验', tags:['RID','身份'], vendor:'移远 / u-blox' },
+      { id:'park-5ga', name:'园区 5G-A 通感站', type:'rid', x:37, y:60, icon:'5', range:22, status:'online', role:'通感轨迹协同', tags:['通感','走廊'], vendor:'华为 / 中兴' },
+      { id:'mobile-counter', name:'机动反制车', type:'fusion', x:82, y:56, icon:'C', range:14, status:'alert', role:'现场处置联动', tags:['干扰','处置'], vendor:'国产反制平台' }
+    ];
+
+    const incidentData = [
+      {
+        id:'evt-radio-1',
+        theme:'radio',
+        title:'北部物流走廊异常控制链路',
+        x:56,
+        y:27,
+        level:'high',
+        summary:'连续跳频 + 低速盘旋。',
+        evidence:['2.4GHz 异常跳频', '双站测向交汇', '慢盘旋轨迹'],
+        sites:['north-radio','center-fusion','east-eo']
+      },
+      {
+        id:'evt-radar-1',
+        theme:'radar',
+        title:'西侧工业带疑似低空穿越',
+        x:34,
+        y:44,
+        level:'medium',
+        summary:'低空穿越，RID 上报不稳。',
+        evidence:['连续航迹 2.8km', '高度 110m', 'RID 不完整'],
+        sites:['west-radar','park-5ga','center-fusion']
+      },
+      {
+        id:'evt-eo-1',
+        theme:'eo',
+        title:'滨江区域光电确认目标',
+        x:72,
+        y:51,
+        level:'medium',
+        summary:'光电确认多旋翼并持续悬停。',
+        evidence:['可见光目标确认', '热像补充', '停留时间 4min'],
+        sites:['east-eo','center-fusion','mobile-counter']
+      },
+      {
+        id:'evt-rid-1',
+        theme:'rid',
+        title:'南侧身份上报不一致',
+        x:58,
+        y:62,
+        level:'low',
+        summary:'RID 身份与任务清单不一致。',
+        evidence:['RID 字段缺失', '任务清单不匹配', '航向变化异常'],
+        sites:['south-rid','center-fusion','park-5ga']
+      },
+      {
+        id:'evt-behavior-1',
+        theme:'behavior',
+        title:'中心城区异常盘旋模式',
+        x:51,
+        y:40,
+        level:'high',
+        summary:'轨迹曲率和停留时长超阈值。',
+        evidence:['曲率异常', '停留超时', '返航路径偏移'],
+        sites:['center-fusion','west-radar','east-eo']
+      }
+    ];
+
+    const themeData = [
+      {
+        id:'radio',
+        title:'无线电侦测',
+        level:'high',
+        score:92,
+        summary:'优先发现未备案遥控链路。',
+        conclusion:'北部走廊高风险链路，保持测向并联动光电。',
+        focus:['频谱发现', '跳频识别', '测向交汇'],
+        sites:['north-radio','center-fusion','east-eo'],
+        process:[
+          ['频谱采集', '扫描遥控/图传频段，捕获异常占用。'],
+          ['特征识别', '识别跳频、带宽、占空比特征。'],
+          ['方位交汇', '多站测向交汇定位。'],
+          ['确认输出', '联动光电/反制输出处置建议。']
+        ]
+      },
+      {
+        id:'rid',
+        title:'Remote ID 核验',
+        level:'medium',
+        score:68,
+        summary:'快速核验身份一致性。',
+        conclusion:'南侧 RID 字段缺失，转人工复核。',
+        focus:['广播解析', '身份匹配', '一致性校验'],
+        sites:['south-rid','center-fusion','park-5ga'],
+        process:[
+          ['广播接收', '捕获身份、位置、航向、时间戳。'],
+          ['注册比对', '比对注册信息、任务清单、时段授权。'],
+          ['冲突识别', '识别缺失、伪冒、位置不一致。'],
+          ['结论输出', '输出合规提醒或高风险告警。']
+        ]
+      },
+      {
+        id:'eo',
+        title:'光电识别',
+        level:'medium',
+        score:74,
+        summary:'目标确认与取证主题。',
+        conclusion:'滨江目标已确认，持续跟踪并留证。',
+        focus:['目标确认', '连续跟踪', '取证留痕'],
+        sites:['east-eo','center-fusion','mobile-counter'],
+        process:[
+          ['目标引导', '按雷达/无线电结果引导转台。'],
+          ['图像检测', '识别外形、热源、吊舱动作。'],
+          ['连续跟踪', '持续跟踪并记录关键帧。'],
+          ['属性判断', '输出机型、任务属性、可疑等级。']
+        ]
+      },
+      {
+        id:'radar',
+        title:'雷达 / 通感融合',
+        level:'high',
+        score:88,
+        summary:'大范围早发现与补盲。',
+        conclusion:'西侧疑似穿越，持续跟踪并联动 RID/光电。',
+        focus:['回波识别', '轨迹跟踪', '多源补盲'],
+        sites:['west-radar','park-5ga','center-fusion'],
+        process:[
+          ['回波检测', '识别微小目标回波与速度变化。'],
+          ['通感补充', '5G-A 通感补足遮挡区域。'],
+          ['轨迹融合', '统一坐标并生成稳定航迹。'],
+          ['风险评分', '按越界、冲突、穿越输出评分。']
+        ]
+      },
+      {
+        id:'behavior',
+        title:'轨迹行为分析',
+        level:'high',
+        score:95,
+        summary:'多源行为识别主题。',
+        conclusion:'中心城区异常盘旋，进入重点复核。',
+        focus:['轨迹标准化', '意图识别', '异常归因'],
+        sites:['center-fusion','west-radar','east-eo'],
+        process:[
+          ['轨迹标准化', '统一雷达、通感、RID、光电结果。'],
+          ['行为建模', '识别巡检、盘旋、返航、穿越模式。'],
+          ['异常比对', '比对任务授权、围栏和历史模式。'],
+          ['处置建议', '输出异常原因与关注区域。']
+        ]
+      }
+    ];
+
+    const state = {
+      page: location.hash === '#warning' ? 'warning' : (location.hash === '#algorithm' ? 'algorithm' : 'home'),
+      linkId: 'control',
+      hardwareType: 'detection',
+      hardwareName: '',
+      costMode: 'single_set',
+      algoParam: '遥控频段',
+      themeId: 'radio',
+      incidentId: 'evt-radio-1',
+      siteId: null,
+      mapFilter: 'all'
+    };
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    const chainGrid = $('#chainGrid');
+    const linkDetail = $('#linkDetail');
+    const algoParamList = $('#algoParamList');
+    const algoDetail = $('#algoDetail');
+    const themeList = $('#themeList');
+    const deviceList = $('#deviceList');
+    const themeDetail = $('#themeDetail');
+    const mapSiteLayer = $('#mapSiteLayer');
+    const mapIncidentLayer = $('#mapIncidentLayer');
+    const toast = $('#toast');
+
+    let toastTimer = null;
+
+    function getLink(id){
+      return linkData.find(item => item.id === id) || linkData[0];
+    }
+    function getTheme(id){
+      return themeData.find(item => item.id === id) || themeData[0];
+    }
+    function getIncident(id){
+      return incidentData.find(item => item.id === id) || incidentData.find(item => item.theme === state.themeId) || incidentData[0];
+    }
+    function getSite(id){
+      return siteData.find(item => item.id === id);
+    }
+
+    function showToast(text){
+      toast.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    function formatCostByMode(costText, mode){
+      if (!costText) return '-';
+      const match = costText.match(/(\d+)\s*-\s*(\d+)\s*万\/([套站车])/);
+      if (!match) return costText;
+      const low = Number(match[1]);
+      const high = Number(match[2]);
+      const unit = match[3];
+      const base = {
+        unit,
+        low,
+        high
+      };
+      function toSet(range){
+        if (range.unit === '套') return range;
+        if (range.unit === '站') return { unit:'套', low:Math.round(range.low * 0.72), high:Math.round(range.high * 0.72) };
+        return { unit:'套', low:Math.round(range.low * 0.58), high:Math.round(range.high * 0.58) };
+      }
+      function toStation(range){
+        if (range.unit === '站') return range;
+        if (range.unit === '套') return { unit:'站', low:Math.round(range.low * 1.38), high:Math.round(range.high * 1.38) };
+        return { unit:'站', low:Math.round(range.low * 0.92), high:Math.round(range.high * 0.92) };
+      }
+      const asSet = toSet(base);
+      const asStation = toStation(base);
+      if (mode === 'single_station'){
+        return `${asStation.low}-${asStation.high} 万/站`;
+      }
+      if (mode === 'single_set'){
+        return `${asSet.low}-${asSet.high} 万/套`;
+      }
+      const cityMultiplier = asStation.high >= 120 ? 10 : 16;
+      return `${asStation.low * cityMultiplier}-${asStation.high * cityMultiplier} 万/城区`;
+    }
+
+    function renderCounts(){
+      $$('[data-count]').forEach(el => {
+        const target = Number(el.dataset.count || 0);
+        const duration = 900;
+        const start = performance.now();
+        function tick(now){
+          const p = Math.min((now - start) / duration, 1);
+          el.textContent = Math.round(target * (0.15 + 0.85 * p));
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = target;
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    function setPage(page){
+      state.page = page;
+      $('#page-home').classList.toggle('active', page === 'home');
+      $('#page-warning').classList.toggle('active', page === 'warning');
+      $('#page-algorithm').classList.toggle('active', page === 'algorithm');
+      $$('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
+      location.hash = page === 'warning' ? '#warning' : (page === 'algorithm' ? '#algorithm' : '#home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderChains(){
+      chainGrid.innerHTML = linkData.map((item, index) => `
+        <button class="chain-card ${state.linkId === item.id ? 'active' : ''}" data-link="${item.id}">
+          <div class="chain-top">
+            <h4>${item.title}</h4>
+            <span class="chain-no">${index + 1}</span>
+          </div>
+          <p>${item.brief}</p>
+        </button>
+      `).join('');
+      $$('.system-node').forEach(btn => btn.classList.toggle('active', btn.dataset.link === state.linkId));
+    }
+
+    function renderLinkDetail(linkId){
+      const item = getLink(linkId);
+      state.linkId = item.id;
+      const activeList = state.hardwareType === 'counter' ? item.counterHardware : item.detectionHardware;
+      state.hardwareName = activeList.find(hw => hw.name === state.hardwareName)?.name || (activeList[0]?.name || '');
+      renderChains();
+      const current = activeList.find(hw => hw.name === state.hardwareName) || activeList[0];
+
+      linkDetail.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <div class="eyebrow">LINK ANALYSIS</div>
+            <h3>${item.title}</h3>
+            <p>${item.desc}</p>
+          </div>
+          <div class="signal-badge">重点暴露：${item.brief}</div>
+        </div>
+        <div class="detail-grid">
+          <div class="info-box">
+            <h4>侦测重点</h4>
+            <div class="chip-wrap">${item.focus.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+          </div>
+          <div class="info-box">
+            <h4>可侦测利用参数</h4>
+            <div class="chip-wrap">${item.detectable.map(v => `<span class="chip"><b>●</b>${v}</span>`).join('')}</div>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:12px">
+          <h4>主要侦测 / 反制硬件</h4>
+          <div class="type-toggle">
+            <button class="type-btn ${state.hardwareType === 'detection' ? 'active' : ''}" data-hardware-type="detection">侦测硬件</button>
+            <button class="type-btn ${state.hardwareType === 'counter' ? 'active' : ''}" data-hardware-type="counter">反制硬件</button>
+          </div>
+          <div class="hw-grid">
+            ${activeList.map(hw => `
+              <button class="hw-btn ${state.hardwareName === hw.name ? 'active' : ''}" data-hardware-item="${hw.name}">
+                <b>${hw.name}</b>
+                <span>厂商 + 成本</span>
+              </button>
+            `).join('')}
+          </div>
+          <div class="cost-box">
+            <p>当前硬件：<b>${current ? current.name : '-'}</b></p>
+            <div class="maker-wrap">${(current?.vendors || ['厂商待补充']).map(v => `<span>${v}</span>`).join('')}</div>
+            <div class="cost-toggle">
+              <button class="cost-btn ${state.costMode === 'single_station' ? 'active' : ''}" data-cost-mode="single_station">单站</button>
+              <button class="cost-btn ${state.costMode === 'single_set' ? 'active' : ''}" data-cost-mode="single_set">单套</button>
+              <button class="cost-btn ${state.costMode === 'city_total' ? 'active' : ''}" data-cost-mode="city_total">城区部署总价</button>
+            </div>
+            <p style="margin-top:10px">设备部署成本：<span class="cost">${current ? formatCostByMode(current.cost, state.costMode) : '-'}</span></p>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:12px">
+          <h4>演示口径</h4>
+          <p class="soft-text" style="margin:0">场景：${item.conclusion.replace('场景：','')}</p>
+        </div>
+      `;
+    }
+
+    function renderAlgorithmPage(){
+      algoParamList.innerHTML = paramData.map(item => `
+        <button class="algo-param-btn ${state.algoParam === item.name ? 'active' : ''}" data-algo-param="${item.name}">
+          <b>${item.name}</b>
+          <span>${item.note}</span>
+        </button>
+      `).join('');
+      const item = paramData.find(v => v.name === state.algoParam) || paramData[0];
+      algoDetail.innerHTML = `
+        <h3>${item.name}</h3>
+        <div class="algo-block">
+          <h4>侦测技术</h4>
+          <div class="chip-wrap"><span class="chip">${item.tech}</span></div>
+        </div>
+        <div class="algo-block">
+          <h4>协同参数</h4>
+          <div class="chip-wrap">${item.synergy.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+        </div>
+        <div class="algo-block">
+          <h4>关联侦测硬件</h4>
+          <div class="chip-wrap">${item.detectHardware.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+        </div>
+        <div class="algo-block">
+          <h4>关联反制硬件</h4>
+          <div class="chip-wrap">${item.counterHardware.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+        </div>
+        <div class="algo-block">
+          <h4>应用场景</h4>
+          <div class="chip-wrap">${item.scenes.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+        </div>
+      `;
+    }
+
+    function activeThemeIncidents(){
+      return incidentData.filter(item => item.theme === state.themeId);
+    }
+
+    function renderThemes(){
+      themeList.innerHTML = themeData.map(item => `
+        <button class="theme-card ${state.themeId === item.id ? 'active' : ''}" data-theme="${item.id}">
+          <div class="theme-top">
+            <h4>${item.title}</h4>
+            <span class="level-tag ${item.level}">${item.level === 'high' ? '高风险' : '中风险'}</span>
+          </div>
+          <p>${item.summary}</p>
+          <div class="bar"><i style="width:${item.score}%"></i></div>
+        </button>
+      `).join('');
+      $$('[data-map-filter]').forEach(btn => btn.classList.toggle('active', btn.dataset.mapFilter === state.mapFilter));
+    }
+
+    function renderDevices(){
+      const theme = getTheme(state.themeId);
+      const related = new Set(theme.sites);
+      deviceList.innerHTML = siteData.map(item => `
+        <button class="device-card ${state.siteId === item.id ? 'active' : ''}" data-site="${item.id}">
+          <div class="device-top">
+            <h4>${item.name}</h4>
+            <span class="status-tag ${item.status}">${item.status === 'online' ? '在线' : item.status === 'busy' ? '工作中' : '待处置'}</span>
+          </div>
+          <p>${item.role}</p>
+          <div class="device-chip-wrap" style="margin-top:10px">
+            ${item.tags.map(tag => `<span class="chip">${tag}</span>`).join('')}
+            ${related.has(item.id) ? '<span class="chip"><b>●</b>当前主题关联</span>' : ''}
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function renderMap(){
+      const theme = getTheme(state.themeId);
+      const incident = getIncident(state.incidentId);
+      const filter = state.mapFilter;
+      const themeSites = new Set(theme.sites);
+      const selectedIncidentSites = incident ? new Set(incident.sites) : new Set();
+
+      mapSiteLayer.innerHTML = siteData.map(site => {
+        const active = state.siteId === site.id || selectedIncidentSites.has(site.id) || themeSites.has(site.id);
+        const dim = !themeSites.has(site.id) && state.themeId;
+        const ringCls = active ? 'coverage-ring' : `coverage-ring ${dim ? 'dim' : ''}`;
+        const ringWarn = site.id === 'mobile-counter' ? ' warn' : '';
+        const size = site.range * 14;
+        return `
+          <div class="${ringCls}${ringWarn}" style="left:${site.x}%;top:${site.y}%;width:${size}px;height:${size}px;"></div>
+          <button class="map-site ${site.type} ${active ? 'active' : ''}" data-site="${site.id}" title="${site.name}" style="left:${site.x}%;top:${site.y}%;">
+            <span>${site.icon}</span>
+          </button>
+        `;
+      }).join('');
+
+      mapIncidentLayer.innerHTML = incidentData.map(item => {
+        const hidden = filter !== 'all' && item.theme !== filter;
+        const active = state.incidentId === item.id;
+        return `
+          <button class="map-incident ${item.level} ${hidden ? 'hidden' : ''} ${active ? 'active' : ''}" data-incident="${item.id}" title="${item.title}" style="left:${item.x}%;top:${item.y}%"></button>
+        `;
+      }).join('');
+
+      $('#mapRiskCount').textContent = activeThemeIncidents().length;
+      $('#mapSiteCount').textContent = theme.sites.length;
+      $('#mapOnlineCount').textContent = siteData.filter(v => v.status === 'online').length;
+      $('#mapFusionCount').textContent = incident.evidence.length;
+    }
+
+    function renderSummary(){
+      const theme = getTheme(state.themeId);
+      const relatedIncidents = activeThemeIncidents();
+      const selected = getIncident(state.incidentId);
+      $('#riskHigh').textContent = relatedIncidents.filter(v => v.level === 'high').length;
+      $('#riskPending').textContent = relatedIncidents.length;
+      $('#riskDevices').textContent = theme.sites.length;
+      $('#summaryTitle').textContent = selected ? selected.title : `${theme.title} 结论`;
+      $('#summaryText').textContent = selected ? `${selected.summary}｜${theme.conclusion}` : theme.conclusion;
+    }
+
+    function renderThemeDetail(){
+      const theme = getTheme(state.themeId);
+      const incident = getIncident(state.incidentId);
+      const relatedSites = (incident ? incident.sites : theme.sites).map(getSite).filter(Boolean);
+
+      themeDetail.innerHTML = `
+        <div class="section-head">
+          <div>
+            <h2>${theme.title} · 识别过程</h2>
+            <p>主题、事件、设备、过程四块联动显示。</p>
+          </div>
+          <span class="mini-tag">主题联动 / 地图联动</span>
+        </div>
+        <div class="analysis-top">
+          <div class="analysis-block">
+            <h4>当前事件与证据链</h4>
+            <p style="margin:0;color:#efeaff">${incident.title}</p>
+            <p style="margin:8px 0 0;color:var(--muted)">${incident.summary}</p>
+            <div class="evidence-wrap" style="margin-top:12px">
+              ${incident.evidence.map(v => `<span class="chip">${v}</span>`).join('')}
+            </div>
+            <div class="device-chip-wrap" style="margin-top:12px">
+              ${relatedSites.map(site => `<span class="chip">${site.name}</span>`).join('')}
+            </div>
+          </div>
+          <div class="analysis-block">
+            <h4>主题关注点</h4>
+            <div class="chip-wrap">${theme.focus.map(v => `<span class="chip">${v}</span>`).join('')}</div>
+            <div class="maker-box" style="margin-top:12px">
+              <p style="margin-bottom:8px">主题结论</p>
+              <div class="soft-text">${theme.conclusion}</div>
+            </div>
+          </div>
+        </div>
+        <div class="analysis-block" style="margin-top:14px">
+          <h4>分析识别过程</h4>
+          <div class="step-list">
+            ${theme.process.map((step, index) => `
+              <div class="step">
+                <i>${index + 1}</i>
+                <div>
+                  <b>${step[0]}</b>
+                  <span>${step[1]}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWarningPage(){
+      if (!activeThemeIncidents().some(item => item.id === state.incidentId)){
+        state.incidentId = activeThemeIncidents()[0]?.id || incidentData[0].id;
+      }
+      renderThemes();
+      renderDevices();
+      renderMap();
+      renderSummary();
+      renderThemeDetail();
+    }
+
+    function drawBackground(){
+      const canvas = $('#bgCanvas');
+      const ctx = canvas.getContext('2d');
+      const points = Array.from({ length: 64 }, () => ({
+        x: Math.random(),
+        y: Math.random(),
+        vx: (Math.random() - .5) * .00045,
+        vy: (Math.random() - .5) * .00045,
+        r: 1 + Math.random() * 1.8
+      }));
+
+      function resize(){
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(innerWidth * dpr);
+        canvas.height = Math.floor(innerHeight * dpr);
+        canvas.style.width = innerWidth + 'px';
+        canvas.style.height = innerHeight + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function loop(){
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        ctx.fillStyle = 'rgba(255,255,255,.52)';
+        points.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > 1) p.vx *= -1;
+          if (p.y < 0 || p.y > 1) p.vy *= -1;
+          const x = p.x * innerWidth;
+          const y = p.y * innerHeight;
+          ctx.beginPath();
+          ctx.arc(x, y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.strokeStyle = 'rgba(186,144,255,.10)';
+        for (let i = 0; i < points.length; i++){
+          for (let j = i + 1; j < points.length; j++){
+            const dx = points[i].x - points[j].x;
+            const dy = points[i].y - points[j].y;
+            const d = Math.hypot(dx, dy);
+            if (d < .14){
+              ctx.globalAlpha = 1 - d / .14;
+              ctx.beginPath();
+              ctx.moveTo(points[i].x * innerWidth, points[i].y * innerHeight);
+              ctx.lineTo(points[j].x * innerWidth, points[j].y * innerHeight);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      loop();
+    }
+
+    function bindEvents(){
+      document.addEventListener('click', (e) => {
+        const pageBtn = e.target.closest('[data-page]');
+        if (pageBtn){
+          setPage(pageBtn.dataset.page);
+          return;
+        }
+
+        const scrollBtn = e.target.closest('[data-scroll]');
+        if (scrollBtn){
+          document.getElementById(scrollBtn.dataset.scroll)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        const linkBtn = e.target.closest('[data-link]');
+        if (linkBtn){
+          renderLinkDetail(linkBtn.dataset.link);
+          return;
+        }
+
+        const typeBtn = e.target.closest('[data-hardware-type]');
+        if (typeBtn){
+          state.hardwareType = typeBtn.dataset.hardwareType;
+          state.hardwareName = '';
+          renderLinkDetail(state.linkId);
+          return;
+        }
+
+        const hardwareItemBtn = e.target.closest('[data-hardware-item]');
+        if (hardwareItemBtn){
+          state.hardwareName = hardwareItemBtn.dataset.hardwareItem;
+          renderLinkDetail(state.linkId);
+          return;
+        }
+
+        const costModeBtn = e.target.closest('[data-cost-mode]');
+        if (costModeBtn){
+          state.costMode = costModeBtn.dataset.costMode;
+          renderLinkDetail(state.linkId);
+          return;
+        }
+
+        const algoBtn = e.target.closest('[data-algo-param]');
+        if (algoBtn){
+          state.algoParam = algoBtn.dataset.algoParam;
+          renderAlgorithmPage();
+          return;
+        }
+
+        const themeBtn = e.target.closest('[data-theme]');
+        if (themeBtn){
+          state.themeId = themeBtn.dataset.theme;
+          state.mapFilter = themeBtn.dataset.theme;
+          state.siteId = null;
+          state.incidentId = activeThemeIncidents()[0]?.id || state.incidentId;
+          renderWarningPage();
+          return;
+        }
+
+        const deviceBtn = e.target.closest('[data-site]');
+        if (deviceBtn){
+          state.siteId = deviceBtn.dataset.site;
+          const site = getSite(state.siteId);
+          if (site){
+            showToast(`已定位站点：${site.name}`);
+          }
+          renderDevices();
+          renderMap();
+          return;
+        }
+
+        const incidentBtn = e.target.closest('[data-incident]');
+        if (incidentBtn){
+          const incident = getIncident(incidentBtn.dataset.incident);
+          state.incidentId = incident.id;
+          state.themeId = incident.theme;
+          state.mapFilter = incident.theme;
+          renderWarningPage();
+          showToast(`已切换事件：${incident.title}`);
+          return;
+        }
+
+        const filterBtn = e.target.closest('[data-map-filter]');
+        if (filterBtn){
+          state.mapFilter = filterBtn.dataset.mapFilter;
+          if (state.mapFilter !== 'all'){
+            state.themeId = state.mapFilter;
+            state.incidentId = incidentData.find(item => item.theme === state.themeId)?.id || state.incidentId;
+          }
+          renderWarningPage();
+          return;
+        }
+
+        const resetBtn = e.target.closest('[data-map-reset]');
+        if (resetBtn){
+          state.mapFilter = 'all';
+          state.themeId = 'radio';
+          state.incidentId = 'evt-radio-1';
+          state.siteId = null;
+          renderWarningPage();
+          showToast('视图已重置');
+          return;
+        }
+
+      });
+
+      window.addEventListener('hashchange', () => {
+        setPage(location.hash === '#warning' ? 'warning' : (location.hash === '#algorithm' ? 'algorithm' : 'home'));
+      });
+    }
+
+    function init(){
+      renderCounts();
+      renderChains();
+      renderLinkDetail(state.linkId);
+      renderAlgorithmPage();
+      renderWarningPage();
+      bindEvents();
+      drawBackground();
+      setPage(state.page);
+    }
+
+    init();
+  </script>
+</body>
+</html>

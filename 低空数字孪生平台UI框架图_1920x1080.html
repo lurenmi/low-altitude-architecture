@@ -1,0 +1,4532 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>低空数字孪生平台 | 政务科技风版</title>
+  
+  <!-- 本地部署版：不依赖 CDN，地图由内置轻量态势底图兜底渲染 -->
+  
+  <style>
+    :root {
+      --bg-primary: #f9fafb;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.96);
+      --bg-card-hover: #ffffff;
+      --ink-primary: #1f2937;
+      --ink-secondary: #374151;
+      --ink-muted: #6b7280;
+      --line-primary: #e5e7eb;
+      --line-secondary: #f3f4f6;
+      --brand-primary: #9333ea;
+      --brand-secondary: #ec4899;
+      --brand-gradient: linear-gradient(90deg, #9333ea 0%, #ec4899 100%);
+      --hero-gradient: linear-gradient(-45deg, #9333ea, #c084fc, #f0abfc, #c084fc);
+      --success: #2f9f72;
+      --warning: #b7791f;
+      --danger: #d94872;
+      --shadow-glow: 0 18px 28px rgba(147, 51, 234, 0.12);
+      --shadow-card: 0 10px 24px rgba(15, 23, 42, 0.08);
+      --overlay: rgba(31, 41, 55, 0.24);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      background: #f9fafb;
+      color: var(--ink-primary);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      min-height: 100vh;
+      padding: 18px 0 36px;
+    }
+
+    .wrap {
+      width: 1920px;
+      max-width: none;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    .title {
+      display: none;
+    }
+
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 {
+      font-size: 28px;
+      letter-spacing: 0.5px;
+      color: var(--ink-primary);
+      font-weight: 780;
+    }
+    h2 { font-size: 22px; letter-spacing: 0.2px; }
+    h3 { font-size: 15px; letter-spacing: 0.1px; }
+    h4 { font-size: 13px; letter-spacing: 0; color: var(--ink-secondary); }
+    p { color: var(--ink-muted); line-height: 1.5; }
+
+    .artboard {
+      width: 1920px;
+      height: 1080px;
+      margin: 0 auto 36px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--line-primary);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+      overflow: hidden;
+      position: relative;
+      border-radius: 10px;
+    }
+
+    /* 顶部动态流光装饰 */
+    .artboard::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(127, 170, 224, 0.2), rgba(127, 170, 224, 0.65), transparent);
+      animation: scanLine 6s linear infinite;
+      z-index: 100;
+    }
+
+    @keyframes scanLine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .header {
+      height: 72px;
+      display: grid;
+      grid-template-columns: 260px 1fr 260px;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px;
+      background: linear-gradient(180deg, rgba(10, 24, 43, 0.96) 0%, rgba(8, 20, 36, 0.94) 100%);
+      border-bottom: 1px solid var(--line-primary);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      background: var(--brand-gradient);
+      box-shadow: 0 6px 16px rgba(47, 111, 214, 0.28);
+      flex-shrink: 0;
+    }
+
+    .logo-title {
+      font-size: 18px;
+      font-weight: 760;
+      color: var(--ink-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .top-nav::-webkit-scrollbar { display: none; }
+
+    .nav-btn {
+      height: 42px;
+      min-width: 96px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(122, 156, 199, 0.28);
+      background: linear-gradient(180deg, rgba(15, 32, 54, 0.86) 0%, rgba(11, 25, 43, 0.88) 100%);
+      color: var(--ink-secondary);
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      border-color: rgba(116, 167, 236, 0.78);
+      color: var(--ink-primary);
+      box-shadow: 0 4px 14px rgba(47, 111, 214, 0.18);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(180deg, rgba(62, 119, 205, 0.96) 0%, rgba(38, 88, 170, 0.96) 100%);
+      border-color: rgba(132, 176, 233, 0.45);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 16px rgba(24, 69, 142, 0.26);
+    }
+
+    .user-area {
+      justify-self: end;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid rgba(122, 156, 199, 0.28);
+      background: linear-gradient(180deg, rgba(15, 32, 54, 0.86) 0%, rgba(11, 25, 43, 0.88) 100%);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: normal;
+      color: var(--ink-secondary);
+      transition: all 0.3s ease;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      border-color: rgba(116, 167, 236, 0.78);
+      color: var(--ink-primary);
+      box-shadow: 0 4px 12px rgba(47, 111, 214, 0.18);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      display: grid;
+      place-items: center;
+    }
+
+    .user-card {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(122, 156, 199, 0.28);
+      background: linear-gradient(180deg, rgba(15, 32, 54, 0.86) 0%, rgba(11, 25, 43, 0.88) 100%);
+      font-size: 13px;
+      white-space: nowrap;
+      color: var(--ink-secondary);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .user-card:hover {
+      border-color: rgba(116, 167, 236, 0.78);
+      box-shadow: 0 4px 12px rgba(47, 111, 214, 0.18);
+    }
+
+    .user-card:active {
+      transform: scale(0.98);
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--brand-gradient);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(47, 111, 214, 0.22);
+      flex-shrink: 0;
+    }
+
+    .user-menu {
+      position: absolute;
+      right: 0;
+      top: 52px;
+      width: 260px;
+      background: rgba(13, 29, 51, 0.98);
+      border: 1px solid var(--line-primary);
+      border-radius: 10px;
+      box-shadow: 0 12px 28px rgba(3, 13, 27, 0.42);
+      padding: 8px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      display: none;
+    }
+
+    .user-menu.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideOutRight {
+      from { transform: translateX(0); }
+      to { transform: translateX(100%); }
+    }
+
+    .menu-head {
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid var(--line-primary);
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .menu-item {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      border-radius: 8px;
+      color: var(--ink-secondary);
+      font-size: 13px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background: rgba(91, 163, 245, 0.12);
+      color: #d7e9ff;
+    }
+
+    .content {
+      height: calc(1080px - 72px);
+      min-height: 0;
+      padding: 20px 24px 24px;
+      overflow: hidden;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .kpi, .panel {
+      background: linear-gradient(180deg, rgba(14, 31, 53, 0.94) 0%, rgba(11, 25, 43, 0.96) 100%);
+      border: 1px solid var(--line-primary);
+      border-radius: 10px;
+      min-width: 0;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .kpi:hover, .panel:hover {
+      border-color: rgba(121, 162, 214, 0.5);
+      box-shadow: 0 8px 20px rgba(8, 20, 38, 0.22);
+    }
+
+    .kpi {
+      height: 90px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .kpi:active {
+      transform: scale(0.98);
+    }
+
+    /* KPI 脉冲效果 */
+    .kpi::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(91, 163, 245, 0.06) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .kpi h3 {
+      color: var(--ink-muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .value {
+      font-size: 26px;
+      font-weight: 820;
+      letter-spacing: 0;
+      color: var(--ink-primary);
+      text-shadow: none;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .value small {
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-weight: 400;
+    }
+
+    .trend {
+      margin-top: 4px;
+      color: var(--ink-secondary);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .trend.up { color: var(--success); }
+    .trend.down { color: var(--danger); }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      grid-template-rows: 380px 1fr;
+      gap: 16px;
+      height: calc(100% - 106px);
+      min-height: 0;
+    }
+
+    .dashboard > .panel:nth-child(1) {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    .dashboard > .panel:nth-child(2) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .dashboard > .panel:nth-child(3) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .dashboard > .panel:nth-child(4) {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .dashboard > .panel:nth-child(5) {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .panel-head {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line-primary);
+      font-weight: 760;
+      font-size: 14px;
+      color: var(--ink-primary);
+      background: linear-gradient(180deg, rgba(39, 82, 145, 0.12) 0%, rgba(18, 40, 67, 0.08) 100%);
+      flex-shrink: 0;
+    }
+
+    .panel-head-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .panel-body {
+      position: relative;
+      padding: 14px;
+      height: calc(100% - 44px);
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .panel-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .panel-body::-webkit-scrollbar-thumb {
+      background: var(--line-primary);
+      border-radius: 2px;
+    }
+
+    /* 真实地图容器样式 */
+    .map-container {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0 0 10px 10px;
+      min-height: 0;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(121, 162, 214, 0.12), transparent 35%),
+        linear-gradient(180deg, rgba(7, 18, 33, 0.15), rgba(4, 11, 22, 0.38));
+      perspective: 1400px;
+    }
+
+    #mainMap, #heatMap, #detailMap, #planMap {
+      width: 100%;
+      height: 100%;
+      background: #070f1a;
+    }
+
+    .map-container.three-d #mainMap,
+    .map-container.three-d #heatMap,
+    .map-container.three-d #detailMap,
+    .map-container.three-d #planMap {
+      transform: perspective(1400px) rotateX(4deg) scale(1.035);
+      transform-origin: center center;
+      filter: saturate(1.08) contrast(1.04) brightness(0.94);
+    }
+
+    /* 覆盖Leaflet默认样式，适配政务科技风 */
+    .leaflet-container {
+      background: #070f1a !important;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif !important;
+    }
+
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .leaflet-control-zoom-in, .leaflet-control-zoom-out {
+      background: rgba(10, 22, 40, 0.85) !important;
+      border: 1px solid var(--line-primary) !important;
+      color: var(--ink-secondary) !important;
+      width: 32px !important;
+      height: 32px !important;
+      line-height: 32px !important;
+      border-radius: 6px !important;
+      margin-bottom: 6px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .leaflet-control-zoom-in:hover, .leaflet-control-zoom-out:hover {
+      background: rgba(91, 163, 245, 0.12) !important;
+      color: var(--ink-primary) !important;
+      border-color: rgba(116, 167, 236, 0.78) !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(10, 22, 40, 0.85) !important;
+      color: var(--ink-muted) !important;
+      border-top: 1px solid var(--line-primary) !important;
+      border-left: 1px solid var(--line-primary) !important;
+      border-radius: 8px 0 0 0 !important;
+      padding: 4px 8px !important;
+      font-size: 10px !important;
+    }
+
+    .leaflet-control-attribution a {
+      color: var(--ink-secondary) !important;
+    }
+
+    /* 地图扫描线动效 */
+    .map-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(91, 163, 245, 0.035) 50%, transparent 100%);
+      animation: mapScan 8s linear infinite;
+      pointer-events: none;
+      z-index: 400;
+    }
+
+    .map-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 18%),
+        radial-gradient(circle at 50% 120%, rgba(5, 10, 18, 0.65), transparent 46%);
+      pointer-events: none;
+      z-index: 401;
+    }
+
+    @keyframes mapScan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    .map-boundary {
+      position: absolute;
+      inset: 48px 72px 70px 70px;
+      border: 2px solid rgba(117, 160, 216, 0.42);
+      border-radius: 42% 58% 46% 54%;
+      background: rgba(91, 163, 245, 0.05);
+      box-shadow: 0 0 18px rgba(47, 111, 214, 0.14);
+      pointer-events: none;
+      z-index: 300;
+    }
+
+    /* 自定义飞行器标记样式 */
+    .aircraft-marker {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 3px solid #fff;
+      background: var(--brand-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 12px rgba(91, 163, 245, 0.34);
+      animation: pulse 2s infinite;
+      cursor: pointer;
+    }
+
+    .aircraft-marker.ok { background: var(--success); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 230, 118, 0.5); }
+    .aircraft-marker.warn { background: var(--warning); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 171, 0, 0.5); }
+    .aircraft-marker.danger { background: var(--danger); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 82, 82, 0.5); }
+    .aircraft-marker.unauthorized { background: #9c27b0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(156, 39, 176, 0.5); }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 12px rgba(91, 163, 245, 0.34); }
+      50% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 18px rgba(91, 163, 245, 0.48); }
+      100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 12px rgba(91, 163, 245, 0.34); }
+    }
+
+    .map-toolbar {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 500;
+    }
+
+    .tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(10, 22, 40, 0.85);
+      border-radius: 8px;
+      padding: 6px;
+      border: 1px solid var(--line-primary);
+    }
+
+    .tool {
+      height: 32px;
+      width: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: none;
+      background: rgba(9, 22, 39, 0.28);
+      font-size: 16px;
+      color: var(--ink-secondary);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .tool:hover, .tool.active {
+      background: rgba(91, 163, 245, 0.12);
+      color: #dcecff;
+    }
+
+    .tool:active {
+      transform: scale(0.9);
+    }
+
+    /* 悬浮提示样式 */
+    .tool[data-tooltip]::after,
+    .icon-btn[data-tooltip]::after,
+    .btn[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 45px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 4px 8px;
+      background: rgba(10, 22, 40, 0.95);
+      border: 1px solid var(--line-primary);
+      border-radius: 4px;
+      color: var(--ink-primary);
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+    }
+
+    .tool[data-tooltip]:hover::after,
+    .icon-btn[data-tooltip]:hover::after,
+    .btn[data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .map-card {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 320px;
+      max-width: calc(100% - 40px);
+      background: rgba(11, 25, 43, 0.96);
+      border: 1px solid var(--line-primary);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 16px 30px rgba(3, 13, 27, 0.46);
+      z-index: 600;
+      backdrop-filter: blur(12px);
+      display: none;
+    }
+
+    .map-card.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .map-card.float-popup::before {
+      content: "实时目标详情";
+      position: absolute;
+      left: 12px;
+      top: -12px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(117, 160, 216, 0.58);
+      background: rgba(53, 110, 183, 0.18);
+      color: #d8e9ff;
+      font-size: 11px;
+      font-weight: 760;
+    }
+
+    .map-card.float-popup {
+      border-color: rgba(117, 160, 216, 0.62);
+      box-shadow: 0 18px 34px rgba(3, 13, 27, 0.46);
+    }
+
+    .map-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .map-card-close {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background: transparent;
+      border: none;
+      color: var(--ink-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .map-card-close:hover {
+      color: var(--danger);
+      background: rgba(217, 92, 92, 0.12);
+    }
+
+    .map-card-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .map-card-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .map-card-item label {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .map-card-item value {
+      font-size: 13px;
+      color: var(--ink-primary);
+      font-weight: 500;
+    }
+
+    .map-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .layer-panel {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      width: 260px;
+      max-width: calc(100% - 40px);
+      background: rgba(11, 25, 43, 0.95);
+      border: 1px solid var(--line-primary);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 14px 28px rgba(3, 13, 27, 0.42);
+      z-index: 600;
+      backdrop-filter: blur(12px);
+    }
+
+    .layer-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line-secondary);
+    }
+
+    .layer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 32px;
+      padding: 0 4px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .layer-item:hover {
+      background: rgba(91, 163, 245, 0.08);
+    }
+
+    .layer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .layer-checkbox {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid var(--line-primary);
+      background: rgba(10, 22, 40, 0.6);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .layer-checkbox.checked::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .layer-checkbox.checked {
+      background: var(--brand-gradient);
+      border-color: transparent;
+    }
+
+    .layer-name {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .layer-opacity {
+      width: 60px;
+      height: 4px;
+      background: var(--line-secondary);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .layer-opacity-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 80%;
+      background: var(--brand-primary);
+      border-radius: 2px;
+    }
+
+    .search-box {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      width: 300px;
+      max-width: calc(100% - 100px);
+      display: flex;
+      gap: 8px;
+      z-index: 600;
+    }
+
+    .search-input {
+      flex: 1;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line-primary);
+      background: rgba(10, 22, 40, 0.85);
+      color: var(--ink-primary);
+      font-size: 13px;
+      backdrop-filter: blur(8px);
+      min-width: 0;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      box-shadow: 0 4px 12px rgba(47, 111, 214, 0.16);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border: 1px solid var(--line-primary);
+      border-radius: 999px;
+      background: rgba(10, 22, 40, 0.6);
+      color: var(--ink-secondary);
+      font-size: 11px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .pill.ok { color: var(--success); border-color: rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.1); }
+    .pill.warn { color: var(--warning); border-color: rgba(255, 171, 0, 0.3); background: rgba(255, 171, 0, 0.1); }
+    .pill.danger { color: var(--danger); border-color: rgba(255, 82, 82, 0.3); background: rgba(255, 82, 82, 0.1); }
+    .pill.info { color: #d8e9ff; border-color: rgba(117, 160, 216, 0.36); background: rgba(53, 110, 183, 0.18); }
+    .pill.purple { color: #9c27b0; border-color: rgba(156, 39, 176, 0.3); background: rgba(156, 39, 176, 0.1); }
+
+    .btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid var(--line-primary);
+      background: rgba(10, 22, 40, 0.6);
+      color: var(--ink-secondary);
+      font-size: 12px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .btn:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+      box-shadow: 0 4px 12px rgba(47, 111, 214, 0.16);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.primary { 
+      background: var(--brand-gradient); 
+      border-color: transparent; 
+      color: #fff; 
+      box-shadow: 0 6px 14px rgba(47, 111, 214, 0.20);
+    }
+
+    .btn.primary:hover {
+      box-shadow: 0 8px 18px rgba(47, 111, 214, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .btn.danger { 
+      color: var(--danger); 
+      border-color: rgba(255, 82, 82, 0.3); 
+      background: rgba(255, 82, 82, 0.1); 
+    }
+
+    .btn.danger:hover {
+      box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
+    }
+
+    .btn.small {
+      height: 26px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+
+    .btn.icon-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .status-item {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 8px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line-primary);
+      border-radius: 8px;
+      background: rgba(10, 22, 40, 0.4);
+      font-size: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .status-item:hover {
+      border-color: rgba(117, 160, 216, 0.40);
+      background: rgba(53, 110, 183, 0.10);
+    }
+
+    .status-item:active {
+      transform: scale(0.99);
+    }
+
+    .status-item-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .status-item-title {
+      color: var(--ink-primary);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-item-desc {
+      color: var(--ink-muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+      flex-shrink: 0;
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bars {
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 16px 4px 4px;
+    }
+
+    .bar {
+      flex: 1;
+      min-width: 18px;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, #f0abfc, #9333ea);
+      box-shadow: 0 6px 12px rgba(217, 70, 239, 0.20);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .bar:hover {
+      box-shadow: 0 8px 16px rgba(217, 70, 239, 0.24);
+    }
+
+    .pie-chart {
+      height: 180px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .pie-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--success) 60%,
+        var(--warning) 25%,
+        var(--danger) 15%
+      );
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .pie-ring:hover {
+      box-shadow: 0 8px 18px rgba(47, 111, 214, 0.20);
+    }
+
+    .pie-inner {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .table th,
+    .table td {
+      height: 36px;
+      border-bottom: 1px solid var(--line-secondary);
+      text-align: left;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    .table th {
+      background: rgba(53, 110, 183, 0.10);
+      color: var(--ink-secondary);
+      font-weight: 740;
+    }
+
+    .table tr {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .table tr:hover {
+      background: rgba(53, 110, 183, 0.10);
+    }
+
+    .layout-3 {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .layout-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .layout-map {
+      display: grid;
+      grid-template-columns: 300px 1fr 320px;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .layout-approval {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .framework-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .module-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .module-menu .menu-item {
+      height: auto;
+      min-height: 42px;
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      border: 1px solid var(--line-secondary);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .module-menu .menu-item strong {
+      font-size: 13px;
+      color: var(--ink-primary);
+    }
+
+    .module-menu .menu-item small {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .module-hero {
+      min-height: 168px;
+      border-radius: 12px;
+      padding: 22px;
+      color: #fff;
+      background: var(--brand-gradient);
+      box-shadow: 0 20px 25px -5px rgba(147, 51, 234, 0.22), 0 10px 10px -5px rgba(147, 51, 234, 0.10);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .module-hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      pointer-events: none;
+    }
+
+    .module-hero h2 {
+      font-size: 30px;
+      font-weight: 820;
+      margin-bottom: 8px;
+    }
+
+    .module-hero p {
+      max-width: 760px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 14px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .module-card {
+      min-height: 118px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: linear-gradient(135deg, #faf5ff 0%, #fdf2f8 100%);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .module-card h3 {
+      font-size: 15px;
+      color: #6b21a8;
+    }
+
+    .module-card p {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .module-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .module-table td,
+    .module-table th {
+      font-size: 12px;
+    }
+
+    .local-map-canvas {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(147, 51, 234, 0.13), transparent 20%),
+        radial-gradient(circle at 68% 62%, rgba(236, 72, 153, 0.12), transparent 23%),
+        linear-gradient(135deg, #f8fafc 0%, #fdf2f8 100%);
+    }
+
+    .local-map-canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(147, 51, 234, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(147, 51, 234, 0.055) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    .local-river {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      top: 55%;
+      height: 92px;
+      transform: rotate(-11deg);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(14, 165, 233, 0.16), rgba(14, 165, 233, 0.34), rgba(14, 165, 233, 0.12));
+      box-shadow: inset 0 0 24px rgba(14, 165, 233, 0.16);
+    }
+
+    .local-zone,
+    .local-point,
+    .local-heat,
+    .local-route {
+      position: absolute;
+      z-index: 2;
+    }
+
+    .local-zone {
+      border: 2px solid currentColor;
+      background: color-mix(in srgb, currentColor 13%, transparent);
+      border-radius: 18px;
+    }
+
+    .local-route {
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      box-shadow: 0 0 12px rgba(147, 51, 234, 0.28);
+      transform-origin: left center;
+    }
+
+    .local-point {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 3px solid #fff;
+      background: #9333ea;
+      box-shadow: 0 0 14px rgba(147, 51, 234, 0.38);
+    }
+
+    .local-point.warn { background: var(--warning); }
+    .local-point.danger { background: var(--danger); }
+    .local-point.ok { background: var(--success); }
+
+    .local-label {
+      position: absolute;
+      z-index: 3;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #e5e7eb;
+      color: var(--ink-secondary);
+      font-size: 11px;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .local-heat {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(217, 70, 239, 0.52), rgba(245, 158, 11, 0.26) 45%, transparent 72%);
+      filter: blur(2px);
+      opacity: 0.78;
+    }
+
+    .section-title {
+      margin-bottom: 10px;
+      color: var(--ink-secondary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .quick-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .section-box {
+      border: 1px solid var(--line-secondary);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(8, 20, 36, 0.24);
+      margin-bottom: 14px;
+    }
+
+    .approval-plan-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .approval-plan-item {
+      border: 1px solid var(--line-primary);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(11, 25, 43, 0.72);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .approval-plan-item:hover {
+      border-color: rgba(117, 160, 216, 0.48);
+      background: rgba(15, 31, 52, 0.92);
+    }
+
+    .approval-plan-item.active {
+      border-color: rgba(117, 160, 216, 0.62);
+      box-shadow: inset 0 0 0 1px rgba(117, 160, 216, 0.24);
+    }
+
+    .approval-plan-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .approval-plan-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+
+    .approval-plan-desc {
+      font-size: 11px;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .point-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .point-table th,
+    .point-table td {
+      border-bottom: 1px solid var(--line-secondary);
+      padding: 8px 6px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .point-table th {
+      color: var(--ink-secondary);
+      background: rgba(53, 110, 183, 0.08);
+      font-weight: 700;
+    }
+
+    .material-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .material-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid var(--line-secondary);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: rgba(8, 20, 36, 0.24);
+      font-size: 12px;
+    }
+
+    .risk-summary-card {
+      padding: 12px;
+      background: rgba(213, 164, 58, 0.08);
+      border: 1px solid rgba(213, 164, 58, 0.28);
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mini-kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mini-kpi {
+      border: 1px solid var(--line-secondary);
+      border-radius: 8px;
+      padding: 10px;
+      background: rgba(8, 20, 36, 0.24);
+    }
+
+    .mini-kpi strong {
+      display: block;
+      font-size: 18px;
+      color: var(--ink-primary);
+      margin-top: 4px;
+    }
+
+    .flow-record {
+      display: grid;
+      gap: 8px;
+    }
+
+    .flow-item {
+      border-left: 3px solid rgba(117, 160, 216, 0.42);
+      padding: 6px 0 6px 10px;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--ink-muted);
+      font-size: 12px;
+      min-width: 0;
+    }
+
+    .field.required label::after {
+      content: " *";
+      color: var(--danger);
+    }
+
+    .input, .select, .textarea {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border: 1px solid var(--line-primary);
+      border-radius: 6px;
+      background: rgba(10, 22, 40, 0.6);
+      color: var(--ink-primary);
+      font-size: 12px;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      box-shadow: 0 4px 12px rgba(47, 111, 214, 0.16);
+    }
+
+    .input:disabled, .select:disabled, .textarea:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .textarea { 
+      height: 80px; 
+      align-items: flex-start; 
+      padding-top: 8px;
+      resize: none;
+    }
+
+    .step-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 0;
+      color: var(--ink-muted);
+      font-size: 12px;
+      border-bottom: 1px solid var(--line-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .step:hover {
+      background: rgba(53, 110, 183, 0.08);
+    }
+
+    .step-no {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(10, 22, 40, 0.6);
+      border: 1px solid var(--line-primary);
+      font-weight: 760;
+      color: var(--ink-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .step.active .step-no { 
+      background: var(--brand-gradient); 
+      color: #fff; 
+      border-color: transparent;
+      box-shadow: 0 6px 14px rgba(47, 111, 214, 0.22);
+    }
+
+    .step.completed .step-no {
+      background: var(--success);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--ink-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step.active .step-title {
+      color: var(--ink-primary);
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .workflow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 10px;
+      background: rgba(53, 110, 183, 0.08);
+      border-radius: 8px;
+    }
+
+    .node {
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid var(--line-primary);
+      background: rgba(10, 22, 40, 0.6);
+      font-size: 11px;
+      color: var(--ink-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .node.active {
+      background: var(--brand-gradient);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .node.completed {
+      background: rgba(0, 230, 118, 0.1);
+      color: var(--success);
+      border-color: rgba(0, 230, 118, 0.3);
+    }
+
+    .arrow { color: var(--ink-muted); font-weight: 800; flex-shrink: 0; }
+
+    .risk-item {
+      display: grid;
+      grid-template-columns: 8px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .risk-item:hover {
+      transform: translateX(2px);
+    }
+
+    .risk-item.low { background: rgba(0, 230, 118, 0.05); border-left: 3px solid var(--success); }
+    .risk-item.medium { background: rgba(255, 171, 0, 0.05); border-left: 3px solid var(--warning); }
+    .risk-item.high { background: rgba(255, 82, 82, 0.05); border-left: 3px solid var(--danger); }
+    .risk-item.block { background: rgba(156, 39, 176, 0.05); border-left: 3px solid #9c27b0; }
+
+    .risk-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .risk-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .risk-desc {
+      font-size: 11px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-chart {
+      height: 40px;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .mini-bar {
+      flex: 1;
+      background: var(--brand-primary);
+      border-radius: 2px 2px 0 0;
+      opacity: 0.6;
+    }
+
+    .mini-bar.highlight {
+      background: var(--danger);
+      opacity: 0.8;
+    }
+
+    .approval-opinion {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(53, 110, 183, 0.08);
+      border-radius: 8px;
+      border: 1px solid var(--line-secondary);
+    }
+
+    .opinion-templates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .template-tag {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(10, 22, 40, 0.6);
+      border: 1px solid var(--line-primary);
+      font-size: 11px;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .template-tag:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+      background: rgba(53, 110, 183, 0.18);
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--line-primary);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab-item {
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tab-item:hover {
+      color: var(--brand-primary);
+    }
+
+    .tab-item.active {
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* 右侧悬浮弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--overlay);
+      z-index: 2000;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .modal-right {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 480px;
+      max-width: 100%;
+      height: 100vh;
+      background: rgba(11, 25, 43, 0.985);
+      border-left: 1px solid var(--line-primary);
+      box-shadow: -10px 0 28px rgba(3, 13, 27, 0.42);
+      z-index: 2001;
+      display: none;
+      backdrop-filter: blur(12px);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-right.show {
+      display: flex;
+      flex-direction: column;
+      transform: translateX(0);
+    }
+
+    .modal-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line-primary);
+      background: linear-gradient(180deg, rgba(39, 82, 145, 0.12) 0%, rgba(18, 40, 67, 0.08) 100%);
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      color: var(--ink-muted);
+      font-size: 18px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+      background: rgba(217, 92, 92, 0.12);
+    }
+
+    .modal-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      background: var(--line-primary);
+      border-radius: 2px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line-primary);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    /* 响应式媒体查询 */
+    /* Winter report color system: gray page, white panels, purple-pink accents */
+    .artboard {
+      background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+      border-color: #e5e7eb;
+      box-shadow: 0 20px 32px rgba(15, 23, 42, 0.10);
+    }
+
+    .artboard::before {
+      background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.30), rgba(236, 72, 153, 0.46), transparent);
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom-color: #e5e7eb;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .logo-mark,
+    .avatar,
+    .nav-btn.active,
+    .btn.primary,
+    .submit-step.active .step-index {
+      background: var(--brand-gradient) !important;
+      color: #fff !important;
+      border-color: rgba(255, 255, 255, 0.42) !important;
+      box-shadow: 0 10px 20px rgba(147, 51, 234, 0.24) !important;
+    }
+
+    .nav-btn,
+    .icon-btn,
+    .user-card,
+    .tool,
+    .btn,
+    .tab-btn,
+    .filter-chip,
+    .view-tab,
+    .segment-btn {
+      background: #ffffff !important;
+      border-color: #e5e7eb !important;
+      color: var(--ink-secondary) !important;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .nav-btn:hover,
+    .icon-btn:hover,
+    .user-card:hover,
+    .tool:hover,
+    .tool.active,
+    .btn:hover,
+    .tab-btn.active,
+    .filter-chip.active,
+    .view-tab.active,
+    .segment-btn.active {
+      background: linear-gradient(135deg, #faf5ff 0%, #fdf2f8 100%) !important;
+      border-color: rgba(147, 51, 234, 0.26) !important;
+      color: #9333ea !important;
+      box-shadow: 0 8px 18px rgba(147, 51, 234, 0.12);
+    }
+
+    .user-menu,
+    .kpi,
+    .panel,
+    .drawer-panel,
+    .modal,
+    .modal-content,
+    .map-popup,
+    .map-card,
+    .stat-card,
+    .task-card,
+    .approval-plan-item,
+    .detail-card,
+    .form-section,
+    .table-wrap,
+    .timeline-item,
+    .event-card,
+    .portal-card,
+    .scenario-card {
+      background: #ffffff !important;
+      border-color: #e5e7eb !important;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(8px);
+    }
+
+    .kpi,
+    .map-card,
+    .stat-card,
+    .task-card,
+    .approval-plan-item,
+    .detail-card,
+    .event-card,
+    .portal-card,
+    .scenario-card {
+      background: linear-gradient(135deg, #faf5ff 0%, #fdf2f8 100%) !important;
+    }
+
+    .kpi:hover,
+    .panel:hover,
+    .map-card:hover,
+    .task-card:hover,
+    .approval-plan-item:hover,
+    .portal-card:hover,
+    .scenario-card:hover {
+      border-color: rgba(147, 51, 234, 0.22) !important;
+      box-shadow: 0 20px 25px -5px rgba(147, 51, 234, 0.20), 0 10px 10px -5px rgba(147, 51, 234, 0.08);
+    }
+
+    .panel-head,
+    .modal-header,
+    .drawer-header,
+    .map-card-head,
+    .table-head {
+      background: #ffffff !important;
+      border-color: #e5e7eb !important;
+    }
+
+    .menu-item:hover,
+    .menu-item.active,
+    .leaflet-control-zoom-in:hover,
+    .leaflet-control-zoom-out:hover,
+    .pill.info {
+      background: #f3e8ff !important;
+      border-color: #e9d5ff !important;
+      color: #6b21a8 !important;
+    }
+
+    .content {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(249, 250, 251, 0.96) 100%),
+        radial-gradient(circle at 12% 8%, rgba(192, 132, 252, 0.18), transparent 28%),
+        radial-gradient(circle at 92% 10%, rgba(240, 171, 252, 0.18), transparent 30%);
+    }
+
+    .map-container {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(249, 250, 251, 0.90) 100%) !important;
+      border-color: #e5e7eb !important;
+    }
+
+    .map-container::before {
+      background: linear-gradient(180deg, transparent 0%, rgba(147, 51, 234, 0.06) 50%, transparent 100%);
+    }
+
+    .map-container::after {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.20), transparent 18%),
+        radial-gradient(circle at 50% 120%, rgba(147, 51, 234, 0.08), transparent 46%);
+    }
+
+    .leaflet-container,
+    #mainMap,
+    #heatMap,
+    #detailMap,
+    #planMap {
+      background: #f9fafb !important;
+    }
+
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out,
+    .leaflet-control-attribution,
+    .tool-group {
+      background: rgba(255, 255, 255, 0.94) !important;
+      border-color: #e5e7eb !important;
+      color: var(--ink-secondary) !important;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    .map-boundary {
+      border-color: rgba(217, 70, 239, 0.44);
+      background: rgba(217, 70, 239, 0.07);
+      box-shadow: 0 0 22px rgba(217, 70, 239, 0.20);
+    }
+
+    .aircraft-marker {
+      background: var(--brand-primary);
+      box-shadow: 0 5px 14px rgba(147, 51, 234, 0.20), 0 0 16px rgba(217, 70, 239, 0.38);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 5px 14px rgba(147, 51, 234, 0.20), 0 0 12px rgba(217, 70, 239, 0.34); }
+      50% { box-shadow: 0 5px 14px rgba(147, 51, 234, 0.20), 0 0 20px rgba(217, 70, 239, 0.52); }
+      100% { box-shadow: 0 5px 14px rgba(147, 51, 234, 0.20), 0 0 12px rgba(217, 70, 239, 0.34); }
+    }
+
+    .aircraft-marker.unauthorized {
+      background: #a855f7;
+      box-shadow: 0 5px 14px rgba(147, 51, 234, 0.20), 0 0 16px rgba(168, 85, 247, 0.46);
+    }
+
+    input,
+    select,
+    textarea,
+    .input,
+    .search-box,
+    .form-control {
+      background: rgba(255, 255, 255, 0.82) !important;
+      border-color: rgba(147, 51, 234, 0.22) !important;
+      color: var(--ink-primary) !important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    .input:focus,
+    .form-control:focus {
+      border-color: rgba(217, 70, 239, 0.62) !important;
+      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.14) !important;
+    }
+
+    .pill,
+    .status,
+    .badge,
+    .tag {
+      border-color: rgba(147, 51, 234, 0.24);
+    }
+
+    @media (max-width: 1600px) {
+      .kpi-row {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .dashboard {
+        grid-template-columns: 280px 1fr;
+        grid-template-rows: auto auto auto;
+      }
+      
+      .dashboard > .panel:nth-child(1) {
+        grid-column: 2;
+        grid-row: 1 / span 3;
+      }
+      
+      .dashboard > .panel:nth-child(4) {
+        grid-column: 1;
+        grid-row: 3;
+      }
+      
+      .dashboard > .panel:nth-child(5) {
+        grid-column: 1;
+        grid-row: 4;
+      }
+    }
+
+    @media (max-width: 1366px) {
+      .header {
+        grid-template-columns: 220px 1fr 220px;
+        padding: 0 16px;
+      }
+      
+      .nav-btn {
+        min-width: 100px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+      
+      .content {
+        padding: 16px;
+      }
+      
+      .kpi-row {
+        gap: 10px;
+      }
+      
+      .kpi {
+        height: 80px;
+        padding: 12px;
+      }
+      
+      .value {
+        font-size: 22px;
+      }
+      
+      .dashboard {
+        grid-template-columns: 260px 1fr;
+        gap: 12px;
+      }
+      
+      .modal-right {
+        width: 420px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .header {
+        grid-template-columns: auto 1fr auto;
+        height: auto;
+        padding: 12px 16px;
+        gap: 12px;
+      }
+      
+      .logo-title {
+        display: none;
+      }
+      
+      .top-nav {
+        justify-content: flex-start;
+      }
+      
+      .nav-btn {
+        min-width: auto;
+        padding: 0 10px;
+        height: 36px;
+      }
+      
+      .user-card span:nth-child(2) {
+        display: none;
+      }
+      
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto auto;
+      }
+      
+      .dashboard > .panel:nth-child(1) {
+        grid-column: 1;
+        grid-row: 2;
+        min-height: 500px;
+      }
+      
+      .dashboard > .panel:nth-child(2) {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      
+      .dashboard > .panel:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+      }
+      
+      .dashboard > .panel:nth-child(4) {
+        grid-column: 1;
+        grid-row: 4;
+      }
+      
+      .dashboard > .panel:nth-child(5) {
+        grid-column: 1;
+        grid-row: 5;
+      }
+      
+      .layout-3 {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+      
+      .modal-right {
+        width: 100%;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <div>
+        <h1>低空数字孪生平台</h1>
+        <p>政务科技风版 | Leaflet 引擎 | 实时地图与态势渲染</p>
+      </div>
+      <span class="pill info">Web端响应式</span>
+    </div>
+    
+    <!-- ==================== 1. 监管驾驶舱 ==================== -->
+    <section class="artboard" id="home">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-mark">LA</div>
+          <div>
+            <div class="logo-title">低空数字孪生平台</div>
+            <p style="font-size:12px;">Low Altitude Digital Twin</p>
+          </div>
+        </div>
+        <nav class="top-nav">
+          <button class="nav-btn active" data-page="home">监管驾驶舱</button>
+          <button class="nav-btn" data-page="map-page">低空一张图</button>
+          <button class="nav-btn" data-page="account-page">主体台账</button>
+          <button class="nav-btn" data-page="approval-page">飞行服务</button>
+          <button class="nav-btn" data-page="ops-page">运行监控</button>
+          <button class="nav-btn" data-page="alert-page">告警中心</button>
+          <button class="nav-btn" data-page="airspace-page">空域设施</button>
+          <button class="nav-btn" data-page="emergency-page">应急指挥</button>
+          <button class="nav-btn" data-page="scenario-page">场景应用</button>
+        </nav>
+        <div class="user-area">
+          <button class="icon-btn" data-tooltip="消息通知">🔔<span class="badge">11</span></button>
+          <div class="user-card" id="userCard">
+            <span class="avatar">管</span>
+            <span>监管值班员</span>
+            <span>▾</span>
+          </div>
+          <div class="user-menu" id="userMenu">
+            <div class="menu-head">用户中心</div>
+            <div class="menu-item active"><span>个人信息</span><span>›</span></div>
+            <div class="menu-item" data-page="interface-page"><span>开放接口</span><span>›</span></div>
+            <div class="menu-item" data-page="operation-page"><span>运营管理</span><span>›</span></div>
+            <div class="menu-item" data-page="system-page"><span>系统管理</span><span>›</span></div>
+            <div class="menu-item"><span>退出登录</span><span>›</span></div>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <!-- 核心KPI指标 -->
+        <div class="kpi-row">
+          <div class="kpi" data-kpi="aircraft">
+            <h3>当前在线飞行器</h3>
+            <div class="value">128<span>架</span></div>
+            <div class="trend">正常 116 / 告警 7 / 未授权 5</div>
+          </div>
+          <div class="kpi" data-kpi="flights">
+            <h3>今日飞行架次</h3>
+            <div class="value">642<span>架次</span></div>
+            <div class="trend up">同比昨日 +12%</div>
+          </div>
+          <div class="kpi" data-kpi="pending">
+            <h3>待审批计划</h3>
+            <div class="value">36<span>个</span></div>
+            <div class="trend">平均等待 18 分钟</div>
+          </div>
+          <div class="kpi" data-kpi="airspace">
+            <h3>空域平均占用率</h3>
+            <div class="value">43<span>%</span></div>
+            <div class="trend">高峰 14:00-16:00 (78%)</div>
+          </div>
+          <div class="kpi" data-kpi="alarms">
+            <h3>今日告警总数</h3>
+            <div class="value">47<span>条</span></div>
+            <div class="trend">待处置 11 / 已闭环 36</div>
+          </div>
+          <div class="kpi" data-kpi="closure">
+            <h3>告警闭环率</h3>
+            <div class="value">91<span>%</span></div>
+            <div class="trend down">较昨日 -2%</div>
+          </div>
+          <div class="kpi" data-kpi="devices">
+            <h3>设备在线率</h3>
+            <div class="value">96<span>%</span></div>
+            <div class="trend">机库离线 2 / 感知源离线 1</div>
+          </div>
+          <div class="kpi" data-kpi="approval">
+            <h3>审批通过率</h3>
+            <div class="value">89<span>%</span></div>
+            <div class="trend">驳回 4 / 补正 8</div>
+          </div>
+        </div>
+
+        <div class="dashboard">
+          <!-- 中间：全局低空运行态势图（真实地图） -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>全局低空运行态势</span>
+              <div class="panel-head-actions">
+                <span class="pill info">三维影像底图</span>
+                <span class="pill info">实时刷新：5s</span>
+                <button class="btn small icon-btn" data-tooltip="全屏">⛶</button>
+              </div>
+            </div>
+            <div class="map-container three-d">
+              <div id="mainMap"></div>
+              
+              <!-- 地图工具栏 -->
+              <div class="map-toolbar">
+                <div class="tool-group">
+                  <button class="tool active" data-tooltip="2D视图">⬜</button>
+                  <button class="tool" data-tooltip="3D视图">📦</button>
+                </div>
+                <div class="tool-group">
+                  <button class="tool" data-tooltip="测距">📏</button>
+                  <button class="tool" data-tooltip="测面">📐</button>
+                  <button class="tool" data-tooltip="标绘">✏️</button>
+                </div>
+                <div class="tool-group">
+                  <button class="tool" data-tooltip="全域视图">🌍</button>
+                  <button class="tool" data-tooltip="定位">📍</button>
+                </div>
+              </div>
+
+              <!-- 重点风险浮窗 -->
+              <div class="map-card float-popup show" id="riskPopup">
+                <div class="map-card-header">
+                  <h4>重点风险摘要</h4>
+                  <button class="map-card-close" id="closeRiskPopup">✕</button>
+                </div>
+                <p style="margin-bottom:12px; font-size:12px;">
+                  杭州奥体中心与钱江新城联动保障区发现未授权目标(UAV-HZ-BF-099)，已持续飞行 3 分钟，当前高度 156m，速度 12m/s。
+                </p>
+                <div class="map-card-actions">
+                  <button class="btn danger">立即处置</button>
+                  <button class="btn">查看航迹</button>
+                  <button class="btn">关联计划</button>
+                </div>
+              </div>
+
+              <!-- 图层控制面板 -->
+              <div class="layer-panel">
+                <div class="layer-panel-header">
+                  <h4>图层控制</h4>
+                  <button class="btn small icon-btn" data-tooltip="图层管理">⚙️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked" data-layer="aircraft"></div>
+                    <span class="layer-name">实时飞行器</span>
+                  </div>
+                  <div class="layer-opacity">
+                    <div class="layer-opacity-fill" style="width:100%"></div>
+                  </div>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked" data-layer="airspace"></div>
+                    <span class="layer-name">空域/航线</span>
+                  </div>
+                  <div class="layer-opacity">
+                    <div class="layer-opacity-fill" style="width:80%"></div>
+                  </div>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked" data-layer="restricted"></div>
+                    <span class="layer-name">禁限飞区</span>
+                  </div>
+                  <div class="layer-opacity">
+                    <div class="layer-opacity-fill" style="width:60%"></div>
+                  </div>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox" data-layer="weather"></div>
+                    <span class="layer-name">气象风险</span>
+                  </div>
+                  <div class="layer-opacity">
+                    <div class="layer-opacity-fill" style="width:50%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 左上：实时风险与待办 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>实时风险与待办</span>
+              <button class="btn small">全部待办</button>
+            </div>
+            <div class="panel-body status-list">
+              <div class="status-item" data-alarm="1">
+                <span class="dot" style="color:var(--danger)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">杭州奥体中心保障区未授权目标</div>
+                  <div class="status-item-desc">触发时间：14:22:08 | 位置：东经120.233 北纬30.233</div>
+                </div>
+                <span class="pill danger">紧急</span>
+              </div>
+              <div class="status-item" data-alarm="2">
+                <span class="dot" style="color:var(--danger)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">机库 DK-HZ-07 离线超过 5 分钟</div>
+                  <div class="status-item-desc">设备编号：HK-HZ-007 | 位置：滨江物联机库</div>
+                </div>
+                <span class="pill danger">异常</span>
+              </div>
+              <div class="status-item" data-alarm="3">
+                <span class="dot" style="color:var(--warn)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">滨江至钱江新城物流航线通信覆盖不足</div>
+                  <div class="status-item-desc">盲区长度：2.3km | 建议沿钱塘江南岸改航</div>
+                </div>
+                <span class="pill warn">关注</span>
+              </div>
+              <div class="status-item" data-alarm="4">
+                <span class="dot" style="color:var(--warn)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">36 个飞行计划待审批</div>
+                  <div class="status-item-desc">其中紧急任务 3 个 | 超时 2 个</div>
+                </div>
+                <span class="pill warn">待办</span>
+              </div>
+              <div class="status-item" data-alarm="5">
+                <span class="dot" style="color:var(--warn)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">UAV-HZ-061 电量低于 20%</div>
+                  <div class="status-item-desc">预计剩余飞行时间：8 分钟 | 建议返航至钱江世纪城起降点</div>
+                </div>
+                <span class="pill warn">关注</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 左下：空域容量热力图（真实热力图） -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>杭州主城区空域容量热力图</span>
+              <div class="panel-head-actions">
+                <span class="pill info">当前时段</span>
+                <button class="btn small" id="toggleHeatTime">未来2小时</button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding:0; height:calc(100% - 44px);">
+              <div class="map-container three-d" style="height:100%;">
+                <div id="heatMap"></div>
+              </div>
+              <div style="position:absolute; bottom:10px; left:10px; right:10px; display:flex; justify-content:space-between; padding:0 10px; z-index:100;">
+                <span style="font-size:11px; color:var(--ink-muted);">低占用 (<30%)</span>
+                <span style="font-size:11px; color:var(--ink-muted);">中占用 (30%-60%)</span>
+                <span style="font-size:11px; color:var(--ink-muted);">高占用 (>60%)</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 右上：待审批任务 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>待审批任务</span>
+              <button class="btn primary small" id="goToApproval">进入审批工作台</button>
+            </div>
+            <div class="panel-body">
+              <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                <button class="btn small primary">全部(36)</button>
+                <button class="btn small">紧急(3)</button>
+                <button class="btn small">普通(33)</button>
+              </div>
+              <table class="table" id="approvalTable">
+                <thead>
+                  <tr>
+                    <th>计划编号</th>
+                    <th>任务类型</th>
+                    <th>申请单位</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-plan="FP-240518-001">
+                    <td>FP-240518-001</td>
+                    <td>应急保障</td>
+                    <td>消防救援支队</td>
+                    <td><span class="pill danger">紧急</span></td>
+                    <td><button class="btn small primary btn-accept">受理</button></td>
+                  </tr>
+                  <tr data-plan="FP-240518-018">
+                    <td>FP-240518-018</td>
+                    <td>物流配送</td>
+                    <td>顺丰无人机</td>
+                    <td><span class="pill warn">待审批</span></td>
+                    <td><button class="btn small btn-accept">受理</button></td>
+                  </tr>
+                  <tr data-plan="FP-240518-032">
+                    <td>FP-240518-032</td>
+                    <td>城市巡检</td>
+                    <td>城管执法局</td>
+                    <td><span class="pill info">审批中</span></td>
+                    <td><button class="btn small btn-view">查看</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 右下：运行统计 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>运行统计</span>
+              <div class="panel-head-actions">
+                <span class="pill info">今日</span>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="charts">
+                <div class="chart-container">
+                  <h4>飞行架次趋势</h4>
+                  <div class="bars">
+                    <div class="bar" style="height:42%"></div>
+                    <div class="bar" style="height:58%"></div>
+                    <div class="bar" style="height:72%"></div>
+                    <div class="bar" style="height:48%"></div>
+                    <div class="bar" style="height:84%"></div>
+                    <div class="bar" style="height:66%"></div>
+                    <div class="bar" style="height:74%"></div>
+                  </div>
+                </div>
+                <div class="chart-container">
+                  <h4>告警类型分布</h4>
+                  <div class="pie-chart">
+                    <div class="pie-ring">
+                      <div class="pie-inner">47</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; justify-content:space-around; margin-top:8px; flex-wrap:wrap; gap:8px;">
+                    <span style="font-size:11px; color:var(--success);">正常 60%</span>
+                    <span style="font-size:11px; color:var(--warning);">警告 25%</span>
+                    <span style="font-size:11px; color:var(--danger);">严重 15%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="margin-top:16px;">
+                <h4 style="margin-bottom:10px;">感知源状态</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div class="status-item" style="min-height:36px;">
+                    <span class="dot" style="color:var(--success)"></span>
+                    <span>Remote ID</span>
+                    <span class="pill ok">12/12 在线</span>
+                  </div>
+                  <div class="status-item" style="min-height:36px;">
+                    <span class="dot" style="color:var(--success)"></span>
+                    <span>ADS-B 接收</span>
+                    <span class="pill ok">3/3 在线</span>
+                  </div>
+                  <div class="status-item" style="min-height:36px;">
+                    <span class="dot" style="color:var(--success)"></span>
+                    <span>雷达探测</span>
+                    <span class="pill ok">5/5 在线</span>
+                  </div>
+                  <div class="status-item" style="min-height:36px;">
+                    <span class="dot" style="color:var(--danger)"></span>
+                    <span>光电跟踪</span>
+                    <span class="pill danger">3/4 在线</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </section>
+    
+    <!-- ==================== 2. 低空一张图 ==================== -->
+    <section class="artboard" id="map-page" style="display:none;">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-mark">LA</div>
+          <div>
+            <div class="logo-title">低空数字孪生平台</div>
+            <p style="font-size:12px;">低空一张图</p>
+          </div>
+        </div>
+        <nav class="top-nav">
+          <button class="nav-btn" data-page="home">监管驾驶舱</button>
+          <button class="nav-btn active" data-page="map-page">低空一张图</button>
+          <button class="nav-btn" data-page="account-page">主体台账</button>
+          <button class="nav-btn" data-page="approval-page">飞行服务</button>
+          <button class="nav-btn" data-page="ops-page">运行监控</button>
+          <button class="nav-btn" data-page="alert-page">告警中心</button>
+          <button class="nav-btn" data-page="airspace-page">空域设施</button>
+          <button class="nav-btn" data-page="emergency-page">应急指挥</button>
+          <button class="nav-btn" data-page="scenario-page">场景应用</button>
+        </nav>
+        <div class="user-area">
+          <button class="icon-btn" data-tooltip="消息通知">🔔<span class="badge">11</span></button>
+          <div class="user-card"><span class="avatar">管</span><span>监管值班员</span><span>▾</span></div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="layout-map">
+          <!-- 左侧：图层与工具 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>图层与工具</span>
+            </div>
+            <div class="panel-body">
+              <!-- 搜索框 -->
+              <div style="margin-bottom:16px;">
+                <input type="text" class="input" placeholder="搜索航空器/企业/航线/空域">
+                <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+                  <span class="pill">高级筛选</span>
+                  <span class="pill">按时间</span>
+                  <span class="pill">按类型</span>
+                </div>
+              </div>
+
+              <!-- 图层树 -->
+              <h4 style="margin-bottom:10px;">图层管理</h4>
+              <div style="border:1px solid var(--line-secondary); border-radius:8px; padding:10px; margin-bottom:16px;">
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">三维底图</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">行政区划</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">空域网格</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">航线航路</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">起降点/机库</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">禁飞区</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">机库与起降点</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+                <div class="layer-item">
+                  <div class="layer-left">
+                    <div class="layer-checkbox checked"></div>
+                    <span class="layer-name">重点保障区域</span>
+                  </div>
+                  <button class="btn small icon-btn" data-tooltip="图层详情">ℹ️</button>
+                </div>
+              </div>
+
+              <!-- 图层操作 -->
+              <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+                <button class="btn primary">➕ 新增图层</button>
+                <button class="btn">📥 导入 GIS</button>
+              </div>
+
+              <!-- 标绘管理 -->
+              <h4 style="margin-bottom:10px;">标绘管理</h4>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn icon-btn" data-tooltip="点标绘">📍</button>
+                <button class="btn icon-btn" data-tooltip="线标绘">📏</button>
+                <button class="btn icon-btn" data-tooltip="面标绘">📐</button>
+                <button class="btn icon-btn" data-tooltip="文字标注">📝</button>
+                <button class="btn icon-btn" data-tooltip="清除标绘">🗑️</button>
+                <button class="btn icon-btn" data-tooltip="保存标绘">💾</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 中间：一张图主地图（真实地图） -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>一张图态势</span>
+              <div class="panel-head-actions">
+                <span class="pill info">三维影像底图</span>
+                <button class="btn small icon-btn" data-tooltip="全屏">⛶</button>
+              </div>
+            </div>
+            <div class="map-container three-d">
+              <div id="detailMap"></div>
+              
+              <!-- 地图工具栏 -->
+              <div class="map-toolbar">
+                <div class="tool-group">
+                  <button class="tool active" data-tooltip="2D视图">⬜</button>
+                  <button class="tool" data-tooltip="3D视图">📦</button>
+                </div>
+                <div class="tool-group">
+                  <button class="tool" data-tooltip="测距">📏</button>
+                  <button class="tool" data-tooltip="测面">📐</button>
+                  <button class="tool active" data-tooltip="标绘">✏️</button>
+                </div>
+                <div class="tool-group">
+                  <button class="tool" data-tooltip="全域视图">🌍</button>
+                  <button class="tool" data-tooltip="定位">📍</button>
+                  <button class="tool" data-tooltip="清除">🗑️</button>
+                </div>
+              </div>
+
+              <div class="map-card float-popup show" style="right:18px; top:18px; width:340px;">
+                <div class="map-card-header">
+                  <h4>杭州一张图浮窗</h4>
+                  <button class="map-card-close">✕</button>
+                </div>
+                <p style="margin-bottom:12px; font-size:12px;">
+                  当前定位杭州主城区。地图已叠加西湖景区核心禁飞区、钱塘江巡查航线、滨江物流测试航线、奥体中心保障区和机库起降点样例数据。
+                </p>
+                <div class="map-card-actions">
+                  <button class="btn primary">查看目标详情</button>
+                  <button class="btn">查看航线</button>
+                  <button class="btn">查看空域</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <span>杭州样例要素</span>
+              <span class="pill info">地图关联</span>
+            </div>
+            <div class="panel-body status-list">
+              <div class="status-item">
+                <span class="dot" style="color:var(--brand-primary)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">钱江新城综合起降点</div>
+                  <div class="status-item-desc">坐标：120.205 / 30.249 | 状态：可用</div>
+                </div>
+                <span class="pill ok">起降点</span>
+              </div>
+              <div class="status-item">
+                <span class="dot" style="color:var(--success)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">滨江物联机库</div>
+                  <div class="status-item-desc">面向巡检与物流联动 | 在线</div>
+                </div>
+                <span class="pill ok">机库</span>
+              </div>
+              <div class="status-item">
+                <span class="dot" style="color:var(--warning)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">西湖景区核心禁飞区</div>
+                  <div class="status-item-desc">北山街-孤山-杨公堤核心保护范围</div>
+                </div>
+                <span class="pill warn">禁飞区</span>
+              </div>
+              <div class="status-item">
+                <span class="dot" style="color:var(--brand-primary)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">钱塘江巡查航线</div>
+                  <div class="status-item-desc">滨江闻涛路至奥体中心段</div>
+                </div>
+                <span class="pill info">航线</span>
+              </div>
+              <div class="status-item">
+                <span class="dot" style="color:var(--danger)"></span>
+                <div class="status-item-content">
+                  <div class="status-item-title">奥体中心重大活动保障区</div>
+                  <div class="status-item-desc">启用临时管制与黑飞重点监测</div>
+                </div>
+                <span class="pill danger">保障区</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </section>
+    
+    <!-- ==================== 3. 飞行计划申报与审批 ==================== -->
+    <section class="artboard" id="approval-page" style="display:none;">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-mark">LA</div>
+          <div>
+            <div class="logo-title">低空数字孪生平台</div>
+            <p style="font-size:12px;">飞行计划申报与审批</p>
+          </div>
+        </div>
+        <nav class="top-nav">
+          <button class="nav-btn" data-page="home">监管驾驶舱</button>
+          <button class="nav-btn" data-page="map-page">低空一张图</button>
+          <button class="nav-btn" data-page="account-page">主体台账</button>
+          <button class="nav-btn active" data-page="approval-page">飞行服务</button>
+          <button class="nav-btn" data-page="ops-page">运行监控</button>
+          <button class="nav-btn" data-page="alert-page">告警中心</button>
+          <button class="nav-btn" data-page="airspace-page">空域设施</button>
+          <button class="nav-btn" data-page="emergency-page">应急指挥</button>
+          <button class="nav-btn" data-page="scenario-page">场景应用</button>
+        </nav>
+        <div class="user-area">
+          <button class="icon-btn" data-tooltip="消息通知">🔔<span class="badge">11</span></button>
+          <div class="user-card"><span class="avatar">审</span><span>审批员</span><span>▾</span></div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="layout-approval">
+          <!-- 左侧：计划列表与申报流程 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>计划列表与流程</span>
+              <span class="pill warn">草稿</span>
+            </div>
+            <div class="panel-body">
+              <div class="chip-row">
+                <span class="pill info">全部 36</span>
+                <span class="pill warn">待审批 18</span>
+                <span class="pill danger">补正中 4</span>
+                <span class="pill ok">已通过 9</span>
+              </div>
+
+              <div class="approval-plan-list">
+                <div class="approval-plan-item active">
+                  <div class="approval-plan-head">
+                    <div class="approval-plan-title">FP-HZ-20260519-032</div>
+                    <span class="pill warn">草稿</span>
+                  </div>
+                  <div class="approval-plan-desc">钱塘江巡查任务 | 杭州城管水域巡查 | 2026-05-19 14:30</div>
+                </div>
+                <div class="approval-plan-item">
+                  <div class="approval-plan-head">
+                    <div class="approval-plan-title">FP-HZ-20260519-041</div>
+                    <span class="pill info">待审批</span>
+                  </div>
+                  <div class="approval-plan-desc">滨江物流测试 | 杭州低空物流示范线 | 待受理</div>
+                </div>
+                <div class="approval-plan-item">
+                  <div class="approval-plan-head">
+                    <div class="approval-plan-title">FP-HZ-20260519-018</div>
+                    <span class="pill danger">补正中</span>
+                  </div>
+                  <div class="approval-plan-desc">西湖景区巡检 | 缺少应急预案附件 | 退回补正</div>
+                </div>
+                <div class="approval-plan-item">
+                  <div class="approval-plan-head">
+                    <div class="approval-plan-title">FP-HZ-20260519-007</div>
+                    <span class="pill ok">已通过</span>
+                  </div>
+                  <div class="approval-plan-desc">奥体中心保障航线 | 已授权待执行 | 查看许可</div>
+                </div>
+              </div>
+
+              <div class="step-nav">
+                <div class="step completed" data-step="1">
+                  <div class="step-no">✓</div>
+                  <div class="step-content">
+                    <div class="step-title">基本信息</div>
+                    <div class="step-desc">任务、时间、单位信息</div>
+                  </div>
+                </div>
+                <div class="step active" data-step="2">
+                  <div class="step-no">2</div>
+                  <div class="step-content">
+                    <div class="step-title">航线信息</div>
+                    <div class="step-desc">绘制/导入/选择航线</div>
+                  </div>
+                </div>
+                <div class="step" data-step="3">
+                  <div class="step-no">3</div>
+                  <div class="step-content">
+                    <div class="step-title">航空器与人员</div>
+                    <div class="step-desc">选择设备与操控员</div>
+                  </div>
+                </div>
+                <div class="step" data-step="4">
+                  <div class="step-no">4</div>
+                  <div class="step-content">
+                    <div class="step-title">风险校验</div>
+                    <div class="step-desc">规则校验与风险评估</div>
+                  </div>
+                </div>
+                <div class="step" data-step="5">
+                  <div class="step-no">5</div>
+                  <div class="step-content">
+                    <div class="step-title">提交确认</div>
+                    <div class="step-desc">提交进入审批流程</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:24px;">
+                <div class="section-title">快速操作</div>
+                <div class="quick-stack">
+                  <button class="btn">📄 新建计划</button>
+                  <button class="btn">📋 使用航线模板</button>
+                  <button class="btn">📥 导入历史计划</button>
+                  <button class="btn">💾 保存为模板</button>
+                  <button class="btn">📌 查看流程</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 中间：飞行计划表单与航线编辑 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>飞行计划申报</span>
+              <div class="panel-head-actions">
+                <span class="pill warn">草稿</span>
+                <button class="btn small icon-btn" data-tooltip="保存草稿">💾</button>
+                <button class="btn small" data-tooltip="查看流程">流程</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="workflow">
+                <span class="node active">草稿</span>
+                <span class="arrow">></span>
+                <span class="node">待提交</span>
+                <span class="arrow">></span>
+                <span class="node">待受理</span>
+                <span class="arrow">></span>
+                <span class="node">审批中</span>
+                <span class="arrow">></span>
+                <span class="node">已通过</span>
+              </div>
+
+              <div class="section-box">
+                <div class="section-title">基本信息</div>
+                <div class="form-grid">
+                  <div class="field required">
+                    <label>任务名称</label>
+                    <input type="text" class="input" value="钱塘江巡查 2026-05-19 午后班次">
+                  </div>
+                  <div class="field required">
+                    <label>任务类型</label>
+                    <select class="select">
+                      <option>城市治理巡检</option>
+                      <option>电力巡检</option>
+                      <option>物流配送</option>
+                      <option>应急救援</option>
+                    </select>
+                  </div>
+                  <div class="field required">
+                    <label>申请单位</label>
+                    <input type="text" class="input" value="杭州市城市治理巡查中心" disabled>
+                  </div>
+                  <div class="field required">
+                    <label>联系人</label>
+                    <input type="text" class="input" value="李四">
+                  </div>
+                  <div class="field required">
+                    <label>联系电话</label>
+                    <input type="text" class="input" value="138-0000-2519">
+                  </div>
+                  <div class="field required">
+                    <label>执行区域</label>
+                    <select class="select">
+                      <option>滨江 - 钱江新城 - 奥体中心</option>
+                      <option>西湖景区</option>
+                      <option>未来科技城</option>
+                    </select>
+                  </div>
+                  <div class="field required">
+                    <label>计划起飞时间</label>
+                    <input type="datetime-local" class="input" value="2026-05-19T14:30">
+                  </div>
+                  <div class="field required">
+                    <label>计划结束时间</label>
+                    <input type="datetime-local" class="input" value="2026-05-19T15:10">
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-box">
+                <div class="section-title">航线规划</div>
+                <div class="map-container three-d" style="height:200px; margin-bottom:10px; border-radius:8px; overflow:hidden;">
+                  <div id="planMap"></div>
+                </div>
+                <div class="chip-row">
+                  <button class="btn primary">✏️ 绘制航线</button>
+                  <button class="btn">📥 导入航线</button>
+                  <button class="btn">📋 选择模板</button>
+                  <button class="btn">💾 保存模板</button>
+                  <button class="btn">🔄 一键避让</button>
+                  <button class="btn danger">🗑️ 清空航线</button>
+                </div>
+                <table class="point-table">
+                  <thead>
+                    <tr>
+                      <th>航点</th>
+                      <th>经度</th>
+                      <th>纬度</th>
+                      <th>高度</th>
+                      <th>速度</th>
+                      <th>动作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>WP-01</td><td>120.1828</td><td>30.2068</td><td>80m</td><td>10m/s</td><td>起飞</td></tr>
+                    <tr><td>WP-02</td><td>120.1964</td><td>30.2198</td><td>100m</td><td>12m/s</td><td>巡查悬停</td></tr>
+                    <tr><td>WP-03</td><td>120.2128</td><td>30.2335</td><td>110m</td><td>12m/s</td><td>视频采集</td></tr>
+                    <tr><td>WP-04</td><td>120.2265</td><td>30.2458</td><td>90m</td><td>8m/s</td><td>返航</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="section-box">
+                <div class="section-title">航空器与执行资源</div>
+                <div class="form-grid">
+                  <div class="field required">
+                    <label>选择航空器</label>
+                    <select class="select">
+                      <option>UAV-HZ-021 (大疆 M350 RTK / 已实名 / 正常)</option>
+                      <option>UAV-HZ-022 (大疆 M350 RTK / 已实名 / 正常)</option>
+                    </select>
+                  </div>
+                  <div class="field required">
+                    <label>选择操控员</label>
+                    <select class="select">
+                      <option>张三 (A2证 / 有效期至2028-05-01)</option>
+                      <option>王五 (A2证 / 有效期至2027-12-15)</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>所属机库</label>
+                    <input type="text" class="input" value="滨江物联机库" disabled>
+                  </div>
+                  <div class="field">
+                    <label>挂载载荷</label>
+                    <select class="select">
+                      <option>高清云台相机</option>
+                      <option>红外双光载荷</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-box">
+                <div class="section-title">应急预案与申请材料</div>
+                <textarea class="textarea">1. 低电量自动返航至起飞点
+2. 失联后悬停等待30秒，无信号自动返航
+3. 越界时触发告警，人工接管
+4. 紧急情况一键迫降</textarea>
+                <div class="material-list" style="margin-top:12px;">
+                  <div class="material-item"><span>企业资质附件.pdf</span><span class="pill ok">已上传</span></div>
+                  <div class="material-item"><span>操控员证照.jpg</span><span class="pill ok">已上传</span></div>
+                  <div class="material-item"><span>应急预案说明.docx</span><span class="pill warn">待补充</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:8px; margin-top:18px; justify-content:flex-end; flex-wrap:wrap;">
+                <button class="btn">💾 保存草稿</button>
+                <button class="btn">📋 复制新建</button>
+                <button class="btn">↩️ 撤回</button>
+                <button class="btn">👁️ 预览航线</button>
+                <button class="btn" id="checkRiskBtn">🔍 规则校验</button>
+                <button class="btn primary">提交申请</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 右侧：风险、材料、审批工作台 -->
+          <section class="panel">
+            <div class="panel-head">
+              <span>风险与审批工作台</span>
+              <button class="btn small">查看地图</button>
+            </div>
+            <div class="panel-body">
+              <div class="risk-summary-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
+                  <div class="section-title" style="margin:0;">本次风险汇总</div>
+                  <span class="pill warn">中风险</span>
+                </div>
+                <p style="font-size:12px;">规则校验发现 1 项高风险、1 项中风险、3 项通过项。高风险项需审批人员重点确认。</p>
+              </div>
+
+              <div class="mini-kpi-grid">
+                <div class="mini-kpi"><span style="font-size:12px;color:var(--ink-muted);">风险点</span><strong>5</strong></div>
+                <div class="mini-kpi"><span style="font-size:12px;color:var(--ink-muted);">审批节点</span><strong>3</strong></div>
+                <div class="mini-kpi"><span style="font-size:12px;color:var(--ink-muted);">材料缺失</span><strong>1</strong></div>
+                <div class="mini-kpi"><span style="font-size:12px;color:var(--ink-muted);">预计耗时</span><strong>18m</strong></div>
+              </div>
+
+              <div class="section-title">风险明细</div>
+              <div class="risk-item high">
+                <span class="dot" style="color:var(--danger)"></span>
+                <div class="risk-content">
+                  <div class="risk-title">高度层接近限制上限</div>
+                  <div class="risk-desc">最大申报高度 120m，钱江新城区段限高 120m</div>
+                </div>
+                <button class="btn small icon-btn" data-tooltip="地图定位">📍</button>
+              </div>
+              <div class="risk-item medium">
+                <span class="dot" style="color:var(--warning)"></span>
+                <div class="risk-content">
+                  <div class="risk-title">邻近人口密集区</div>
+                  <div class="risk-desc">奥体中心周边人流密度较高，建议降低速度</div>
+                </div>
+                <button class="btn small icon-btn" data-tooltip="地图定位">📍</button>
+              </div>
+              <div class="risk-item low">
+                <span class="dot" style="color:var(--success)"></span>
+                <div class="risk-content">
+                  <div class="risk-title">资质有效性校验通过</div>
+                  <div class="risk-desc">企业、人员、航空器资质均在有效期内</div>
+                </div>
+                <button class="btn small icon-btn" data-tooltip="查看详情">ℹ️</button>
+              </div>
+
+              <div class="section-box" style="margin-top:14px;">
+                <div class="section-title">审批意见与流转</div>
+                <div class="chip-row">
+                  <span class="pill">待受理</span>
+                  <span class="pill">审批中</span>
+                  <span class="pill">已通过</span>
+                  <span class="pill">退回补正</span>
+                </div>
+                <textarea class="textarea" placeholder="填写审批意见、限制条件或补正要求...">建议保持高度 100m 以下，避开奥体中心高峰观演时段飞行。</textarea>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                  <button class="btn">查看地图</button>
+                  <button class="btn">查看风险</button>
+                  <button class="btn">下载附件</button>
+                  <button class="btn primary">受理</button>
+                  <button class="btn">批量受理</button>
+                  <button class="btn">退回补正</button>
+                  <button class="btn">转办</button>
+                  <button class="btn">会签</button>
+                  <button class="btn danger">驳回</button>
+                </div>
+              </div>
+
+              <div class="section-box" style="margin-top:14px;">
+                <div class="section-title">流程留痕</div>
+                <div class="flow-record">
+                  <div class="flow-item">14:12 申请人保存草稿，补充航线与应急预案。</div>
+                  <div class="flow-item">14:18 系统完成规则校验，生成中风险报告。</div>
+                  <div class="flow-item">14:20 待受理队列，当前审批角色：飞行服务中心值班员。</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </section>
+
+    <!-- ==================== 4+. 需求规格说明书一级模块骨架 ==================== -->
+    <section class="artboard module-board" id="account-page" style="display:none;"></section>
+    <section class="artboard module-board" id="ops-page" style="display:none;"></section>
+    <section class="artboard module-board" id="alert-page" style="display:none;"></section>
+    <section class="artboard module-board" id="airspace-page" style="display:none;"></section>
+    <section class="artboard module-board" id="emergency-page" style="display:none;"></section>
+    <section class="artboard module-board" id="scenario-page" style="display:none;"></section>
+    <section class="artboard module-board" id="interface-page" style="display:none;"></section>
+    <section class="artboard module-board" id="operation-page" style="display:none;"></section>
+    <section class="artboard module-board" id="system-page" style="display:none;"></section>
+  </div>
+
+  <!-- ==================== 右侧悬浮弹窗 ==================== -->
+  
+  <!-- 1. 飞行器详情弹窗 -->
+  <div class="modal-overlay" id="aircraftModalOverlay"></div>
+  <div class="modal-right" id="aircraftModal">
+    <div class="modal-header">
+      <div class="modal-title">
+        飞行器详情
+        <span class="pill danger">告警中</span>
+      </div>
+      <button class="modal-close" id="closeAircraftModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 标签页 -->
+      <div class="tab-nav">
+        <div class="tab-item active" data-modal-tab="basic">基本信息</div>
+        <div class="tab-item" data-modal-tab="telemetry">实时遥测</div>
+        <div class="tab-item" data-modal-tab="alarm">关联告警</div>
+        <div class="tab-item" data-modal-tab="history">历史任务</div>
+      </div>
+
+      <!-- 基本信息 -->
+      <div class="tab-content active" id="modal-tab-basic">
+        <div class="form-grid">
+          <div class="field">
+            <label>飞行器编号</label>
+            <div class="input" disabled>UAV-20260518-032</div>
+          </div>
+          <div class="field">
+            <label>所属企业</label>
+            <div class="input" disabled>低空运营示范公司</div>
+          </div>
+          <div class="field">
+            <label>飞行器型号</label>
+            <div class="input" disabled>大疆 M300 RTK</div>
+          </div>
+          <div class="field">
+            <label>实名登记号</label>
+            <div class="input" disabled>UAV1234567890</div>
+          </div>
+          <div class="field">
+            <label>操控员</label>
+            <div class="input" disabled>张三 (A2证)</div>
+          </div>
+          <div class="field">
+            <label>当前任务</label>
+            <div class="input" disabled>FP-240518-032 河道巡检</div>
+          </div>
+          <div class="field">
+            <label>任务开始时间</label>
+            <div class="input" disabled>2026-05-18 14:05:22</div>
+          </div>
+          <div class="field">
+            <label>预计结束时间</label>
+            <div class="input" disabled>2026-05-18 14:45:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 实时遥测 -->
+      <div class="tab-content" id="modal-tab-telemetry">
+        <div class="form-grid">
+          <div class="field">
+            <label>经度</label>
+            <div class="input" disabled>120.233456</div>
+          </div>
+          <div class="field">
+            <label>纬度</label>
+            <div class="input" disabled>30.232789</div>
+          </div>
+          <div class="field">
+            <label>海拔高度</label>
+            <div class="input" disabled>118m</div>
+          </div>
+          <div class="field">
+            <label>相对高度</label>
+            <div class="input" disabled>92m</div>
+          </div>
+          <div class="field">
+            <label>飞行速度</label>
+            <div class="input" disabled>8.2m/s</div>
+          </div>
+          <div class="field">
+            <label>航向角</label>
+            <div class="input" disabled>156°</div>
+          </div>
+          <div class="field">
+            <label>剩余电量</label>
+            <div class="input" disabled>65%</div>
+          </div>
+          <div class="field">
+            <label>卫星数量</label>
+            <div class="input" disabled>16颗</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关联告警 -->
+      <div class="tab-content" id="modal-tab-alarm">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>告警时间</th>
+              <th>告警类型</th>
+              <th>告警级别</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>14:22:08</td>
+              <td>越界飞行</td>
+              <td><span class="pill danger">高</span></td>
+              <td><span class="pill warn">待处置</span></td>
+            </tr>
+            <tr>
+              <td>14:15:32</td>
+              <td>接近限飞区</td>
+              <td><span class="pill warn">中</span></td>
+              <td><span class="pill ok">已处理</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 历史任务 -->
+      <div class="tab-content" id="modal-tab-history">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>任务编号</th>
+              <th>任务类型</th>
+              <th>飞行时间</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>FP-240517-028</td>
+              <td>河道巡检</td>
+              <td>2026-05-17 09:30-10:15</td>
+              <td><span class="pill ok">已完成</span></td>
+            </tr>
+            <tr>
+              <td>FP-240516-042</td>
+              <td>道路巡检</td>
+              <td>2026-05-16 14:00-14:40</td>
+              <td><span class="pill ok">已完成</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn primary">👁️ 跟随目标</button>
+      <button class="btn">📋 查看任务详情</button>
+      <button class="btn">📈 查看历史航迹</button>
+      <button class="btn danger">⚠️ 处理告警</button>
+      <button class="btn">📞 联系责任人</button>
+    </div>
+  </div>
+
+  <!-- 2. 风险校验结果弹窗 -->
+  <div class="modal-overlay" id="riskModalOverlay"></div>
+  <div class="modal-right" id="riskModal">
+    <div class="modal-header">
+      <div class="modal-title">风险校验结果</div>
+      <button class="modal-close" id="closeRiskModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 风险汇总 -->
+      <div style="padding:12px; background:rgba(255, 171, 0, 0.05); border:1px solid rgba(255, 171, 0, 0.3); border-radius:8px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <h4>本次申报风险评估</h4>
+          <span class="pill warn">中风险</span>
+        </div>
+        <p style="font-size:12px;">共检测到 3 个风险点：低风险 1 个，中风险 1 个，高风险 1 个。需审批人员重点关注高风险项。</p>
+      </div>
+
+      <!-- 风险列表 -->
+      <h4 style="margin-bottom:10px;">风险明细</h4>
+      <div class="risk-item high">
+        <span class="dot" style="color:var(--danger)"></span>
+        <div class="risk-content">
+          <div class="risk-title">高度层接近限制上限</div>
+          <div class="risk-desc">申报最大高度120m，该区域限制高度为120m，存在超高风险</div>
+        </div>
+        <button class="btn small icon-btn" data-tooltip="查看地图">📍</button>
+      </div>
+      <div class="risk-item medium">
+        <span class="dot" style="color:var(--warning)"></span>
+        <div class="risk-content">
+          <div class="risk-title">航线邻近人口密集区</div>
+          <div class="risk-desc">航线距离居民区最近距离85m，建议保持高度并避开人群</div>
+        </div>
+        <button class="btn small icon-btn" data-tooltip="查看地图">📍</button>
+      </div>
+      <div class="risk-item low">
+        <span class="dot" style="color:var(--success)"></span>
+        <div class="risk-content">
+          <div class="risk-title">时段为飞行高峰</div>
+          <div class="risk-desc">14:30-15:00为飞行高峰时段，空域占用率较高</div>
+        </div>
+        <button class="btn small icon-btn" data-tooltip="查看详情">ℹ️</button>
+      </div>
+      <div class="risk-item low">
+        <span class="dot" style="color:var(--success)"></span>
+        <div class="risk-content">
+          <div class="risk-title">资质有效性校验通过</div>
+          <div class="risk-desc">企业、人员、航空器资质均在有效期内</div>
+        </div>
+        <button class="btn small icon-btn" data-tooltip="查看详情">ℹ️</button>
+      </div>
+      <div class="risk-item low">
+        <span class="dot" style="color:var(--success)"></span>
+        <div class="risk-content">
+          <div class="risk-title">未穿越禁飞区</div>
+          <div class="risk-desc">申报航线未与任何禁飞区相交</div>
+        </div>
+        <button class="btn small icon-btn" data-tooltip="查看详情">ℹ️</button>
+      </div>
+
+      <!-- 审批操作区 -->
+      <div class="approval-opinion" style="margin-top:20px;">
+        <h4 style="margin-bottom:10px;">审批意见</h4>
+        <div class="opinion-templates">
+          <span class="template-tag" data-opinion="同意，严格按申报航线飞行，注意避开人口密集区">同意，严格按航线飞行</span>
+          <span class="template-tag" data-opinion="请补充完善应急预案后重新提交">需补充应急预案</span>
+          <span class="template-tag" data-opinion="建议将飞行高度调整至100m以下">建议降低飞行高度</span>
+          <span class="template-tag" data-opinion="请调整飞行时段至非高峰时段">请调整飞行时段</span>
+        </div>
+        <textarea class="textarea" id="modalOpinionText" placeholder="请填写审批意见..." style="margin-top:10px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn primary">✅ 通过</button>
+      <button class="btn">↩️ 退回补正</button>
+      <button class="btn">🔄 转办</button>
+      <button class="btn">📝 会签</button>
+      <button class="btn danger">❌ 驳回</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 全局变量 ====================
+    let mainMap, detailMap, planMap, heatMap;
+    let aircraftMarkers = [];
+    let heatLayer;
+    
+    // 杭州市中心坐标（示例）
+    const CENTER_LAT = 30.2741;
+    const CENTER_LNG = 120.1551;
+    
+    // 模拟飞行器数据
+    const aircraftData = [
+      {id: 'UAV-HZ-001', lat: 30.2698, lng: 120.1412, status: 'ok', type: '大疆 M350 RTK', mission: '西湖景区巡查'},
+      {id: 'UAV-HZ-002', lat: 30.2486, lng: 120.2143, status: 'danger', type: '大疆 M350 RTK', mission: '奥体保障巡查'},
+      {id: 'UAV-HZ-003', lat: 30.2068, lng: 120.2105, status: 'warn', type: '极飞 P100', mission: '滨江物流测试'},
+      {id: 'UAV-HZ-004', lat: 30.2894, lng: 120.1826, status: 'ok', type: '大疆 Mavic 3E', mission: '运河巡查'},
+      {id: 'UAV-HZ-005', lat: 30.3165, lng: 120.0718, status: 'warn', type: '大疆 M30T', mission: '未来科技城巡检'},
+      {id: 'UAV-HZ-BF-099', lat: 30.2329, lng: 120.2332, status: 'unauthorized', type: '未知目标', mission: '黑飞识别'}
+    ];
+    
+    // 模拟热力图数据 [纬度, 经度, 强度(0-1)]
+    const heatData = [
+      [30.2480, 120.2050, 0.88],
+      [30.2456, 120.2148, 0.96],
+      [30.2394, 120.2242, 1.00],
+      [30.2338, 120.2326, 0.98],
+      [30.2286, 120.2448, 0.92],
+      [30.2198, 120.2585, 0.84],
+      [30.2088, 120.2086, 0.78],
+      [30.2032, 120.1934, 0.74],
+      [30.2684, 120.1430, 0.66],
+      [30.2720, 120.1564, 0.70],
+      [30.2812, 120.1822, 0.72],
+      [30.3168, 120.0725, 0.60]
+    ];
+
+    const primaryNav = [
+      ['home', '监管驾驶舱'],
+      ['map-page', '低空一张图'],
+      ['account-page', '主体台账'],
+      ['approval-page', '飞行服务'],
+      ['ops-page', '运行监控'],
+      ['alert-page', '告警中心'],
+      ['airspace-page', '空域设施'],
+      ['emergency-page', '应急指挥'],
+      ['scenario-page', '场景应用']
+    ];
+
+    const modulePages = {
+      'account-page': {
+        title: '主体与航空器',
+        role: '基础台账与资质管理',
+        summary: '承载企业、人员、资质、航空器、机库等基础数据，作为计划申报、审批校验、运行监控和告警追责的统一数据底座。',
+        menu: [
+          ['企业台账', '新增、编辑、审核、停用、导入导出'],
+          ['人员台账', '操控员、证照、授权范围、有效期预警'],
+          ['航空器台账', '实名登记、适航状态、挂载载荷、保险'],
+          ['机库台账', '位置、能力、在线状态、运维记录'],
+          ['资质台账', '企业资质、人员证照、设备证书']
+        ],
+        cards: [
+          ['企业台账', '新增企业、审核资质、停用主体，已被计划引用的数据只允许停用不物理删除。', ['新增企业', '审核', '导入']],
+          ['人员与资质', '维护操控员证照、有效期、授权机型和应急角色，支持到期预警。', ['新增人员', '证照校验', '导出']],
+          ['航空器与机库', '维护无人机、载荷、机库、保险和远程识别信息，为申报自动带出资源。', ['新增航空器', '绑定机库', '查看在线']]
+        ],
+        rows: [
+          ['杭州低空物流示范公司', '企业', '有效', '飞行计划 18 个'],
+          ['张三', '操控员', '证照有效', 'A2 / M350 RTK'],
+          ['UAV-HZ-021', '航空器', '正常', '滨江物联机库']
+        ],
+        todos: ['补录 2 家企业保险附件', '3 名操控员证照 30 天内到期', '1 架航空器 Remote ID 待校验']
+      },
+      'ops-page': {
+        title: '运行监控',
+        role: '实时航迹、冲突检测与历史回放',
+        summary: '聚合实时航迹、计划一致性、冲突检测和历史回放，保障执行中任务可视、可查、可预警。',
+        menu: [
+          ['实时监控', '航迹、速度、高度、航向、任务状态'],
+          ['航迹列表', '按任务、区域、状态和告警筛选'],
+          ['计划一致性', '偏航、越界、超高、延误识别'],
+          ['冲突检测', '水平/垂直间隔、交汇点预测'],
+          ['历史回放', '航迹、告警、处置联动复盘']
+        ],
+        cards: [
+          ['实时航迹', '接入无人机、机库和第三方平台航迹，普通航迹展示延迟小于 3 秒。', ['查看航迹', '跟踪目标', '历史回放']],
+          ['计划一致性', '对执行中任务进行偏航、越界、超高、失联和低电量识别。', ['规则配置', '定位异常', '生成告警']],
+          ['冲突检测', '动态计算交汇冲突、容量拥堵和临时管制影响，为告警中心复用。', ['冲突模拟', '处置建议', '导出']]
+        ],
+        rows: [
+          ['UAV-HZ-002', '执行中', '奥体保障巡查', '偏航 38m'],
+          ['UAV-HZ-003', '执行中', '滨江物流测试', '通信覆盖不足'],
+          ['UAV-HZ-061', '返航中', '钱江巡检', '低电量']
+        ],
+        todos: ['2 个目标存在潜在交汇冲突', '5 条航迹等待归档', '1 个历史回放报告待生成']
+      },
+      'alert-page': {
+        title: '告警中心',
+        role: '确认、派发、处置、关闭、复盘闭环',
+        summary: '统一承接偏航、越界、超高、失联、低电量、黑飞和设备异常告警，按状态流转形成处置留痕。',
+        menu: [
+          ['告警列表', '未确认、已确认、处置中、待关闭'],
+          ['处置工单', '派发、反馈、升级、重新派发'],
+          ['事件复盘', '时间线、航迹、附件、责任单位'],
+          ['规则配置', '阈值、级别、通知、升级策略']
+        ],
+        cards: [
+          ['告警确认', '值班人员确认告警真伪和影响范围，高风险告警不可跳过确认直接关闭。', ['确认', '误报', '查看']],
+          ['工单派发', '按区域、单位、角色和事件等级派发处置任务，支持升级应急事件。', ['派发', '升级', '处置反馈']],
+          ['复盘归档', '汇总告警、处置、航迹和附件，形成复盘报告并支持导出。', ['关闭', '复盘', '导出']]
+        ],
+        rows: [
+          ['AL-HZ-20260519-008', '未授权目标', '紧急', '未确认'],
+          ['AL-HZ-20260519-017', '超高', '高', '处置中'],
+          ['AL-HZ-20260519-021', '机库离线', '中', '待关闭']
+        ],
+        todos: ['11 条告警待处置', '2 条高风险告警超过 10 分钟', '3 份复盘报告待归档']
+      },
+      'airspace-page': {
+        title: '空域与设施',
+        role: '四维网格、容量评估、设施资源与微气象',
+        summary: '管理空域、航路、起降点、禁限飞区、微气象、通信覆盖和通导监设施，为申报校验、动态放行和规划仿真提供规则底座。',
+        menu: [
+          ['空域管理', '空域、航线、禁限飞区、敏感区'],
+          ['四维网格', '时间、高度、区域、容量'],
+          ['容量评估', '占用率、峰值、拥堵预测'],
+          ['设施管理', '起降点、机库、通导监设施'],
+          ['微气象通信', '风场、降雨、能见度、覆盖盲区']
+        ],
+        cards: [
+          ['四维空域网格', '按区域、高度和时间切片管理容量，为审批和放行提供冲突判断。', ['新建网格', '容量评估', '发布']],
+          ['设施资源', '维护起降点、机库、通信和监视设施，支持运行状态与覆盖分析。', ['新增设施', '覆盖分析', '运维记录']],
+          ['选址仿真', '对起降点、航路和设施候选方案进行风险、成本、效率评分。', ['新建方案', '开始计算', '查看排名']]
+        ],
+        rows: [
+          ['钱江新城空域网格 A-12', '容量 78%', '高峰', '限制新增计划'],
+          ['滨江物联机库', '在线', '可调度', '物流/巡检'],
+          ['奥体保障区', '临时管制', '启用中', '重大活动']
+        ],
+        todos: ['2 个网格容量超过阈值', '1 段航路通信覆盖不足', '4 个候选起降点待评分']
+      },
+      'emergency-page': {
+        title: '应急指挥',
+        role: '应急空域、预案库、指挥调度与复盘',
+        summary: '支持突发事件新建、应急空域一键划设、预案启动、资源调度、现场视频和事件复盘。',
+        menu: [
+          ['应急事件', '新建事件、等级、牵头单位'],
+          ['应急空域', '划设、发布管制、解除管制'],
+          ['预案库', '预案选择、任务清单、资源编组'],
+          ['指挥调度', '派发机库、飞手、救援单位'],
+          ['保障复盘', '事件时间线、航迹、视频、报告']
+        ],
+        cards: [
+          ['新建事件', '填写事件类型、位置、等级和牵头单位，自动定位地图和推荐预案。', ['新建事件', '启动预案', '关联告警']],
+          ['应急空域', '地图框选范围并设置高度、时段和管制规则，发布后影响审批和放行。', ['一键划设', '发布管制', '解除管制']],
+          ['指挥调度', '向机库、飞手和行业单位派发任务，接收现场图文视频回传。', ['派发任务', '视频接入', '生成报告']]
+        ],
+        rows: [
+          ['EM-HZ-20260519-003', '奥体保障', '二级', '处置中'],
+          ['EA-HZ-009', '应急空域', '0-120m', '已发布'],
+          ['TASK-118', '现场巡查', '滨江机库', '执行中']
+        ],
+        todos: ['1 个应急空域待解除', '2 路现场视频在线', '1 份保障复盘待生成']
+      },
+      'scenario-page': {
+        title: '场景应用',
+        role: '应急、巡检、物流任务与成果闭环',
+        summary: '围绕应急救援、城市巡检、物流配送等场景，提供任务创建、航线生成、执行监控、成果归档和报告下载。',
+        menu: [
+          ['应急任务', '创建、生成航线、派发、现场直播'],
+          ['巡检任务', '巡检对象、缺陷、工单、报告'],
+          ['物流任务', '订单、起降点、载重、签收'],
+          ['成果管理', '视频、图片、轨迹、缺陷、报告']
+        ],
+        cards: [
+          ['应急救援', '基于事件生成无人机任务，快速调度机库和飞手，归档现场视频。', ['新建任务', '生成航线', '现场直播']],
+          ['城市巡检', '面向河道、道路、电力和城管巡检，关联缺陷和处置工单。', ['新建巡检', '识别缺陷', '生成报告']],
+          ['低空物流', '订单转换为飞行计划，执行签收和异常处理，支撑示范线运营。', ['导入订单', '生成计划', '签收']]
+        ],
+        rows: [
+          ['钱塘江河道巡检', '巡检', '执行中', '已采集 43 张图片'],
+          ['滨江低空配送', '物流', '待放行', '载重 3.2kg'],
+          ['奥体应急巡查', '应急', '已完成', '报告待审核']
+        ],
+        todos: ['5 个成果待归档', '2 个巡检缺陷待生成工单', '1 条物流示范线待评估']
+      },
+      'interface-page': {
+        title: '开放接口',
+        role: '设备接入、GIS 导入、接口配置和调用日志',
+        summary: '支撑无人机、机库、Remote ID、UOM/USS 预留接口、GIS 数据和第三方系统接入，统一管理密钥、字段映射和调用审计。',
+        menu: [
+          ['设备接入', '无人机、机库、感知源'],
+          ['GIS 导入', '空域、航线、禁限飞区、设施'],
+          ['接口配置', '应用、密钥、字段映射、限流'],
+          ['接口日志', '调用统计、失败重试、审计']
+        ],
+        cards: [
+          ['设备接入', '配置无人机、机库、Remote ID、雷达和光电等接入通道。', ['新增接入', '测试连接', '查看日志']],
+          ['GIS 导入', '导入空域、航线、起降点、禁限飞区和设施资源，支持校验预览。', ['导入 GIS', '字段映射', '发布图层']],
+          ['接口管理', '维护 UOM/USS、告警、飞行计划和应急平台接口，支持密钥轮换。', ['创建应用', '生成密钥', '调用统计']]
+        ],
+        rows: [
+          ['Remote ID 接入', '运行中', '12 路在线', '延迟 2s'],
+          ['GIS 航线导入', '待发布', '64 条航线', '已校验'],
+          ['UOM/USS 预留接口', '配置中', '双向', '待联调']
+        ],
+        todos: ['1 个接口失败率超过阈值', '2 个应用密钥 30 天内到期', '3 批 GIS 数据待发布']
+      },
+      'operation-page': {
+        title: '运营管理',
+        role: '租户、开发者门户、运营看板和服务统计',
+        summary: '支持按城市、园区、行业单位和运营企业划分租户，面向第三方提供开发者门户、调用统计和运营指标分析。',
+        menu: [
+          ['租户管理', '租户、管理员、菜单、数据范围'],
+          ['开发者门户', '接入申请、文档、应用、密钥'],
+          ['运营看板', '租户、区域、场景、时间筛选'],
+          ['服务统计', '调用、飞行、审批、告警、设备']
+        ],
+        cards: [
+          ['租户管理', '配置租户类型、区域、管理员、资源配额、菜单和数据权限。', ['新增租户', '配置权限', '停用']],
+          ['开发者门户', '第三方申请接入、查看文档、创建应用并跟踪调用统计。', ['审核申请', '文档中心', '应用统计']],
+          ['运营看板', '按租户、区域、时间和场景分析飞行、审批、告警和设备指标。', ['指标筛选', '导出报表', '趋势分析']]
+        ],
+        rows: [
+          ['杭州市低空专班', '监管租户', '有效', '全域数据'],
+          ['滨江物流示范区', '园区租户', '有效', '物流场景'],
+          ['第三方开发者 A', '开发者', '待审核', '接口申请']
+        ],
+        todos: ['2 个开发者申请待审核', '1 个租户资源配额将超限', '本周接口调用同比 +18%']
+      },
+      'system-page': {
+        title: '系统管理',
+        role: '组织权限、审批流、告警规则和审计日志',
+        summary: '维护用户、组织、角色、字典、审批流、告警规则和审计日志，不承载具体业务单据办理。',
+        menu: [
+          ['组织用户', '部门、用户、角色、岗位'],
+          ['权限模型', '菜单、按钮、数据、高风险权限'],
+          ['流程规则', '审批流、告警规则、字典参数'],
+          ['审计日志', '登录、导出、审批、告警、应急']
+        ],
+        cards: [
+          ['用户角色', '按监管、运营中心、企业、飞手、行业单位和管理员配置权限。', ['新增用户', '分配角色', '数据权限']],
+          ['流程配置', '配置飞行计划审批流、动态放行规则和告警升级策略。', ['审批流', '告警规则', '发布']],
+          ['审计日志', '记录数据导出、审批、告警关闭、规则发布和应急管制等关键操作。', ['查询日志', '导出', '归档']]
+        ],
+        rows: [
+          ['审批流版本 V1.3', '已发布', '飞行服务', '2026-05-19'],
+          ['告警规则：超高', '启用', '阈值 120m', '高风险'],
+          ['审计日志', '今日 286 条', '正常', '可追溯']
+        ],
+        todos: ['1 条审批流草案待发布', '4 个高风险权限待复核', '今日数据导出 6 次']
+      }
+    };
+
+    function getNavHtml(activePage) {
+      return primaryNav.map(([id, label]) =>
+        `<button class="nav-btn ${id === activePage ? 'active' : ''}" data-page="${id}">${label}</button>`
+      ).join('');
+    }
+
+    function renderModulePages() {
+      Object.entries(modulePages).forEach(([pageId, page]) => {
+        const section = document.getElementById(pageId);
+        if (!section || section.dataset.rendered === '1') return;
+        section.dataset.rendered = '1';
+        section.innerHTML = `
+          <header class="header">
+            <div class="logo">
+              <div class="logo-mark">LA</div>
+              <div>
+                <div class="logo-title">低空数字孪生平台</div>
+                <p style="font-size:12px;">${page.role}</p>
+              </div>
+            </div>
+            <nav class="top-nav">${getNavHtml(pageId)}</nav>
+            <div class="user-area">
+              <button class="icon-btn" data-tooltip="消息通知">🔔<span class="badge">11</span></button>
+              <div class="user-card"><span class="avatar">管</span><span>监管值班员</span><span>▾</span></div>
+            </div>
+          </header>
+          <main class="content">
+            <div class="framework-layout">
+              <section class="panel">
+                <div class="panel-head"><span>二级页面</span><span class="pill info">按需规 4.2</span></div>
+                <div class="panel-body">
+                  <div class="module-menu">
+                    ${page.menu.map(item => `<div class="menu-item"><strong>${item[0]}</strong><small>${item[1]}</small></div>`).join('')}
+                  </div>
+                </div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <span>${page.title}</span>
+                  <div class="panel-head-actions">
+                    <span class="pill info">本地静态原型</span>
+                    <button class="btn small primary">新建</button>
+                    <button class="btn small">导出</button>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="module-hero">
+                    <div>
+                      <h2>${page.title}</h2>
+                      <p>${page.summary}</p>
+                    </div>
+                    <div class="module-actions">
+                      <button class="btn primary">进入办理</button>
+                      <button class="btn">查看流程</button>
+                    </div>
+                  </div>
+                  <div class="module-grid">
+                    ${page.cards.map(card => `
+                      <div class="module-card">
+                        <div>
+                          <h3>${card[0]}</h3>
+                          <p>${card[1]}</p>
+                        </div>
+                        <div class="module-actions">${card[2].map(action => `<button class="btn small">${action}</button>`).join('')}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                  <table class="table module-table">
+                    <thead><tr><th>对象</th><th>类型/状态</th><th>当前进展</th><th>关联信息</th></tr></thead>
+                    <tbody>
+                      ${page.rows.map(row => `<tr>${row.map(col => `<td>${col}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><span>待办与规则</span><span class="pill warn">${page.todos.length}</span></div>
+                <div class="panel-body status-list">
+                  ${page.todos.map((todo, index) => `
+                    <div class="status-item">
+                      <span class="dot" style="color:${index === 0 ? 'var(--danger)' : 'var(--warning)'}"></span>
+                      <div class="status-item-content">
+                        <div class="status-item-title">${todo}</div>
+                        <div class="status-item-desc">来自需求规格说明书功能规则与验收场景</div>
+                      </div>
+                      <span class="pill ${index === 0 ? 'danger' : 'warn'}">${index === 0 ? '优先' : '待办'}</span>
+                    </div>
+                  `).join('')}
+                  <div class="section-box" style="margin-top:14px;">
+                    <div class="section-title">通用按钮状态</div>
+                    <div class="chip-row">
+                      <span class="pill">新增</span>
+                      <span class="pill">编辑</span>
+                      <span class="pill">查看</span>
+                      <span class="pill">导入</span>
+                      <span class="pill">导出</span>
+                      <span class="pill">审核</span>
+                      <span class="pill">停用</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </main>
+        `;
+      });
+    }
+    
+    // ==================== 地图初始化函数 ====================
+
+    function hasLeaflet() {
+      return typeof window.L !== 'undefined' && typeof L.map === 'function';
+    }
+
+    function renderLocalMap(containerId, mode = 'main') {
+      const el = document.getElementById(containerId);
+      if (!el) return { invalidateSize() {} };
+      if (el.dataset.localRendered === '1') return { invalidateSize() {} };
+      el.dataset.localRendered = '1';
+      const isHeat = mode === 'heat';
+      const isPlan = mode === 'plan';
+      el.innerHTML = `
+        <div class="local-map-canvas">
+          <div class="local-river"></div>
+          <div class="local-zone" style="left:16%;top:23%;width:16%;height:14%;color:#b7791f;"></div>
+          <div class="local-zone" style="left:67%;top:36%;width:18%;height:14%;color:#d94872;"></div>
+          <div class="local-route" style="left:24%;top:67%;width:38%;transform:rotate(-13deg);"></div>
+          ${isHeat ? `
+            <div class="local-heat" style="left:63%;top:30%;"></div>
+            <div class="local-heat" style="left:44%;top:52%;width:96px;height:96px;"></div>
+            <div class="local-heat" style="left:20%;top:34%;width:82px;height:82px;opacity:.54;"></div>
+          ` : ''}
+          <div class="local-point ok" style="left:64%;top:43%;"></div>
+          <div class="local-point danger" style="left:71%;top:37%;"></div>
+          <div class="local-point warn" style="left:42%;top:62%;"></div>
+          <div class="local-point" style="left:30%;top:58%;"></div>
+          <div class="local-label" style="left:62%;top:48%;">钱江新城起降点</div>
+          <div class="local-label" style="left:67%;top:31%;">奥体保障区</div>
+          <div class="local-label" style="left:18%;top:19%;">西湖禁飞区</div>
+          <div class="local-label" style="left:36%;top:68%;">钱塘江巡查航线</div>
+          ${isPlan ? `<div class="local-label" style="left:48%;top:54%;">当前申报航线：4 航点 / 120m</div>` : ''}
+          <div class="local-label" style="right:14px;bottom:14px;">本地部署离线态势底图</div>
+        </div>
+      `;
+      return { invalidateSize() {} };
+    }
+
+    function addImageryBaseMap(map, showLabels = true) {
+      const LocalTileLayer = L.GridLayer.extend({
+        createTile: function(coords) {
+          const tile = document.createElement('div');
+          tile.style.width = '256px';
+          tile.style.height = '256px';
+          tile.style.background = (coords.x + coords.y) % 2 === 0 ? '#f8fafc' : '#fdf2f8';
+          tile.style.border = '1px solid rgba(147, 51, 234, 0.06)';
+          tile.style.position = 'relative';
+          if (showLabels && coords.z >= 10) {
+            tile.innerHTML = '<span style="position:absolute;right:10px;bottom:8px;font-size:11px;color:#8e61b8;">杭州低空本地底图</span>';
+          }
+          return tile;
+        }
+      });
+      new LocalTileLayer({ attribution: '本地静态底图', maxZoom: 19 }).addTo(map);
+    }
+
+    function addHangzhouScenarioLayers(map, mode = 'main') {
+      const qiantangPatrolRoute = [
+        [30.2068, 120.1828],
+        [30.2198, 120.1964],
+        [30.2335, 120.2128],
+        [30.2458, 120.2265]
+      ];
+
+      const westLakeRestrictedZone = [
+        [30.2668, 120.1225],
+        [30.2756, 120.1318],
+        [30.2702, 120.1450],
+        [30.2588, 120.1432],
+        [30.2544, 120.1296]
+      ];
+
+      const olympicSecurityZone = [
+        [30.2398, 120.2248],
+        [30.2398, 120.2412],
+        [30.2278, 120.2412],
+        [30.2278, 120.2248]
+      ];
+
+      L.polyline(qiantangPatrolRoute, {
+        color: '#c084fc',
+        weight: 4,
+        opacity: 0.9,
+        dashArray: mode === 'plan' ? '10, 5' : null
+      }).addTo(map).bindTooltip('钱塘江巡查航线', { className: 'custom-tooltip' });
+
+      L.polygon(westLakeRestrictedZone, {
+        color: '#d5a43a',
+        weight: 2,
+        fillColor: '#d5a43a',
+        fillOpacity: 0.18
+      }).addTo(map).bindTooltip('西湖景区核心禁飞区', { className: 'custom-tooltip' });
+
+      L.polygon(olympicSecurityZone, {
+        color: '#d95c5c',
+        weight: 2,
+        fillColor: '#d95c5c',
+        fillOpacity: 0.16
+      }).addTo(map).bindTooltip('奥体中心重大活动保障区', { className: 'custom-tooltip' });
+
+      const scenePoints = [
+        { name: '钱江新城综合起降点', lat: 30.2489, lng: 120.2058, color: '#2eb872' },
+        { name: '滨江物联机库', lat: 30.2052, lng: 120.2118, color: '#9333ea' },
+        { name: '未来科技城起降点', lat: 30.3162, lng: 120.0732, color: '#2eb872' }
+      ];
+
+      scenePoints.forEach(point => {
+        L.circleMarker([point.lat, point.lng], {
+          radius: 7,
+          color: point.color,
+          weight: 2,
+          fillColor: point.color,
+          fillOpacity: 0.85
+        }).addTo(map).bindTooltip(point.name, { className: 'custom-tooltip' });
+      });
+    }
+    
+    // 初始化主地图（监管驾驶舱）
+    function initMainMap() {
+      if (mainMap) return;
+      if (!hasLeaflet()) {
+        mainMap = renderLocalMap('mainMap', 'main');
+        return;
+      }
+      
+      mainMap = L.map('mainMap', {
+        center: [CENTER_LAT, CENTER_LNG],
+        zoom: 11,
+        zoomControl: false, // 隐藏默认缩放控件，使用自定义工具栏
+        attributionControl: true
+      });
+      
+      addImageryBaseMap(mainMap, true);
+      
+      // 添加自定义缩放控件到左侧
+      L.control.zoom({
+        position: 'bottomright'
+      }).addTo(mainMap);
+      
+      // 添加飞行器标记
+      addHangzhouScenarioLayers(mainMap, 'main');
+      addAircraftMarkers(mainMap);
+    }
+    
+    // 初始化详情地图（低空一张图）
+    function initDetailMap() {
+      if (detailMap) return;
+      if (!hasLeaflet()) {
+        detailMap = renderLocalMap('detailMap', 'detail');
+        return;
+      }
+      
+      detailMap = L.map('detailMap', {
+        center: [CENTER_LAT, CENTER_LNG],
+        zoom: 11,
+        zoomControl: false,
+        attributionControl: true
+      });
+      
+      addImageryBaseMap(detailMap, true);
+      
+      L.control.zoom({
+        position: 'bottomright'
+      }).addTo(detailMap);
+      
+      addHangzhouScenarioLayers(detailMap, 'detail');
+      addAircraftMarkers(detailMap);
+    }
+    
+    // 初始化计划地图（飞行计划申报）
+    function initPlanMap() {
+      if (planMap) return;
+      if (!hasLeaflet()) {
+        planMap = renderLocalMap('planMap', 'plan');
+        return;
+      }
+      
+      planMap = L.map('planMap', {
+        center: [CENTER_LAT, CENTER_LNG],
+        zoom: 12,
+        zoomControl: false,
+        attributionControl: false
+      });
+      
+      addImageryBaseMap(planMap, false);
+      
+      // 绘制示例航线
+      const routePoints = [
+        [30.2068, 120.1828],
+        [30.2198, 120.1964],
+        [30.2335, 120.2128],
+        [30.2458, 120.2265]
+      ];
+      
+      L.polyline(routePoints, {
+        color: '#9333ea',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '10, 5'
+      }).addTo(planMap).bindTooltip('钱塘江巡查航线', { className: 'custom-tooltip' });
+      
+      // 添加起点和终点标记
+      L.marker(routePoints[0], {
+        icon: L.divIcon({
+          className: 'aircraft-marker ok',
+          iconSize: [18, 18]
+        })
+      }).addTo(planMap);
+      
+      L.marker(routePoints[3], {
+        icon: L.divIcon({
+          className: 'aircraft-marker ok',
+          iconSize: [18, 18]
+        })
+      }).addTo(planMap);
+    }
+    
+    // 初始化热力图
+    function initHeatMap() {
+      if (heatMap) return;
+      if (!hasLeaflet() || typeof L.heatLayer !== 'function') {
+        heatMap = renderLocalMap('heatMap', 'heat');
+        return;
+      }
+      
+      heatMap = L.map('heatMap', {
+        center: [CENTER_LAT, CENTER_LNG],
+        zoom: 11,
+        zoomControl: false,
+        attributionControl: false
+      });
+      
+      addImageryBaseMap(heatMap, false);
+      
+      // 添加热力图层
+      heatLayer = L.heatLayer(heatData, {
+        radius: 38,
+        blur: 28,
+        minOpacity: 0.45,
+        maxZoom: 17,
+        gradient: {
+          0.25: '#2eb872',
+          0.5: '#d5a43a',
+          0.72: '#f07c4a',
+          0.92: '#d95c5c'
+        }
+      }).addTo(heatMap);
+    }
+    
+    // 添加飞行器标记到地图
+    function addAircraftMarkers(map) {
+      aircraftData.forEach(aircraft => {
+        const marker = L.marker([aircraft.lat, aircraft.lng], {
+          icon: L.divIcon({
+            className: `aircraft-marker ${aircraft.status}`,
+            iconSize: [18, 18]
+          })
+        }).addTo(map);
+        
+        // 绑定点击事件
+        marker.on('click', () => {
+          openRightModal('aircraftModal', 'aircraftModalOverlay');
+        });
+        
+        // 绑定悬浮提示
+        marker.bindTooltip(`${aircraft.id}<br>${aircraft.type}<br>${aircraft.mission || ''}`, {
+          direction: 'top',
+          offset: [0, -10],
+          className: 'custom-tooltip'
+        });
+        
+        aircraftMarkers.push(marker);
+      });
+    }
+    
+    // 更新热力图数据
+    function updateHeatMapData() {
+      if (!heatLayer) return;
+      
+      // 模拟数据变化
+      const newData = heatData.map(point => [
+        point[0] + (Math.random() - 0.5) * 0.002,
+        point[1] + (Math.random() - 0.5) * 0.002,
+        Math.max(0.1, Math.min(0.9, point[2] + (Math.random() - 0.5) * 0.1))
+      ]);
+      
+      heatLayer.setLatLngs(newData);
+    }
+    
+    // ==================== 全局交互逻辑 ====================
+    renderModulePages();
+    
+    // 1. 用户菜单切换
+    const userCard = document.getElementById('userCard');
+    const userMenu = document.getElementById('userMenu');
+    
+    if (userCard && userMenu) {
+      userCard.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('show');
+      });
+    }
+    
+    // 点击页面其他地方关闭用户菜单
+    document.addEventListener('click', () => {
+      if (userMenu) userMenu.classList.remove('show');
+    });
+    
+    // 2. 导航栏页面切换
+    const navBtns = document.querySelectorAll('.nav-btn[data-page]');
+    const artboards = document.querySelectorAll('.artboard');
+    
+    function activatePage(targetPage, activeButton = null) {
+      navBtns.forEach(b => b.classList.remove('active'));
+      if (activeButton) activeButton.classList.add('active');
+      
+      artboards.forEach(artboard => {
+        artboard.style.display = 'none';
+      });
+      
+      const targetArtboard = document.getElementById(targetPage);
+      if (!targetArtboard) return;
+      targetArtboard.style.display = 'block';
+      
+      setTimeout(() => {
+        if (targetPage === 'home') {
+          initMainMap();
+          initHeatMap();
+          if (mainMap && mainMap.invalidateSize) mainMap.invalidateSize();
+          if (heatMap && heatMap.invalidateSize) heatMap.invalidateSize();
+        } else if (targetPage === 'map-page') {
+          initDetailMap();
+          if (detailMap && detailMap.invalidateSize) detailMap.invalidateSize();
+        } else if (targetPage === 'approval-page') {
+          initPlanMap();
+          if (planMap && planMap.invalidateSize) planMap.invalidateSize();
+        }
+      }, 100);
+    }
+    
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetPage = btn.getAttribute('data-page');
+        activatePage(targetPage, btn);
+      });
+    });
+
+    document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pageId = item.getAttribute('data-page');
+        const target = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
+        if (target) {
+          target.click();
+        } else {
+          activatePage(pageId);
+        }
+        if (userMenu) userMenu.classList.remove('show');
+      });
+    });
+    
+    // 3. 地图工具按钮选中状态
+    const mapTools = document.querySelectorAll('.tool');
+    
+    mapTools.forEach(tool => {
+      tool.addEventListener('click', () => {
+        // 同一组内的工具互斥
+        const toolGroup = tool.closest('.tool-group');
+        if (toolGroup) {
+          toolGroup.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+        }
+        tool.classList.add('active');
+      });
+    });
+    
+    // 4. 图层复选框切换
+    const layerCheckboxes = document.querySelectorAll('.layer-checkbox');
+    
+    layerCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('click', () => {
+        checkbox.classList.toggle('checked');
+      });
+    });
+    
+    // 5. 标签页切换（通用函数）
+    function initTabNavigation(tabSelector, contentSelector) {
+      const tabs = document.querySelectorAll(tabSelector);
+      const contents = document.querySelectorAll(contentSelector);
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // 移除所有标签的active状态
+          tabs.forEach(t => t.classList.remove('active'));
+          // 给当前点击的标签添加active状态
+          tab.classList.add('active');
+          
+          // 隐藏所有标签内容
+          contents.forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // 显示对应标签内容
+          const targetTab = tab.getAttribute('data-tab') || tab.getAttribute('data-modal-tab');
+          const targetContent = document.getElementById(`${contentSelector.replace('.', '')}-${targetTab}`);
+          if (targetContent) {
+            targetContent.classList.add('active');
+          }
+        });
+      });
+    }
+    
+    // 初始化页面内标签页
+    initTabNavigation('.tab-item', '.tab-content');
+    // 初始化弹窗内标签页
+    initTabNavigation('[data-modal-tab]', '.modal .tab-content');
+    
+    // 6. 步骤导航切换
+    const stepItems = document.querySelectorAll('.step');
+    
+    stepItems.forEach(step => {
+      step.addEventListener('click', () => {
+        // 移除所有步骤的active状态
+        stepItems.forEach(s => s.classList.remove('active'));
+        // 给当前点击的步骤添加active状态
+        step.classList.add('active');
+      });
+    });
+    
+    // 7. 审批意见模板点击填充
+    const templateTags = document.querySelectorAll('.template-tag');
+    const modalOpinionText = document.getElementById('modalOpinionText');
+    
+    templateTags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        const opinion = tag.getAttribute('data-opinion');
+        if (modalOpinionText) modalOpinionText.value = opinion;
+      });
+    });
+    
+    // 8. 风险浮窗关闭
+    const closeRiskPopup = document.getElementById('closeRiskPopup');
+    const riskPopup = document.getElementById('riskPopup');
+    
+    if (closeRiskPopup && riskPopup) {
+      closeRiskPopup.addEventListener('click', () => {
+        riskPopup.classList.remove('show');
+      });
+    }
+    
+    // 9. 进入审批工作台按钮
+    const goToApproval = document.getElementById('goToApproval');
+    if (goToApproval) {
+      goToApproval.addEventListener('click', () => {
+        document.querySelector('[data-page="approval-page"]').click();
+      });
+    }
+    
+    // 10. 审批表格按钮交互
+    const acceptBtns = document.querySelectorAll('.btn-accept');
+    const viewBtns = document.querySelectorAll('.btn-view');
+    
+    acceptBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const planId = btn.closest('tr').getAttribute('data-plan');
+        alert(`已受理计划 ${planId}`);
+      });
+    });
+    
+    viewBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const planId = btn.closest('tr').getAttribute('data-plan');
+        alert(`查看计划 ${planId} 详情`);
+      });
+    });
+    
+    // 11. 表格行点击交互
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('click', () => {
+        const planId = row.getAttribute('data-plan');
+        if (planId) {
+          alert(`查看计划 ${planId} 详情`);
+        }
+      });
+    });
+    
+    // 12. 待办项点击交互
+    const statusItems = document.querySelectorAll('.status-item[data-alarm]');
+    statusItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const alarmId = item.getAttribute('data-alarm');
+        alert(`查看告警 ${alarmId} 详情`);
+      });
+    });
+    
+    // 13. KPI卡片点击交互
+    const kpiCards = document.querySelectorAll('.kpi[data-kpi]');
+    kpiCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const kpiName = card.querySelector('h3').textContent;
+        alert(`查看${kpiName}详细统计`);
+      });
+    });
+    
+    // 14. 热力图时间切换
+    const toggleHeatTime = document.getElementById('toggleHeatTime');
+    let isCurrentTime = true;
+    
+    if (toggleHeatTime) {
+      toggleHeatTime.addEventListener('click', () => {
+        isCurrentTime = !isCurrentTime;
+        toggleHeatTime.textContent = isCurrentTime ? '未来2小时' : '当前时段';
+        updateHeatMapData();
+      });
+    }
+    
+    // ==================== 右侧悬浮弹窗交互逻辑 ====================
+    
+    // 通用弹窗控制函数
+    function openRightModal(modalId, overlayId) {
+      const modal = document.getElementById(modalId);
+      const overlay = document.getElementById(overlayId);
+      if (modal && overlay) {
+        modal.classList.add('show');
+        overlay.classList.add('show');
+        // 禁止页面滚动
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    
+    function closeRightModal(modalId, overlayId) {
+      const modal = document.getElementById(modalId);
+      const overlay = document.getElementById(overlayId);
+      if (modal && overlay) {
+        modal.classList.remove('show');
+        overlay.classList.remove('show');
+        // 恢复页面滚动
+        document.body.style.overflow = '';
+      }
+    }
+    
+    // 1. 飞行器详情弹窗
+    const aircraftModalOverlay = document.getElementById('aircraftModalOverlay');
+    const aircraftModal = document.getElementById('aircraftModal');
+    const closeAircraftModal = document.getElementById('closeAircraftModal');
+    
+    if (closeAircraftModal) {
+      closeAircraftModal.addEventListener('click', () => {
+        closeRightModal('aircraftModal', 'aircraftModalOverlay');
+      });
+    }
+    
+    if (aircraftModalOverlay) {
+      aircraftModalOverlay.addEventListener('click', () => {
+        closeRightModal('aircraftModal', 'aircraftModalOverlay');
+      });
+    }
+    
+    // 2. 风险校验结果弹窗
+    const checkRiskBtn = document.getElementById('checkRiskBtn');
+    const riskModalOverlay = document.getElementById('riskModalOverlay');
+    const riskModal = document.getElementById('riskModal');
+    const closeRiskModal = document.getElementById('closeRiskModal');
+    
+    if (checkRiskBtn) {
+      checkRiskBtn.addEventListener('click', () => {
+        openRightModal('riskModal', 'riskModalOverlay');
+      });
+    }
+    
+    if (closeRiskModal) {
+      closeRiskModal.addEventListener('click', () => {
+        closeRightModal('riskModal', 'riskModalOverlay');
+      });
+    }
+    
+    if (riskModalOverlay) {
+      riskModalOverlay.addEventListener('click', () => {
+        closeRightModal('riskModal', 'riskModalOverlay');
+      });
+    }
+    
+    // 阻止弹窗内部点击事件冒泡到遮罩层
+    const modals = document.querySelectorAll('.modal-right');
+    modals.forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
+    
+    // ESC键关闭所有弹窗
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeRightModal('aircraftModal', 'aircraftModalOverlay');
+        closeRightModal('riskModal', 'riskModalOverlay');
+        if (userMenu) userMenu.classList.remove('show');
+      }
+    });
+    
+    // ==================== 页面初始化 ====================
+    window.addEventListener('load', () => {
+      // 初始化首页地图
+      initMainMap();
+      initHeatMap();
+      
+      // 每5秒更新一次热力图数据（模拟实时更新）
+      setInterval(updateHeatMapData, 5000);
+    });
+  </script>
+</body>
+</html>

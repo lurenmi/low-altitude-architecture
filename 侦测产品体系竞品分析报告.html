@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>低空侦测产品体系竞品分析报告</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --paper: #ffffff;
+      --ink: #172033;
+      --muted: #61708a;
+      --line: #dfe6f0;
+      --blue: #2367d1;
+      --teal: #0f8f8c;
+      --green: #2f855a;
+      --amber: #b7791f;
+      --red: #c53030;
+      --slate: #243447;
+      --soft-blue: #eaf1ff;
+      --soft-teal: #e7f7f5;
+      --soft-amber: #fff5dc;
+      --soft-red: #fff0f0;
+      --shadow: 0 18px 44px rgba(39, 55, 77, .12);
+      --font: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(35,103,209,.12), transparent 34%),
+        linear-gradient(225deg, rgba(15,143,140,.10), transparent 32%),
+        var(--bg);
+      line-height: 1.72;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 34px 28px 56px; }
+    .hero {
+      min-height: 360px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+    .hero-main, .panel, .card, .source-box {
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(223,230,240,.92);
+      box-shadow: var(--shadow);
+    }
+    .hero-main { padding: 38px 42px; border-radius: 18px; }
+    .eyebrow { color: var(--teal); font-weight: 800; letter-spacing: .06em; font-size: 13px; }
+    h1 { margin: 10px 0 12px; font-size: clamp(34px, 4.4vw, 58px); line-height: 1.08; letter-spacing: 0; }
+    h2 { margin: 0 0 16px; font-size: 28px; line-height: 1.25; }
+    h3 { margin: 0 0 10px; font-size: 20px; }
+    p { margin: 0 0 12px; }
+    .lead { font-size: 18px; color: #334155; max-width: 900px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--soft-blue);
+      color: #1f4f9f;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .hero-side {
+      display: grid;
+      gap: 14px;
+    }
+    .metric {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .metric .num { font-size: 34px; font-weight: 900; color: var(--blue); line-height: 1.1; }
+    .metric .label { color: var(--muted); font-size: 13px; }
+    .section { margin-top: 22px; }
+    .panel { border-radius: 18px; padding: 26px; margin-bottom: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card { border-radius: 14px; padding: 20px; box-shadow: none; }
+    .card strong { color: var(--slate); }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      margin: 0 6px 6px 0;
+      border-radius: 8px;
+      background: #eef2f7;
+      color: #3b4a61;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; background: var(--paper); }
+    th, td { border: 1px solid var(--line); padding: 12px 13px; vertical-align: top; text-align: left; }
+    th { background: #edf3fb; color: #25364d; font-weight: 800; }
+    tr:nth-child(even) td { background: #fafcff; }
+    .score { font-weight: 900; color: var(--blue); white-space: nowrap; }
+    .risk { color: var(--red); font-weight: 800; }
+    .ok { color: var(--green); font-weight: 800; }
+    .warn { color: var(--amber); font-weight: 800; }
+    .note {
+      padding: 14px 16px;
+      border-left: 5px solid var(--teal);
+      background: var(--soft-teal);
+      border-radius: 10px;
+      color: #214a4b;
+    }
+    .quote {
+      padding: 14px 16px;
+      border-left: 5px solid var(--amber);
+      background: var(--soft-amber);
+      border-radius: 10px;
+      color: #4f3b17;
+    }
+    .source-box { border-radius: 16px; padding: 22px; }
+    .source-box ol { margin: 8px 0 0 22px; padding: 0; }
+    .source-box li { margin-bottom: 8px; }
+    .small { font-size: 13px; color: var(--muted); }
+    .kbd { font-family: Consolas, Menlo, monospace; background: #eef2f7; padding: 2px 6px; border-radius: 6px; }
+    @media (max-width: 960px) {
+      .hero, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .wrap { padding: 18px 14px 42px; }
+      .hero-main, .panel { padding: 22px; }
+      table { font-size: 14px; }
+      th, td { padding: 9px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      .hero-main, .panel, .card, .metric, .source-box { box-shadow: none; }
+      a { color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">COMPETITOR ANALYSIS · LOW-ALTITUDE DETECTION</div>
+        <h1>低空侦测产品体系竞品分析报告</h1>
+        <p class="lead">面向“低空安全运营能力包”立项与产品化决策。本报告只采用公开可核验信息：政策法规、民航统计、公示采购样本和厂商官网；对竞品能力的判断均标注为“公开能力推断”，不把营销口径直接当作验收指标。</p>
+        <div class="meta">
+          <span class="pill">报告日期：2026-05-21</span>
+          <span class="pill">对象：浙大启真低空侦测产品体系</span>
+          <span class="pill">口径：侦测、识别、研判、联动、审计、运营</span>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="metric">
+          <div class="num">328.7万架</div>
+          <div class="label">民航局披露：截至 2025 年底全国注册无人机数量</div>
+        </div>
+        <div class="metric">
+          <div class="num">4530.29万小时</div>
+          <div class="label">2025 年全国无人机累计飞行小时，低空治理从“偶发安防”进入“常态运行”</div>
+        </div>
+        <div class="metric">
+          <div class="num">46个</div>
+          <div class="label">全国低空飞行服务站，覆盖 23 个省级地区，平台和侦测将逐步耦合</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>一、核心结论</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. 侦测市场正在从“设备采购”升级为“治理闭环”</h3>
+          <p>公开采购样本显示，客户仍会采购单套探测识别、反制或警用无人机装备，但项目名称和交付内容越来越常见“侦测及反制装备”“无人机反制系统”“智能管控平台”等组合式表达。真正可复制的产品不应停在硬件参数，而要把设备告警转为工单、处置、证据和复盘。</p>
+        </div>
+        <div class="card">
+          <h3>2. 国内重点竞品已进入“城市级低空安全”叙事</h3>
+          <p>杰能科世、雷擎科技等厂商公开页面已不只强调反制设备，而是强调城市级监管、重大活动保障、重点区域防护、多源感知和低空安全综合解决方案。这意味着浙大启真若只做设备集成，会被拖入参数竞争；若做运营闭环，则有机会形成差异化。</p>
+        </div>
+        <div class="card">
+          <h3>3. 国际成熟产品的共同方向是开放、融合、自动化</h3>
+          <p>D-Fend、SRC、DroneShield 等强调 RF、雷达、光电、电子战、C2 平台和开放 API 的组合。可学习的不是某一种反制方式，而是“多传感器融合 + 指挥控制 + 快速部署 + 持续软件更新”的工程化方法。</p>
+        </div>
+        <div class="card">
+          <h3>4. 最稳的产品定位：平台主导、设备开放、运营兜底</h3>
+          <p>建议浙大启真定位为“低空侦测与安全运营产品体系”，前端设备采用多厂商可替换生态，核心沉淀在规则引擎、目标融合、告警可信度、联动处置、审计留痕、运营报表和试点方法论。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>二、事实依据与市场约束</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>公开事实</th>
+            <th>对侦测产品的含义</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>监管制度</td>
+            <td>《无人驾驶航空器飞行管理暂行条例》自 2024-01-01 施行；CCAR-92 明确民用无人驾驶航空器运行安全管理框架；GB 46750-2025、GB 46761-2025 于 2026-05-01 实施。</td>
+            <td>合规无人机的实名、识别、运行数据会越来越标准化，但存量、改装、关闭识别、弱信号、复杂电磁环境仍需要多源侦测。</td>
+          </tr>
+          <tr>
+            <td>飞行规模</td>
+            <td>民航局 2025 统计公报披露，注册无人机 328.7 万架，全年飞行 4530.29 万小时，低空飞行服务站 46 个、覆盖 23 个省级地区。</td>
+            <td>低空安全不再是临时安保问题，而是高频运行秩序问题；侦测系统必须支持常态值守、审计和运维。</td>
+          </tr>
+          <tr>
+            <td>产业政策</td>
+            <td>工信部等四部门《通用航空装备创新应用实施方案（2024-2030年）》提出到 2030 年通用航空装备全面融入生产生活各领域。</td>
+            <td>低空基础设施、场景应用和安全保障将同步建设；侦测产品应跟低空平台、园区、起降点、应急体系联动。</td>
+          </tr>
+          <tr>
+            <td>采购锚点</td>
+            <td>公开中标样本从 28.8 万元级反制系统、36 万元级探测识别设备，到 225 万元、244.88 万元级警用无人机及反制装备组合不等；广州公安 2025 年无人机反制设备招标预算 360 万元。</td>
+            <td>市场存在“单点设备、组合装备、系统工程、运营服务”多层价格带。产品包必须分层报价，避免只有一个大而全方案。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">真实性口径：上表金额为公开采购公告样本，不代表全国均价；厂商参数来自官网公开页面，不等同于实测验收结果；本报告的“强弱判断”是基于公开材料的产品化推断。</p>
+    </section>
+
+    <section class="panel">
+      <h2>三、产品体系拆解：客户真正买的不是“看见一架无人机”</h2>
+      <div class="grid-3">
+        <div class="card"><h3>感知层</h3><p>RF 侦测、Remote ID/运行识别接收、雷达、光电/红外、声学、5G-A 通感、便携/车载/固定站。关键指标是覆盖、误报漏报、弱信号、复杂环境适应。</p></div>
+        <div class="card"><h3>融合研判层</h3><p>多源目标关联、轨迹重建、白名单/黑名单、禁限飞区、行为模式、风险分级、告警可信度。关键是把多设备告警变成一个业务目标。</p></div>
+        <div class="card"><h3>联动处置层</h3><p>告警确认、工单派发、短信/电话/政务消息、现场回传、反制授权、处置闭环。关键是角色、权限、留痕和响应时效。</p></div>
+        <div class="card"><h3>运营审计层</h3><p>设备在线率、链路质量、告警趋势、处置时长、误报分析、月报周报、复盘档案、SLA。关键是把项目交付变成持续服务。</p></div>
+        <div class="card"><h3>平台接口层</h3><p>对接低空飞行服务平台、公安/应急/园区平台、视频平台、GIS/CIM、机库、第三方设备。关键是开放 API 和统一数据模型。</p></div>
+        <div class="card"><h3>场景产品层</h3><p>园区版、活动版、重点目标版、城市治理版、应急机动版、机场净空协同版。关键是用不同价格带覆盖不同预算和验收逻辑。</p></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>四、国内竞品矩阵</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>竞品/类型</th>
+            <th>公开能力与定位</th>
+            <th>优势判断</th>
+            <th>短板或尽调点</th>
+            <th>对浙大启真的启示</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>杰能科世</strong><br><span class="tag">城市级低空安全</span><span class="tag">平台+设备+服务</span></td>
+            <td>官网称以“世盾中央大脑”为核心，面向城市级低空无人机公共安全监管、重点区域、重大活动和低空监视融合。不同官网页面披露的服务规模口径存在“300+ / 400+战略合作单位”“1万 / 1.5万平方公里监视网络”差异，应以后续尽调为准。</td>
+            <td class="ok">叙事成熟，城市级治理和重大活动场景包装强，杭州本地竞争相关性高。</td>
+            <td class="warn">公开参数更多偏方案叙述，需尽调设备自研比例、接口开放性、项目复用率、运维成本。</td>
+            <td>必须正面建立“城市级治理闭环”表达，并形成可演示、可报价、可验收的园区版/城市版产品包。</td>
+          </tr>
+          <tr>
+            <td><strong>雷擎科技</strong><br><span class="tag">反无人机装备</span><span class="tag">侦干一体</span></td>
+            <td>官网展示全频段侦干一体反制枪、无人机反制产品中心等，强调低空安全系统方案、侦测反制和导航诱骗技术。</td>
+            <td class="ok">装备谱系清晰，适合公安、重点目标、活动保障等强安防项目。</td>
+            <td class="warn">若进入城市运营类项目，平台、工单、审计、低空服务平台联动能力需要进一步核实。</td>
+            <td>可作为硬件生态合作或直接竞品；启真要避免和其比单机参数，重点比“平台化运营”。</td>
+          </tr>
+          <tr>
+            <td><strong>无影追踪科技</strong><br><span class="tag">RF 侦测识别</span><span class="tag">中小范围防护</span></td>
+            <td>官网称提供无人机侦测、识别、定位和反制解决方案，覆盖大疆、道通等主流机型，页面标注 3 公里侦测范围。</td>
+            <td class="ok">产品表达直接，适合园区、活动、重点区域的轻量部署。</td>
+            <td class="warn">3 公里为官网展示口径，需按地形、电磁环境、机型、天线架设高度做现场验证。</td>
+            <td>轻量试点可参考其快速部署方式，但启真应补齐平台联动和长期运营价值。</td>
+          </tr>
+          <tr>
+            <td><strong>灵信信息 LX-WDS1020</strong><br><span class="tag">协议破解</span><span class="tag">同频干扰</span></td>
+            <td>官网称采用认知无线电协议破解技术及同频干扰技术，面向机场、监狱、重要基地、体育场馆及重大活动等低空安全防御。</td>
+            <td class="ok">场景边界明确，适合重点目标防护。</td>
+            <td class="warn">涉及反制必须关注无线电、授权、处置记录和误伤风险；城市级常态运行要慎用自动反制。</td>
+            <td>启真产品应把“反制授权流程”和“双人确认/留痕”做成强功能，而不是简单接入反制按钮。</td>
+          </tr>
+          <tr>
+            <td><strong>Skycope SkyCore</strong><br><span class="tag">RF/AI 模块</span><span class="tag">生态集成</span></td>
+            <td>官网称覆盖 450+ 机型、近零误报、支持 120+ 无人机同时侦测、360 度被动探测，常规 1-2 公里、加配可到 10 公里。</td>
+            <td class="ok">模块化、轻量化和持续软件更新逻辑清晰，适合被集成进伙伴产品。</td>
+            <td class="warn">参数需现场复核；国外/跨境供应、数据合规、国产化替代需评估。</td>
+            <td>启真可学习“能力模块 + 开放集成”的产品方式，沉淀自己的设备适配层。</td>
+          </tr>
+          <tr>
+            <td><strong>大疆 AeroScope</strong><br><span class="tag">历史标杆</span><span class="tag">厂商生态识别</span></td>
+            <td>DJI 下载中心仍保留 AeroScope 文档，页面显示 DJI Assistant 2 for AeroScope 更新已停止；多方公开报道显示 AeroScope 已停止生产/销售。</td>
+            <td class="ok">曾经证明“厂商协议级识别”在实战中有价值。</td>
+            <td class="risk">单一厂商生态依赖不可持续，且无法覆盖非大疆、改装机和关闭识别设备。</td>
+            <td>必须坚持多协议、多厂商、多传感器，不把产品押在单一路线。</td>
+          </tr>
+          <tr>
+            <td><strong>低空平台型厂商</strong><br><span class="tag">中科星图等</span><span class="tag">低空云/数字孪生</span></td>
+            <td>公开信息显示平台型厂商强调空域网格、低空数据、飞行服务、规划仿真和城市级低空基础设施。</td>
+            <td class="ok">空域、GIS、仿真和平台底座强，容易进入政府低空经济主平台。</td>
+            <td class="warn">前端侦测站网、现场处置和长期值守未必是强项，具体要看项目实施。</td>
+            <td>启真可把侦测作为低空平台的“现场感知与安全运营插件”，与数字孪生平台形成组合。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>五、国际竞品观察</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>竞品</th>
+            <th>公开能力</th>
+            <th>可学习点</th>
+            <th>中国本地化限制</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>D-Fend Solutions EnforceAir</strong></td>
+            <td>官网称以 RF cyber takeover 为核心，支持侦测、定位、识别和接管落地，可单独、多层或集成使用，并提供开放 API。</td>
+            <td>强调“安全可控的非动能处置”和开放集成，适合高价值敏感场景。</td>
+            <td>反制方式、无线电管理、数据安全、跨境供应链和适配国产无人机生态需要重新评估。</td>
+          </tr>
+          <tr>
+            <td><strong>SRC Silent Archer</strong></td>
+            <td>官网称具备检测、跟踪、分类、识别和处置能力，组件包括空中监视雷达、电子战系统、测向单元、EO/IR 相机和用户显示。</td>
+            <td>典型多传感器、分层防御、军警安保一体化架构。</td>
+            <td>偏防务体系，民用城市级部署需考虑成本、合规和授权边界。</td>
+          </tr>
+          <tr>
+            <td><strong>DroneShield</strong></td>
+            <td>官网称聚焦 RF 感知、AI、传感器融合、电子战，DroneSentry-X Mk2 支持移动、固定和弹性部署，并可识别未加密 Remote ID 信号。</td>
+            <td>产品线、软件订阅、C2 平台和多部署形态组合成熟。</td>
+            <td>中国市场需考虑国产化、数据合规、无线电反制许可和售后体系。</td>
+          </tr>
+          <tr>
+            <td><strong>Dedrone / 城市级侦测</strong></td>
+            <td>公开资料显示 Dedrone 曾推出 City-Wide Drone Detection，强调城市级无人机侦测网络和执法/安保访问。</td>
+            <td>城市级服务网络不是单点设备，而是“覆盖网络 + 平台服务 + 多方共享”。</td>
+            <td>中国的 UOM/USS、政务云、公安应急协同和数据安全体系不同，需要本地流程重构。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>六、价格带与采购打法</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>产品包</th>
+            <th>典型客户</th>
+            <th>公开样本参考</th>
+            <th>建议报价/交付逻辑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>轻量侦测包</strong></td>
+            <td>单园区、小型活动、学校/场馆、重点单位</td>
+            <td>28.8 万元、36 万元级样本说明存在小额设备采购带。</td>
+            <td>以 1-2 套侦测设备 + 简版平台 + 值守报表交付，目标是快速打样和形成客户证据。</td>
+          </tr>
+          <tr>
+            <td><strong>园区安全运营包</strong></td>
+            <td>低空产业园、物流园、科创园、大学科技园</td>
+            <td>225 万元级警用无人机及反制设备组合显示“设备组合采购”成立。</td>
+            <td>固定点 + 机动点 + 平台 + 工单 + 月报，突出合法飞行和异常飞行并管。</td>
+          </tr>
+          <tr>
+            <td><strong>重大活动保障包</strong></td>
+            <td>赛事、会展、文旅活动、临时安保</td>
+            <td>244.88 万元、360 万元级样本说明活动/公安场景具备中等预算空间。</td>
+            <td>以租赁/服务方式切入，强调 72 小时快速部署、临时规则、应急联动、活动复盘。</td>
+          </tr>
+          <tr>
+            <td><strong>城市治理扩展包</strong></td>
+            <td>低空专班、公安、应急、城投交投、低空平台公司</td>
+            <td>公开采购小样本不足以代表城市级总价，应采用分期测算和点位扩容模型。</td>
+            <td>一期先做“1 个核心区 + 2 个园区 + 1 个敏感区”，验收后滚动扩面。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>七、浙大启真差异化路线</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>产品主张</h3>
+          <p><strong>不卖“设备清单”，卖“低空安全运营闭环”。</strong>硬件负责看见目标，平台负责判断风险，流程负责联动处置，运营负责持续变好。</p>
+          <p><span class="tag">多源感知</span><span class="tag">融合研判</span><span class="tag">工单闭环</span><span class="tag">审计留痕</span><span class="tag">运营报表</span></p>
+        </div>
+        <div class="card">
+          <h3>首期最小可行产品</h3>
+          <p>优先做 3 个可演示闭环：夜间黑飞、活动保障、敏感区越界。每个闭环都要有固定输入、固定角色、固定输出和固定验收指标。</p>
+          <p>首期不要追求全城覆盖，先把“发现-研判-派单-处置-归档-复盘”跑稳定。</p>
+        </div>
+        <div class="card">
+          <h3>设备生态策略</h3>
+          <p>建立设备适配白名单：RF、RID、雷达、光电、车载、便携、反制设备均以标准数据模型接入。对外强调开放兼容，对内沉淀适配器和质量评分。</p>
+        </div>
+        <div class="card">
+          <h3>竞争护城河</h3>
+          <p>真正难复制的不是界面，而是场景规则、告警可信度、处置流程、部门协同、审计材料、运维机制和可复用项目包。</p>
+        </div>
+      </div>
+      <p class="quote">建议立项口径：浙大启真低空侦测与安全运营产品体系 = 前端侦测站网 + 多源融合研判平台 + 联动处置工作流 + 运营审计服务 + 场景产品包。</p>
+    </section>
+
+    <section class="source-box">
+      <h2>主要来源</h2>
+      <ol>
+        <li>中国民航局：《<a href="https://www.caac.gov.cn/XWZX/MHYW/202604/t20260417_230603.html">民航局发布《2025年民航行业发展统计公报》</a>》及 PDF 公报。</li>
+        <li>工业和信息化部等四部门：《<a href="https://wap.miit.gov.cn/zwgk/zcwj/wjfb/tz/art/2024/art_4ce8d09c15ee4fb1aefc3d5dfbbb6584.html">通用航空装备创新应用实施方案（2024-2030年）</a>》。</li>
+        <li>司法部法规库：《<a href="https://xzfg.moj.gov.cn/law/download?LawID=1663&type=pdf">无人驾驶航空器飞行管理暂行条例</a>》。</li>
+        <li>中国政府采购网：<a href="https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202504/t20250415_24445260.htm">宜兴 36 万元样本</a>、<a href="https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202503/t20250328_24369730.htm">新疆 28.8 万元样本</a>、<a href="https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202503/t20250313_24294717.htm">文山 225 万元样本</a>、<a href="https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202408/t20240830_23040118.htm">深圳福田 244.88 万元样本</a>、<a href="https://www.ccgp.gov.cn/cggg/dfgg/gkzb/202502/t20250218_24179718.htm">广州 360 万元预算样本</a>。</li>
+        <li>厂商官网：<a href="https://www.zjsst.com/">杰能科世</a>、<a href="https://www.hzragine.com/">雷擎科技</a>、<a href="https://www.radiotrack.cn/">无影追踪</a>、<a href="https://www.lingxin-tech.com/products/lx_wds1020.html">灵信信息</a>、<a href="https://www.skycope.com/products/skycore">Skycope SkyCore</a>、<a href="https://www.dji.com/downloads/products/aeroscope">DJI AeroScope 下载中心</a>。</li>
+        <li>国际厂商官网：<a href="https://d-fendsolutions.com/enforceair/">D-Fend EnforceAir</a>、<a href="https://www.srcinc.com/products/counter-uas/silent-archer-counter-uas.html">SRC Silent Archer</a>、<a href="https://www.droneshield.com/home">DroneShield</a>。</li>
+      </ol>
+      <p class="small">注：本报告为公开资料研究版，不包含涉密、未公开合同、内部报价或厂商未披露测试数据。</p>
+    </section>
+  </main>
+</body>
+</html>

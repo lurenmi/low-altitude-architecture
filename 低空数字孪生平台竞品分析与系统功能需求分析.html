@@ -1,0 +1,3386 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>低空数字孪生平台竞品分析与系统功能需求分析</title>
+  <style>
+    :root{
+      --bg:#07090d;
+      --panel:#11161f;
+      --panel2:#151c27;
+      --panel3:#1d2531;
+      --line:#2e3744;
+      --text:#edf2f8;
+      --muted:#bfd0e2;
+      --dim:#8897aa;
+      --yellow:#ffd21f;
+      --yellow2:#f7a817;
+      --cyan:#00d9ff;
+      --green:#2ee87b;
+      --red:#ff5a5f;
+      --blue:#6aa7ff;
+      --shadow:0 24px 70px rgba(0,0,0,.34);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255,210,31,.14), transparent 20rem),
+        radial-gradient(circle at 84% 8%, rgba(0,217,255,.10), transparent 18rem),
+        linear-gradient(180deg, #05070a 0%, #07090d 44%, #090b11 100%);
+      font-family:"Microsoft YaHei","PingFang SC","Segoe UI",Arial,sans-serif;
+      line-height:1.66;
+    }
+    a{color:var(--yellow);text-decoration:none}
+    a:hover{text-decoration:underline}
+    button,input,textarea,select{font:inherit}
+    .page,.shell{max-width:1580px;margin:0 auto}
+    #particles,.grid-bg{
+      position:fixed;inset:0;pointer-events:none;z-index:0
+    }
+    #particles{opacity:.55;mix-blend-mode:screen}
+    .grid-bg{
+      opacity:.30;
+      background-image:
+        linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:linear-gradient(180deg, black, transparent 84%);
+    }
+    header,main,footer{position:relative;z-index:1}
+    header{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(7,9,13,.84);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar{
+      max-width:1580px;
+      margin:0 auto;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:18px;padding:12px 22px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .brand-mark{
+      width:28px;height:28px;border:2px solid var(--yellow);transform:rotate(45deg);
+      box-shadow:0 0 22px rgba(255,210,31,.34);position:relative;flex:0 0 auto
+    }
+    .brand-mark::after{content:"";position:absolute;inset:7px;background:var(--yellow)}
+    .brand span:last-child{letter-spacing:0}
+    .header-meta{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+    .header-meta span{
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid rgba(255,255,255,.10);border-radius:999px;
+      padding:6px 10px;font-size:12px;color:#dce6f1;background:rgba(255,255,255,.04)
+    }
+    .header-meta b{color:var(--yellow)}
+    header .shell{
+      height:auto;
+      min-height:0;
+      display:flex;
+      flex-direction:row;
+    }
+    .dashboard{
+      padding:16px 18px 26px;
+    }
+    .shell{
+      display:flex;flex-direction:column;gap:14px;
+    }
+    .shell-head{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;align-items:end;
+    }
+    .hero-copy{
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.08), transparent 34%),
+        linear-gradient(180deg, rgba(17,22,31,.96), rgba(10,13,19,.96));
+      border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);
+      padding:18px 20px 16px;min-width:0
+    }
+    .eyebrow{
+      color:var(--yellow);font-size:12px;font-weight:900;
+      letter-spacing:2px;text-transform:uppercase;margin-bottom:10px
+    }
+    h1{
+      margin:0;
+      font-size:48px;
+      line-height:1.06;
+      letter-spacing:0;
+    }
+    h1 span,.grad-text{
+      background:linear-gradient(90deg, var(--yellow), #fff0a0 46%, var(--cyan));
+      -webkit-background-clip:text;background-clip:text;color:transparent
+    }
+    .lead{
+      margin:14px 0 0;
+      max-width:900px;
+      color:#cdd8e6;font-size:15px;line-height:1.76
+    }
+    .hero-stats{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px
+    }
+    .stat{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:8px;padding:12px 12px 11px;min-width:0
+    }
+    .stat b{display:block;color:var(--yellow);font-size:22px;line-height:1.1}
+    .stat span{display:block;margin-top:5px;color:#d7e0eb;font-size:12px;line-height:1.45}
+    .board-tabs{
+      display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end
+    }
+    .board-tab,.chip,.subtab,.action{
+      cursor:pointer;border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);color:#d9e2ee;
+      border-radius:8px;padding:9px 12px;font-weight:800;font-size:13px;
+      transition:background .16s ease,border-color .16s ease,transform .16s ease,color .16s ease
+    }
+    .board-tab:hover,.chip:hover,.subtab:hover,.action:hover{transform:translateY(-1px);border-color:rgba(255,210,31,.45)}
+    .board-tab.active{background:var(--yellow);color:#07090d;border-color:var(--yellow)}
+    .shell-actions{
+      display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end
+    }
+    .action.primary{background:var(--yellow);color:#07090d;border-color:var(--yellow)}
+    .action.secondary{background:rgba(0,217,255,.08);border-color:rgba(0,217,255,.28)}
+    .view-stack{
+      background:linear-gradient(180deg, rgba(17,22,31,.76), rgba(10,13,19,.58));
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:10px;box-shadow:var(--shadow);
+      overflow:visible;
+      scroll-margin-top:86px;
+    }
+    .view{
+      display:none;padding:16px;
+      overflow:visible
+    }
+    .view.active{display:block}
+    .view-head{
+      display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:14px
+    }
+    .view-kicker{
+      color:var(--yellow);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase
+    }
+    h2{
+      margin:6px 0 0;
+      font-size:34px;line-height:1.18;letter-spacing:0
+    }
+    .view-desc{
+      max-width:820px;color:#c5d1df;font-size:14px;line-height:1.74
+    }
+    .panel{
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.07), transparent 38%),
+        linear-gradient(180deg, rgba(21,28,39,.98), rgba(10,13,19,.98));
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      min-width:0;min-height:0;
+    }
+    .panel h3,.panel h4{margin:0}
+    .overview-grid{
+      display:grid;
+      grid-template-columns:1.12fr .88fr;
+      gap:16px;
+      min-height:0
+    }
+    .big-panel{padding:18px}
+    .compact-stack{display:grid;gap:16px;min-width:0}
+    .stack-panel{padding:16px}
+    .stack-panel h3{font-size:18px;color:var(--yellow);margin-bottom:8px}
+    .stack-panel p,.stack-panel li{color:#c6d2e1;font-size:13.5px;line-height:1.7}
+    .stack-panel ul{margin:10px 0 0;padding-left:18px}
+    .signal-board{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:12px
+    }
+    .signal{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:8px;
+      padding:12px 12px 11px;
+      min-height:118px
+    }
+    .signal b{display:block;color:var(--yellow);font-size:16px;margin-bottom:6px}
+    .signal span{display:block;color:#c6d2e1;font-size:13px;line-height:1.68}
+    .mini-diagram{
+      margin-top:14px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px;
+      overflow:hidden
+    }
+    .metric-strip{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px
+    }
+    .metric{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:8px;
+      padding:12px 12px 10px;
+      min-width:0
+    }
+    .metric b{display:block;color:var(--yellow);font-size:20px;line-height:1.1}
+    .metric span{display:block;color:#d7e0eb;font-size:12px;line-height:1.5;margin-top:4px}
+    .atlas-grid{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:16px
+    }
+    .map-panel,.side-panel,.cap-panel,.strategy-panel,.roadmap-panel,.media-panel{
+      padding:16px
+    }
+    .map-toolbar,.cap-tabs,.region-tabs,.media-tabs{
+      display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px
+    }
+    .chip.active,.subtab.active{background:var(--yellow);color:#07090d;border-color:var(--yellow)}
+    .map-shell{
+      position:relative;
+      min-height:540px;
+      overflow:hidden;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,210,31,.10), transparent 45%),
+        linear-gradient(180deg, rgba(17,22,31,.96), rgba(9,12,18,.96));
+    }
+    .map-shell svg{width:100%;height:100%;min-height:540px;display:block}
+    .map-note{
+      position:absolute;left:16px;right:16px;bottom:16px;
+      background:rgba(7,9,13,.82);border:1px solid rgba(255,255,255,.10);
+      border-radius:8px;padding:10px 12px;color:#c8d4e2;font-size:12px;line-height:1.6
+    }
+    .map-legend{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px
+    }
+    .legend-card{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:8px;
+      padding:10px 10px 9px;
+      min-width:0
+    }
+    .legend-card b{display:block;color:var(--yellow);font-size:18px;line-height:1.1}
+    .legend-card span{display:block;color:#d7e0eb;font-size:12px;margin-top:4px}
+    .atlas-right{
+      display:grid;
+      grid-template-rows:auto auto auto;
+      gap:12px;
+    }
+    .atlas-right .side-panel:last-child{
+      display:flex;
+      flex-direction:column;
+    }
+    .region-rail{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:8px
+    }
+    .region-card{
+      cursor:pointer;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:8px;
+      padding:12px 11px;
+      min-width:0;
+      transition:transform .16s ease,border-color .16s ease;
+    }
+    .region-card:hover{transform:translateY(-1px);border-color:rgba(255,210,31,.45)}
+    .region-card.active{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(255,210,31,.24) inset}
+    .region-card b{display:block;color:var(--yellow);font-size:20px;line-height:1.1}
+    .region-card span{display:block;color:#d7e0eb;font-size:12px;line-height:1.45;margin-top:4px}
+    .case-list{
+      display:grid;gap:10px;padding-right:8px;
+      max-height:620px;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(255,210,31,.72) rgba(255,255,255,.08)
+    }
+    .case-list::-webkit-scrollbar{width:8px}
+    .case-list::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:999px}
+    .case-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--yellow),var(--yellow2));border-radius:999px}
+    .case-item{
+      width:100%;text-align:left;cursor:pointer;font-family:inherit;
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.06), transparent 36%),
+        rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px 12px 11px;
+      min-width:0;
+    }
+    .case-item:hover,.case-item:focus{outline:none;border-color:rgba(255,210,31,.55)}
+    .case-top{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-start
+    }
+    .case-item h4{margin:0;font-size:16px;line-height:1.35;color:#f8fbff}
+    .badge{
+      flex:0 0 auto;
+      color:#07090d;background:var(--yellow);font-size:11px;font-weight:900;
+      border-radius:4px;padding:3px 7px;white-space:nowrap
+    }
+    .case-meta{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px
+    }
+    .case-meta div{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:6px;padding:8px 8px 7px;min-width:0
+    }
+    .case-meta b{display:block;color:var(--yellow);font-size:12px;margin-bottom:3px}
+    .case-meta span{display:block;color:#cfd9e6;font-size:12px;line-height:1.5}
+    .case-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .case-tags span{
+      display:inline-flex;align-items:center;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:999px;
+      padding:3px 7px;
+      color:#d7e0eb;font-size:11px
+    }
+    .amount-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,210,31,.22);
+      background:rgba(255,210,31,.08);
+      color:var(--yellow);
+      font-size:12px;
+      font-weight:900
+    }
+    .service-line{
+      margin-top:8px;
+      color:#c6d2e1;
+      font-size:12.5px;
+      line-height:1.55;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden
+    }
+    .bubble-legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px
+    }
+    .bubble-legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      color:#d7e0eb;
+      font-size:12px
+    }
+    .bubble-dot{display:inline-block;border-radius:50%;background:var(--yellow);box-shadow:0 0 12px rgba(255,210,31,.65)}
+    .legend-title{
+      margin-top:12px;
+      color:#f8fbff;
+      font-size:12px;
+      font-weight:900
+    }
+    .viz-legend,.chart-legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px
+    }
+    .viz-legend span,.chart-legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:999px;
+      padding:5px 8px;
+      color:#d7e0eb;
+      font-size:11px;
+      line-height:1.3
+    }
+    .legend-line{
+      display:inline-block;
+      width:24px;
+      height:8px;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--yellow),var(--cyan))
+    }
+    .legend-cell{
+      display:inline-block;
+      width:16px;
+      height:16px;
+      border-radius:4px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,210,31,.22)
+    }
+    .legend-dot{
+      display:inline-block;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--yellow);
+      box-shadow:0 0 10px rgba(255,210,31,.54)
+    }
+    .legend-dot.cyan{background:var(--cyan);box-shadow:0 0 10px rgba(0,217,255,.48)}
+    .legend-dot.green{background:var(--green);box-shadow:0 0 10px rgba(46,232,123,.44)}
+    .legend-dot.orange{background:var(--yellow2);box-shadow:0 0 10px rgba(247,168,23,.48)}
+    .legend-dot.blue{background:var(--blue);box-shadow:0 0 10px rgba(106,167,255,.48)}
+    .legend-note{
+      margin:8px 0 0;
+      color:#9fb0c3;
+      font-size:11px;
+      line-height:1.55
+    }
+    .case-focus{
+      display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start
+    }
+    .focus-panel{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px 12px 11px;
+      min-width:0
+    }
+    .focus-panel h3{margin:0 0 7px;color:var(--yellow);font-size:17px}
+    .focus-panel p,.focus-panel li{color:#c6d2e1;font-size:13.5px;line-height:1.7}
+    .focus-panel ul{margin:0;padding-left:18px}
+    .cap-body{
+      display:grid;
+      grid-template-columns:.92fr 1.08fr;
+      gap:16px
+    }
+    .cap-left,.cap-right,.roadmap-left,.roadmap-right,.media-left,.media-right{
+      display:grid;gap:12px;min-width:0
+    }
+    .cap-stage,.roadmap-stage{
+      display:grid;gap:10px
+    }
+    .cap-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px
+    }
+    .cap-card,.road-card,.iter-card,.media-card,.quote-card{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px 12px 11px;
+      min-width:0;
+    }
+    .cap-card h4,.road-card h4,.iter-card h4,.media-card h4,.quote-card h4{
+      margin:0 0 7px;font-size:16px;color:var(--yellow)
+    }
+    .cap-card p,.road-card p,.iter-card p,.media-card p,.quote-card p{
+      margin:0;color:#c6d2e1;font-size:13.5px;line-height:1.7
+    }
+    .cap-card ul,.road-card ul,.iter-card ul,.media-card ul,.quote-card ul{
+      margin:8px 0 0;padding-left:18px;color:#c6d2e1;font-size:13.5px;line-height:1.7
+    }
+    .cap-visual{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px
+    }
+    .radar-box,.word-box{
+      background:linear-gradient(180deg, rgba(17,22,31,.98), rgba(9,12,18,.98));
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:14px;
+      min-width:0
+    }
+    .radar-box svg,.word-box svg{width:100%;height:auto;display:block}
+    .wordcloud{
+      position:relative;min-height:286px;overflow:hidden;
+      background:radial-gradient(circle at 50% 50%, rgba(255,210,31,.08), transparent 50%), rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px
+    }
+    .wordcloud span{
+      position:absolute;font-weight:900;white-space:nowrap;
+      color:#d6e0ed;text-shadow:0 0 16px rgba(0,0,0,.42)
+    }
+    .w1{left:7%;top:21%;font-size:40px;color:var(--yellow)!important}
+    .w2{left:44%;top:15%;font-size:30px;color:var(--cyan)!important}
+    .w3{left:58%;top:55%;font-size:34px;color:var(--green)!important}
+    .w4{left:14%;top:66%;font-size:26px}
+    .w5{left:72%;top:28%;font-size:23px;color:var(--yellow2)!important}
+    .w6{left:31%;top:41%;font-size:21px}
+    .w7{left:9%;top:11%;font-size:20px}
+    .w8{left:68%;top:74%;font-size:18px}
+    .w9{left:49%;top:78%;font-size:17px}
+    .workbench-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+    }
+    .workbench{
+      background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;padding:12px 12px 11px
+    }
+    .workbench h4{margin:0 0 6px;color:var(--yellow);font-size:16px}
+    .workbench ul{margin:0;padding-left:18px;color:#c6d2e1;font-size:13.5px;line-height:1.7}
+    .iteration-body,.roadmap-body{
+      display:grid;grid-template-columns:1.04fr .96fr;gap:16px
+    }
+    .iteration-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px
+    }
+    .iter-card{
+      cursor:pointer;
+      transition:transform .16s ease,border-color .16s ease
+    }
+    .iter-card:hover,.iter-card.active,.road-card:hover,.road-card.active{
+      transform:translateY(-1px);border-color:rgba(255,210,31,.48)
+    }
+    .iter-card.active,.road-card.active{box-shadow:0 0 0 1px rgba(255,210,31,.22) inset}
+    .iter-card .num,.road-card .num{
+      display:inline-grid;place-items:center;
+      width:30px;height:30px;border-radius:50%;
+      background:var(--yellow);color:#07090d;font-size:14px;font-weight:900;
+      margin-bottom:8px
+    }
+    .inspector{
+      background:linear-gradient(180deg, rgba(17,22,31,.98), rgba(9,12,18,.98));
+      border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0
+    }
+    .inspector h3{margin:0 0 8px;color:var(--yellow);font-size:18px}
+    .inspector p,.inspector li{color:#c6d2e1;font-size:13.5px;line-height:1.75}
+    .inspector ul{margin:8px 0 0;padding-left:18px}
+    .roadmap-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px
+    }
+    .road-card{cursor:pointer}
+    .road-line{
+      height:10px;border-radius:999px;overflow:hidden;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+      margin-top:10px
+    }
+    .road-line span{display:block;height:100%;background:linear-gradient(90deg, var(--yellow), var(--cyan))}
+    .timeline{
+      display:grid;gap:10px
+    }
+    .timeline-row{
+      display:grid;grid-template-columns:120px 1fr;gap:10px;
+      align-items:start;background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px
+    }
+    .timeline-row b{color:var(--yellow);font-size:14px}
+    .timeline-row span{color:#c6d2e1;font-size:13.5px;line-height:1.7}
+    .accept-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px
+    }
+    .accept{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;padding:12px 12px 11px
+    }
+    .accept b{display:block;color:var(--yellow);font-size:14px;margin-bottom:5px}
+    .accept span{display:block;color:#c6d2e1;font-size:13px;line-height:1.7}
+    .media-body{
+      display:grid;grid-template-columns:1.02fr .98fr;gap:16px
+    }
+    .media-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px
+    }
+    .video-card{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;overflow:hidden;min-width:0
+    }
+    .video-frame{aspect-ratio:16/9;background:#000}
+    iframe{width:100%;height:100%;border:0}
+    .video-card .content{padding:12px 12px 11px}
+    .video-card h4{margin:0 0 6px;color:var(--yellow);font-size:16px}
+    .video-card p{margin:0;color:#c6d2e1;font-size:13.5px;line-height:1.7}
+    .sim-video{
+      position:relative;width:100%;height:100%;overflow:hidden;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(255,210,31,.16), transparent 44%),
+        #05070a;
+      background-size:32px 32px,32px 32px,auto,auto
+    }
+    .sim-path{
+      position:absolute;height:2px;background:var(--yellow);box-shadow:0 0 16px var(--yellow);
+      transform-origin:left center
+    }
+    .sim-path.p1{left:9%;top:26%;width:68%;transform:rotate(14deg)}
+    .sim-path.p2{left:18%;top:61%;width:57%;transform:rotate(-17deg);background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+    .sim-drone{
+      position:absolute;width:14px;height:14px;border-radius:50%;
+      background:var(--yellow);box-shadow:0 0 22px var(--yellow);
+      animation:fly 5s linear infinite
+    }
+    .sim-drone.d2{background:var(--cyan);box-shadow:0 0 22px var(--cyan);animation-duration:6.2s;animation-delay:-2s}
+    @keyframes fly{
+      0%{left:10%;top:23%;transform:scale(.8)}
+      45%{left:67%;top:39%;transform:scale(1)}
+      100%{left:84%;top:72%;transform:scale(.8)}
+    }
+    .source-strip{
+      margin-top:12px;display:flex;flex-wrap:wrap;gap:8px
+    }
+    .source-strip a,.source-strip span{
+      display:inline-flex;align-items:center;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:999px;padding:6px 10px;
+      color:#d7e0eb;font-size:12px
+    }
+    .focus-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:16px
+    }
+    .vendor-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      max-height:650px;
+      overflow-y:auto;
+      padding-right:8px;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(255,210,31,.72) rgba(255,255,255,.08)
+    }
+    .vendor-grid::-webkit-scrollbar{width:8px}
+    .vendor-grid::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:999px}
+    .vendor-grid::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--yellow),var(--yellow2));border-radius:999px}
+    .vendor-card{
+      cursor:pointer;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:13px 13px 12px;
+      transition:transform .16s ease,border-color .16s ease
+    }
+    .vendor-card:hover,.vendor-card.active{
+      transform:translateY(-1px);
+      border-color:rgba(255,210,31,.50)
+    }
+    .vendor-card.active{box-shadow:0 0 0 1px rgba(255,210,31,.20) inset}
+    .vendor-card h4{margin:0 0 7px;color:#f8fbff;font-size:16px;line-height:1.35}
+    .vendor-card p{margin:0;color:#c6d2e1;font-size:13px;line-height:1.65}
+    .vendor-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .vendor-tags span{
+      display:inline-flex;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      border-radius:999px;
+      padding:3px 7px;
+      color:#d7e0eb;
+      font-size:11px
+    }
+    .vendor-inspector{
+      background:linear-gradient(180deg, rgba(17,22,31,.98), rgba(9,12,18,.98));
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:16px;
+      min-width:0;
+      max-height:650px;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(255,210,31,.72) rgba(255,255,255,.08)
+    }
+    .vendor-inspector::-webkit-scrollbar{width:8px}
+    .vendor-inspector::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:999px}
+    .vendor-inspector::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--yellow),var(--yellow2));border-radius:999px}
+    .vendor-inspector::after{
+      content:"滚动查看完整案例、评分与来源";
+      position:sticky;
+      bottom:-16px;
+      display:block;
+      margin:12px -16px -16px;
+      padding:8px 16px;
+      background:linear-gradient(180deg, rgba(9,12,18,.72), rgba(9,12,18,.96));
+      border-top:1px solid rgba(255,255,255,.08);
+      color:#9fb0c3;
+      font-size:11px;
+      text-align:right
+    }
+    .vendor-inspector h3{margin:0 0 8px;color:var(--yellow);font-size:20px}
+    .vendor-inspector p,.vendor-inspector li{color:#c6d2e1;font-size:13.5px;line-height:1.72}
+    .vendor-inspector ul{margin:8px 0 0;padding-left:18px}
+    .arch-layers{
+      display:grid;
+      gap:8px;
+      margin-top:12px
+    }
+    .product-arch{
+      margin-top:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:10px;
+      padding:12px
+    }
+    .arch-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px
+    }
+    .arch-title b{color:var(--yellow);font-size:15px}
+    .arch-title span{color:#9fb0c3;font-size:11px}
+    .arch-flow{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:9px
+    }
+    .arch-node{
+      position:relative;
+      min-height:116px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(135deg, rgba(255,210,31,.07), transparent 42%), rgba(7,9,13,.36);
+      border-radius:8px;
+      padding:11px;
+      overflow:hidden
+    }
+    .arch-node::after{
+      content:"";
+      position:absolute;
+      right:-18px;
+      top:50%;
+      width:36px;
+      height:2px;
+      background:linear-gradient(90deg,var(--yellow),transparent);
+      transform:translateY(-50%)
+    }
+    .arch-node:last-child::after{display:none}
+    .arch-node small{
+      display:inline-grid;
+      place-items:center;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:var(--yellow);
+      color:#07090d;
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:8px
+    }
+    .arch-node b{display:block;color:#f8fbff;font-size:14px;margin-bottom:5px}
+    .arch-node span{display:block;color:#c6d2e1;font-size:12px;line-height:1.55}
+    .arch-layer{
+      display:grid;
+      grid-template-columns:112px 1fr;
+      gap:10px;
+      align-items:start;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:10px
+    }
+    .arch-layer b{color:var(--yellow);font-size:13px}
+    .arch-layer span{color:#d7e0eb;font-size:13px;line-height:1.6}
+    .vendor-case-list{
+      display:grid;
+      gap:8px;
+      margin-top:12px
+    }
+    .vendor-case{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:10px
+    }
+    .vendor-case b{display:block;color:#f8fbff;font-size:13px;margin-bottom:4px}
+    .vendor-case span{display:block;color:#c6d2e1;font-size:12.5px;line-height:1.6}
+    .arch-matrix{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px
+    }
+    .arch-matrix-card{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px;
+      min-width:0
+    }
+    .arch-matrix-card h4{margin:0 0 8px;color:#f8fbff;font-size:15px}
+    .arch-matrix-card p{margin:0;color:#c6d2e1;font-size:12.5px;line-height:1.6}
+    .arch-mini{
+      display:grid;
+      gap:6px;
+      margin-top:10px
+    }
+    .arch-mini span{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:6px;
+      background:rgba(255,255,255,.035);
+      padding:7px 8px;
+      color:#d7e0eb;
+      font-size:11px;
+      line-height:1.35
+    }
+    .arch-mini b{color:var(--yellow);font-size:11px;white-space:nowrap}
+    .score-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:12px
+    }
+    .score-item{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:10px
+    }
+    .score-item b{display:block;color:#d7e0eb;font-size:12px;margin-bottom:7px}
+    .score-track{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+    .score-track span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg, var(--yellow), var(--cyan))}
+    .score-item small{display:block;color:var(--yellow);font-size:11px;margin-top:5px;font-weight:900}
+    .tender-summary{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:10px;
+      margin-bottom:12px
+    }
+    .tender-stat{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px
+    }
+    .tender-stat b{display:block;color:var(--yellow);font-size:22px;line-height:1.1}
+    .tender-stat span{display:block;color:#d7e0eb;font-size:12px;line-height:1.45;margin-top:5px}
+    .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .viz-panel{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px}
+    .viz-panel h4{margin:0 0 10px;color:var(--yellow);font-size:14px}
+    .bar-row{display:grid;grid-template-columns:86px 1fr 28px;gap:8px;align-items:center;margin:7px 0}
+    .bar-row b{color:#d7e0eb;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bar-track{height:9px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+    .bar-track span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--yellow),var(--cyan))}
+    .bar-row small{color:var(--yellow);font-size:11px;font-weight:900;text-align:right}
+    .heat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+    .heat-cell{min-height:44px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,210,31,.08);display:grid;place-items:center;text-align:center;padding:6px}
+    .heat-cell b{display:block;color:#07090d;background:var(--yellow);border-radius:999px;padding:1px 7px;font-size:11px}
+    .heat-cell span{display:block;color:#d7e0eb;font-size:11px;margin-top:3px}
+    .appendix-note{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-left:8px;
+      padding:3px 7px;
+      border-radius:999px;
+      background:rgba(255,210,31,.10);
+      border:1px solid rgba(255,210,31,.22);
+      color:var(--yellow);
+      font-size:11px;
+      font-weight:900;
+      vertical-align:middle
+    }
+    .jump-hero{
+      padding:28px 18px 18px
+    }
+    .jump-shell{
+      max-width:1580px;
+      margin:0 auto;
+      display:grid;
+      gap:16px
+    }
+    .jump-title{
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.10), transparent 38%),
+        linear-gradient(180deg, rgba(17,22,31,.98), rgba(10,13,19,.98));
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      padding:24px
+    }
+    .jump-title h1{font-size:42px}
+    .jump-title p{max-width:920px;color:#c6d2e1;font-size:15px;line-height:1.75;margin:12px 0 0}
+    .jump-cards{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px
+    }
+    .jump-card{
+      display:block;
+      min-height:150px;
+      padding:16px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.09);
+      background:linear-gradient(135deg, rgba(255,210,31,.08), transparent 42%), rgba(17,22,31,.96);
+      box-shadow:var(--shadow);
+      text-decoration:none
+    }
+    .jump-card:hover{border-color:rgba(255,210,31,.52);text-decoration:none;transform:translateY(-2px);transition:.16s ease}
+    .jump-card b{display:block;color:var(--yellow);font-size:28px;line-height:1.05;margin-bottom:10px}
+    .jump-card strong{display:block;color:#f8fbff;font-size:18px;margin-bottom:6px}
+    .jump-card span{display:block;color:#c6d2e1;font-size:13px;line-height:1.6}
+    .chapter{
+      max-width:1580px;
+      margin:0 auto;
+      padding:22px 18px;
+      scroll-margin-top:86px
+    }
+    .chapter-head{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:end;
+      margin-bottom:14px
+    }
+    .chapter-head h2{font-size:34px}
+    .chapter-desc{max-width:760px;color:#c6d2e1;font-size:14px;line-height:1.7}
+    .chapter-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:16px
+    }
+    .appendix-grid{
+      grid-template-columns:1fr
+    }
+    .simple-card{
+      background:rgba(17,22,31,.96);
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      padding:16px
+    }
+    .simple-card h3{margin:0 0 12px;color:var(--yellow);font-size:18px}
+    .jump-case-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px
+    }
+    .mini-case{
+      cursor:pointer;
+      text-align:left;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:8px;
+      padding:12px;
+      min-height:116px;
+      color:var(--text)
+    }
+    .mini-case:hover{border-color:rgba(255,210,31,.52)}
+    .mini-case h4{margin:0 0 8px;font-size:15px;color:#f8fbff;line-height:1.35}
+    .mini-case .mini-meta{display:flex;flex-wrap:wrap;gap:6px}
+    .mini-case .mini-meta span{font-size:11px;color:#d7e0eb;border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:3px 7px;background:rgba(255,255,255,.04)}
+    .mini-case b{display:block;color:var(--yellow);font-size:16px;margin-top:8px}
+    .simple-vendor-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px
+    }
+    .simple-vendor{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:13px
+    }
+    .simple-vendor h4{margin:0 0 8px;color:#f8fbff;font-size:16px}
+    .simple-vendor p{margin:0;color:#c6d2e1;font-size:13px;line-height:1.65}
+    .simple-vendor .vendor-tags{margin-top:10px}
+    .jump-page{
+      padding-bottom:18px
+    }
+    .legacy-page{
+      display:none
+    }
+    .jump-title{
+      position:relative;
+      overflow:hidden
+    }
+    .jump-title::after{
+      content:"";
+      position:absolute;
+      right:-80px;
+      top:-120px;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,210,31,.18), transparent 64%);
+      pointer-events:none
+    }
+    .jump-nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:18px
+    }
+    .jump-nav a{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:38px;
+      padding:0 13px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.045);
+      color:#e5edf7;
+      font-size:13px;
+      font-weight:900;
+      text-decoration:none
+    }
+    .jump-nav a:hover{
+      border-color:rgba(255,210,31,.54);
+      background:rgba(255,210,31,.10);
+      color:var(--yellow)
+    }
+    .jump-card{
+      position:relative;
+      overflow:hidden
+    }
+    .jump-card::after{
+      content:"";
+      position:absolute;
+      left:16px;
+      right:16px;
+      bottom:12px;
+      height:3px;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--yellow), transparent)
+    }
+    .chapter-head{
+      padding:0 2px
+    }
+    .chapter-label{
+      color:var(--yellow);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase
+    }
+    .chapter-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end
+    }
+    .chapter-actions a{
+      display:inline-flex;
+      align-items:center;
+      min-height:36px;
+      padding:0 12px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:#dce6f1;
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none
+    }
+    .chapter-actions a:hover{border-color:rgba(255,210,31,.48);color:var(--yellow)}
+    .section-band{
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.06), transparent 34%),
+        linear-gradient(180deg, rgba(17,22,31,.78), rgba(8,11,16,.64));
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      padding:16px
+    }
+    .section-band[data-view]{
+      display:block
+    }
+    .section-band .view-head{
+      border-bottom:1px solid rgba(255,255,255,.07);
+      padding-bottom:12px
+    }
+    .visual-strip{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-top:12px
+    }
+    .visual-tile{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:8px;
+      padding:12px;
+      min-height:92px
+    }
+    .visual-tile b{
+      display:block;
+      color:var(--yellow);
+      font-size:22px;
+      line-height:1.1
+    }
+    .visual-tile span{
+      display:block;
+      color:#d5dfeb;
+      font-size:12px;
+      line-height:1.55;
+      margin-top:6px
+    }
+    .jump-note{
+      color:#c6d2e1;
+      font-size:13px;
+      line-height:1.7;
+      margin:0
+    }
+    .trust-board{
+      display:grid;
+      grid-template-columns:1.25fr .75fr;
+      gap:10px;
+      margin-bottom:12px
+    }
+    .trust-card{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:12px;
+      min-width:0
+    }
+    .trust-card h3{
+      margin:0 0 10px;
+      color:var(--yellow);
+      font-size:17px
+    }
+    .trust-flow{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px
+    }
+    .trust-step{
+      min-height:86px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:8px;
+      padding:10px
+    }
+    .trust-step b{display:block;color:#f8fbff;font-size:14px;margin-bottom:5px}
+    .trust-step span{display:block;color:#c6d2e1;font-size:12px;line-height:1.55}
+    .source-donut{
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      margin:0 auto;
+      background:conic-gradient(var(--yellow) 0 58%, var(--cyan) 58% 82%, var(--green) 82% 100%);
+      position:relative;
+      box-shadow:0 0 32px rgba(255,210,31,.16)
+    }
+    .source-donut::after{
+      content:"可信";
+      position:absolute;
+      inset:28px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#0b0f16;
+      color:var(--yellow);
+      font-size:22px;
+      font-weight:900
+    }
+    .source-tags{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:7px;
+      margin-top:12px
+    }
+    .source-tags span,.source-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.04);
+      color:#d7e0eb;
+      font-size:11px;
+      font-weight:900;
+      padding:4px 8px
+    }
+    .source-tags .source-a::before,
+    .source-tags .source-b::before,
+    .source-tags .source-c::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      display:inline-block
+    }
+    .source-tags .source-a::before{background:var(--yellow);box-shadow:0 0 10px rgba(255,210,31,.55)}
+    .source-tags .source-b::before{background:var(--cyan);box-shadow:0 0 10px rgba(0,217,255,.45)}
+    .source-tags .source-c::before{background:var(--green);box-shadow:0 0 10px rgba(46,232,123,.40)}
+    .source-badge{
+      color:var(--yellow);
+      border-color:rgba(255,210,31,.22);
+      background:rgba(255,210,31,.08);
+      margin-top:8px
+    }
+    .modal-mask{
+      position:fixed;inset:0;z-index:50;display:none;
+      align-items:center;justify-content:center;padding:24px;
+      background:rgba(0,0,0,.62);backdrop-filter:blur(10px)
+    }
+    .modal-mask.active{display:flex}
+    .modal{
+      width:min(980px,96vw);max-height:86vh;overflow:hidden;
+      background:
+        linear-gradient(135deg, rgba(255,210,31,.10), transparent 35%),
+        linear-gradient(180deg, rgba(21,28,39,.98), rgba(9,12,18,.98));
+      border:1px solid rgba(255,210,31,.30);
+      border-radius:10px;box-shadow:0 32px 90px rgba(0,0,0,.55);
+      padding:20px;animation:modalIn .18s ease-out;
+      display:flex;flex-direction:column
+    }
+    @keyframes modalIn{
+      from{opacity:0;transform:translateY(10px) scale(.98)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+    .modal-head{
+      display:flex;justify-content:space-between;gap:16px;align-items:flex-start;
+      border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px;
+      flex:0 0 auto
+    }
+    .modal-head h3{margin:0;font-size:30px;line-height:1.2;color:var(--yellow)}
+    .modal-close{
+      cursor:pointer;width:38px;height:38px;border-radius:8px;
+      border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);
+      color:var(--text);font-size:22px;line-height:1
+    }
+    .modal-close:hover{background:var(--yellow);color:#07090d}
+    .modal-scroll{
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      padding-right:8px;
+      max-height:calc(86vh - 112px);
+      scrollbar-width:thin;
+      scrollbar-color:rgba(255,210,31,.72) rgba(255,255,255,.08)
+    }
+    .modal-scroll::-webkit-scrollbar{width:8px}
+    .modal-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:999px}
+    .modal-scroll::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg, var(--yellow), var(--yellow2));
+      border-radius:999px
+    }
+    .modal-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px
+    }
+    .modal-field{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;padding:12px 12px 11px;min-width:0
+    }
+    .modal-field b{display:block;color:var(--yellow);font-size:13px;margin-bottom:4px}
+    .modal-field span{display:block;color:#edf3f9;font-size:14px;line-height:1.7}
+    .modal-desc{margin:12px 0 0;color:#c6d2e1;font-size:14px;line-height:1.8}
+    .modal-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .modal-links a{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:38px;padding:0 14px;border-radius:8px;
+      border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);
+      color:#dfe8f2;text-decoration:none
+    }
+    .modal-links a:hover{border-color:rgba(255,210,31,.45)}
+    footer{
+      padding:16px 22px 26px;color:var(--dim);font-size:12px;line-height:1.7
+    }
+    .visually-hidden{position:absolute;left:-9999px}
+    .map-marker{cursor:pointer;outline:none}
+    .map-marker circle{transition:transform .18s ease,filter .18s ease;transform-origin:center}
+    .map-marker:hover circle,.map-marker:focus circle{
+      transform:scale(1.28);filter:drop-shadow(0 0 10px rgba(255,210,31,.85))
+    }
+    .map-marker text{
+      paint-order:stroke;stroke:rgba(7,9,13,.92);stroke-width:3px;stroke-linejoin:round
+    }
+    .map-region{
+      fill:rgba(255,255,255,.02);stroke:rgba(255,255,255,.08);stroke-width:1
+    }
+    .map-label{fill:#dfe8f2;font-size:16px;font-weight:900}
+    .map-label.small{font-size:13px}
+    @media (max-width: 1200px){
+      h1{font-size:38px}
+      .shell-head,.overview-grid,.atlas-grid,.cap-body,.iteration-body,.roadmap-body,.media-body{
+        grid-template-columns:1fr
+      }
+      .hero-stats,.metric-strip,.map-legend,.region-rail,.cap-grid,.workbench-grid,.iteration-grid,.roadmap-grid,.media-grid,.accept-grid,.focus-grid,.vendor-grid,.tender-summary,.score-grid,.viz-grid,.jump-cards,.visual-strip,.chapter-grid,.trust-board,.trust-flow,.arch-matrix,.arch-flow{
+        grid-template-columns:repeat(2,1fr)
+      }
+      .cap-visual{grid-template-columns:1fr}
+    }
+    @media (max-width: 760px){
+      .dashboard{padding:12px}
+      .shell{height:auto;min-height:0}
+      .view-stack{height:auto}
+      .view{overflow:visible}
+      .vendor-grid,.vendor-inspector{max-height:none;overflow:visible;padding-right:0}
+      .vendor-inspector::after{display:none}
+      h1{font-size:30px}
+      h2{font-size:24px}
+      .topbar,.view-head{display:block}
+      .header-meta,.board-tabs,.shell-actions{justify-content:flex-start;margin-top:10px}
+      .jump-title h1{font-size:30px}
+      .chapter-head{display:block}
+      .chapter-actions{justify-content:flex-start;margin-top:10px}
+      .hero-stats,.metric-strip,.map-legend,.region-rail,.cap-grid,.workbench-grid,.iteration-grid,.roadmap-grid,.media-grid,.accept-grid,.case-meta,.modal-grid,.jump-cards,.visual-strip,.chapter-grid,.trust-board,.trust-flow,.arch-matrix,.arch-flow{
+        grid-template-columns:1fr
+      }
+      .focus-grid,.vendor-grid,.tender-summary,.score-grid,.viz-grid{grid-template-columns:1fr}
+      .case-focus{grid-template-columns:1fr}
+      .map-shell,.map-shell svg{min-height:420px}
+      .map-shell svg{height:420px}
+      .map-note{position:static;margin:12px}
+      .view{padding:12px}
+      .shell-head{gap:12px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <div class="grid-bg"></div>
+  <header>
+    <div class="topbar shell">
+      <div class="brand"><span class="brand-mark"></span><span>低空数字孪生平台竞品分析与系统功能需求分析</span></div>
+      <div class="header-meta" aria-label="页面状态">
+        <span><b>6</b> 类竞品厂商</span>
+        <span><b>13</b> 可溯源案例</span>
+        <span><b>7</b> 地域分布</span>
+        <span><b>8</b> 金额可查</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page jump-page">
+    <section class="jump-hero" id="top">
+      <div class="jump-shell">
+        <div class="jump-title">
+          <div class="eyebrow">Low-Altitude Competitive & Tender Atlas</div>
+          <h1>低空数字孪生平台<br><span>竞品分析与招投标图谱</span></h1>
+          <p>
+            围绕公开招采、竞品能力、视频证据与产品启示组织汇报内容。
+            通过地域分布、金额分级、案例弹窗和能力图谱，快速判断低空平台市场机会、建设重点和产品迭代方向。
+          </p>
+          <div class="jump-nav" aria-label="章节跳转">
+            <a href="#tender">招投标图谱</a>
+            <a href="#competitors">竞品分析</a>
+            <a href="#media">视频与证据</a>
+            <a href="#appendix">产品启示</a>
+          </div>
+        </div>
+        <div class="jump-cards">
+          <a class="jump-card" href="#tender">
+            <b>01</b>
+            <strong>招投标图谱</strong>
+            <span>只把可溯源案例放入主图谱，按地域、金额、单位和建设内容查看机会。</span>
+          </a>
+          <a class="jump-card" href="#competitors">
+            <b>02</b>
+            <strong>竞品分析</strong>
+            <span>聚焦一网通飞、运行服务、空域协同、驾驶舱和侦测反制能力。</span>
+          </a>
+          <a class="jump-card" href="#media">
+            <b>03</b>
+            <strong>视频与证据</strong>
+            <span>汇总公开视频、公开资料链接和本地低空动效演示。</span>
+          </a>
+          <a class="jump-card" href="#appendix">
+            <b>04</b>
+            <strong>产品启示</strong>
+            <span>提炼能力地图、迭代方案和验收路径，支撑启真平台后续产品设计。</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="tender">
+      <div class="chapter-head">
+        <div>
+          <div class="chapter-label">Chapter 01</div>
+          <h2>招投标图谱</h2>
+        </div>
+        <div class="chapter-actions">
+          <a href="#top">返回目录</a>
+          <a href="#competitors">下一章</a>
+        </div>
+      </div>
+      <div class="trust-board">
+        <div class="trust-card">
+          <h3>主图谱口径</h3>
+          <div class="trust-flow">
+            <div class="trust-step"><b>优先保留</b><span>政府公告、采购/中标公告、上市公司公告、平台官网案例。</span></div>
+            <div class="trust-step"><b>谨慎纳入</b><span>权威媒体报道和企业公开案例，金额未披露则不硬估。</span></div>
+            <div class="trust-step"><b>剔除主图</b><span>仅有搜索入口、单位/金额/时间待核验的样本不进入统计。</span></div>
+            <div class="trust-step"><b>点击查看</b><span>每个点位可打开弹窗，查看服务内容、金额口径和来源链接。</span></div>
+          </div>
+        </div>
+        <div class="trust-card">
+          <h3>来源结构</h3>
+          <div class="source-donut" aria-label="来源可信度示意"></div>
+          <div class="source-tags">
+            <span class="source-a">黄：公告/招采结果</span>
+            <span class="source-b">蓝：政府或权威媒体</span>
+            <span class="source-c">绿：企业公开案例</span>
+          </div>
+          <p class="legend-note">环形图为来源结构示意，主图谱优先采用公告级和政府公开资料，企业案例仅作竞品能力参照。</p>
+        </div>
+      </div>
+      <div id="tenderMount"></div>
+    </section>
+
+    <section class="chapter" id="competitors">
+      <div class="chapter-head">
+        <div>
+          <div class="chapter-label">Chapter 02</div>
+          <h2>竞品分析</h2>
+        </div>
+        <div class="chapter-actions">
+          <a href="#tender">上一章</a>
+          <a href="#media">下一章</a>
+        </div>
+      </div>
+      <div id="competitorMount"></div>
+    </section>
+
+    <section class="chapter" id="media">
+      <div class="chapter-head">
+        <div>
+          <div class="chapter-label">Chapter 03</div>
+          <h2>视频与公开证据</h2>
+        </div>
+        <div class="chapter-actions">
+          <a href="#competitors">上一章</a>
+          <a href="#appendix">下一章</a>
+        </div>
+      </div>
+      <div id="mediaMount"></div>
+    </section>
+
+    <section class="chapter" id="appendix">
+      <div class="chapter-head">
+        <div>
+          <div class="chapter-label">Chapter 04</div>
+          <h2>产品启示与路线验收</h2>
+        </div>
+        <div class="chapter-actions">
+          <a href="#media">上一章</a>
+          <a href="#top">返回目录</a>
+        </div>
+      </div>
+      <div class="visual-strip">
+        <div class="visual-tile"><b>航线</b><span>把低空航线规划作为第一优先级，形成选址、空域、净空、风险和容量评估闭环。</span></div>
+        <div class="visual-tile"><b>Agent</b><span>把 AI 智能体作为第二优先级，先做规划助手、审批助手、巡查研判助手。</span></div>
+        <div class="visual-tile"><b>重构</b><span>现有平台基础不再作为可靠底座，按数据、规则、接口和体验四条线补课。</span></div>
+        <div class="visual-tile"><b>闭环</b><span>监管、运营和场景能力围绕航线与智能体沉淀，避免继续做松散大屏。</span></div>
+      </div>
+      <div class="chapter-grid appendix-grid" style="margin-top:16px">
+        <div id="capabilityMount"></div>
+        <div id="iterationMount"></div>
+      </div>
+      <div style="margin-top:16px" id="roadmapMount"></div>
+    </section>
+  </main>
+
+  <main class="page legacy-page">
+    <section class="dashboard">
+      <div class="shell">
+        <div class="shell-head">
+          <div class="hero-copy panel">
+            <div class="eyebrow">Low-Altitude Competitive & Tender Board</div>
+            <h1>聚焦 <span>竞品分析与招投标图谱</span></h1>
+            <p class="lead">
+              这版先把页面收束到两个核心板块：一是竞品分析，看清厂商架构、优势能力、案例视频和可借鉴点；
+              二是招投标图谱，看清项目区域、服务单位、中标时间、金额区间与建设内容。
+              能力地图和迭代方案保留为轻量附录，用于承接后续产品设计。
+            </p>
+            <div class="hero-stats">
+              <div class="stat"><b>15+</b><span>已梳理竞品案例，覆盖区县级一网通飞、运行服务、空域协同、驾驶舱、侦测反制等方向</span></div>
+              <div class="stat"><b>7</b><span>华东、华南、华北、华中、西南、西北、海南等区域分布可视化</span></div>
+              <div class="stat"><b>9</b><span>项目金额可查或可估，支撑市场热度和预算区间判断</span></div>
+              <div class="stat"><b>2</b><span>主分析板块：竞品分析与招投标图谱，先支撑市场判断和产品对标</span></div>
+            </div>
+          </div>
+          <div class="hero-copy panel">
+            <div class="view-kicker">Quick Actions</div>
+            <div class="shell-actions" style="margin-top:10px">
+              <button class="action primary" data-view-tab="atlas">打开招投标图谱</button>
+              <button class="action secondary" data-view-tab="competitors">查看竞品分析</button>
+              <button class="action" data-view-tab="media">看视频证据</button>
+            </div>
+            <div class="mini-diagram">
+              <svg viewBox="0 0 640 240" role="img" aria-label="启真低空产品分析路径图">
+                <defs>
+                  <linearGradient id="gline" x1="0" x2="1">
+                    <stop offset="0" stop-color="#ffd21f"/>
+                    <stop offset="1" stop-color="#00d9ff"/>
+                  </linearGradient>
+                </defs>
+                <rect x="12" y="12" width="616" height="216" rx="14" fill="#0d121a" stroke="#2e3744"/>
+                <g font-family="Microsoft YaHei" text-anchor="middle">
+                  <circle cx="74" cy="114" r="28" fill="#ffd21f"/>
+                  <text x="74" y="109" fill="#07090d" font-size="15" font-weight="900">市场</text>
+                  <text x="74" y="130" fill="#07090d" font-size="15" font-weight="900">信号</text>
+                  <circle cx="196" cy="114" r="28" fill="#151c27" stroke="#ffd21f"/>
+                  <text x="196" y="109" fill="#ffd21f" font-size="15" font-weight="900">竞品</text>
+                  <text x="196" y="130" fill="#ffd21f" font-size="15" font-weight="900">启示</text>
+                  <circle cx="318" cy="114" r="28" fill="#151c27" stroke="#00d9ff"/>
+                  <text x="318" y="109" fill="#00d9ff" font-size="15" font-weight="900">启真</text>
+                  <text x="318" y="130" fill="#00d9ff" font-size="15" font-weight="900">基础</text>
+                  <circle cx="440" cy="114" r="28" fill="#151c27" stroke="#2ee87b"/>
+                  <text x="440" y="109" fill="#2ee87b" font-size="15" font-weight="900">产品</text>
+                  <text x="440" y="130" fill="#2ee87b" font-size="15" font-weight="900">迭代</text>
+                  <circle cx="562" cy="114" r="28" fill="#151c27" stroke="#f7a817"/>
+                  <text x="562" y="109" fill="#f7a817" font-size="15" font-weight="900">场景</text>
+                  <text x="562" y="130" fill="#f7a817" font-size="15" font-weight="900">验收</text>
+                  <path d="M102,114 L168,114 M224,114 L290,114 M346,114 L412,114 M468,114 L534,114" stroke="url(#gline)" stroke-width="4" stroke-linecap="round"/>
+                  <text x="96" y="190" fill="#c8d4e2" font-size="13">政策、资金与项目节奏</text>
+                  <text x="210" y="190" fill="#c8d4e2" font-size="13">竞品架构、视频、金额、单位</text>
+                  <text x="332" y="190" fill="#c8d4e2" font-size="13">规划、云守护、算法、选址</text>
+                  <text x="455" y="190" fill="#c8d4e2" font-size="13">数据底座、监管闭环、沉淀复用</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="board-tabs" role="tablist" aria-label="内容板块">
+          <button class="board-tab active" data-view-tab="atlas" role="tab">招投标图谱</button>
+          <button class="board-tab" data-view-tab="competitors" role="tab">竞品分析</button>
+          <button class="board-tab" data-view-tab="overview" role="tab">总览</button>
+          <button class="board-tab" data-view-tab="media" role="tab">视频资料</button>
+          <button class="board-tab" data-view-tab="capabilities" role="tab">能力附录</button>
+          <button class="board-tab" data-view-tab="iteration" role="tab">迭代附录</button>
+        </div>
+
+        <div class="view-stack">
+          <section class="view" data-view="overview" aria-label="总览">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">01 / Overview</div>
+                <h2>竞品、政策与启真基础，先把判断框架搭稳</h2>
+              </div>
+              <p class="view-desc">
+                这部分不追求堆材料，而是把外部市场信号、竞品启示和启真现有能力压缩成一个可执行的判断框架：
+                低空平台正在从展示型项目转向高频飞行下的运营基础设施，核心不只是大屏，而是空域、审批、任务、围栏、态势、数据和交付闭环。
+              </p>
+            </div>
+            <div class="overview-grid">
+              <div class="panel big-panel">
+                <h3 style="color:var(--yellow);font-size:20px;margin:0 0 10px">市场与竞品的共同指向</h3>
+                <div class="signal-board">
+                  <div class="signal"><b>从“展示”到“运营”</b><span>深圳、杭州、郑州、济南等案例，越来越强调审批、态势、任务、围栏和复盘的闭环能力，而不是单纯的大屏演示。</span></div>
+                  <div class="signal"><b>从“单点应用”到“基础设施”</b><span>区县级一网通飞、空域协同、运行服务、侦测反制逐步连成底座，平台的价值开始向数据、规则和服务标准沉淀。</span></div>
+                  <div class="signal"><b>从“项目交付”到“组件沉淀”</b><span>采购金额虽分散，但重复采购的能力模块越来越集中，说明可复用组件和交付模板正在成为竞争点。</span></div>
+                  <div class="signal"><b>从“静态地图”到“动态分发”</b><span>区域差异明显：华东重协同与规模化，华南重运营与管控，华北和西北重基础设施与试点牵引，海南重飞行服务与长期运行。</span></div>
+                </div>
+                <div class="mini-diagram">
+                  <svg viewBox="0 0 1160 240" role="img" aria-label="能力框架示意图">
+                    <rect x="18" y="18" width="1124" height="204" rx="14" fill="#0d121a" stroke="#2e3744"/>
+                    <g font-family="Microsoft YaHei" text-anchor="middle">
+                      <rect x="60" y="70" width="166" height="90" rx="10" fill="#151c27" stroke="#ffd21f"/>
+                      <text x="143" y="104" fill="#ffd21f" font-size="20" font-weight="900">数据底座</text>
+                      <text x="143" y="129" fill="#c8d4e2" font-size="14">多源时空 / 标准 / 更新</text>
+                      <rect x="264" y="70" width="166" height="90" rx="10" fill="#151c27" stroke="#00d9ff"/>
+                      <text x="347" y="104" fill="#00d9ff" font-size="20" font-weight="900">规划能力</text>
+                      <text x="347" y="129" fill="#c8d4e2" font-size="14">选址 / 空域 / 航线 / 净空</text>
+                      <rect x="468" y="70" width="166" height="90" rx="10" fill="#151c27" stroke="#2ee87b"/>
+                      <text x="551" y="104" fill="#2ee87b" font-size="20" font-weight="900">核心监管</text>
+                      <text x="551" y="129" fill="#c8d4e2" font-size="14">审批 / 申报 / 围栏 / 态势</text>
+                      <rect x="672" y="70" width="166" height="90" rx="10" fill="#151c27" stroke="#f7a817"/>
+                      <text x="755" y="104" fill="#f7a817" font-size="20" font-weight="900">运营服务</text>
+                      <text x="755" y="129" fill="#c8d4e2" font-size="14">任务 / 飞手 / 机库 / 视频</text>
+                      <rect x="876" y="70" width="166" height="90" rx="10" fill="#151c27" stroke="#6aa7ff"/>
+                      <text x="959" y="104" fill="#6aa7ff" font-size="20" font-weight="900">价值沉淀</text>
+                      <text x="959" y="129" fill="#c8d4e2" font-size="14">数据资产 / 复盘 / 服务化</text>
+                      <path d="M226,115 L258,115 M430,115 L462,115 M634,115 L666,115 M838,115 L870,115" stroke="url(#gline)" stroke-width="4" stroke-linecap="round"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+              <div class="compact-stack">
+                <div class="panel stack-panel">
+                  <h3>启真基础判断</h3>
+                  <p>现有平台能力不能直接视为可靠底座，需要重新盘点数据、规则、接口和体验；产品迭代应优先围绕低空航线规划和 AI 智能体形成新抓手。</p>
+                  <ul>
+                    <li>先做航线规划计算、方案比选和风险解释。</li>
+                    <li>再做规划助手、审批助手、巡查研判助手。</li>
+                    <li>旧平台能力按可用性筛选，能复用才复用，不能复用就重构。</li>
+                  </ul>
+                </div>
+                <div class="panel stack-panel">
+                  <h3>产品经理视角的结论</h3>
+                  <p>下一阶段不是继续包装已有平台，而是用航线规划和 AI 智能体重新定义产品主线，先形成可演示、可交付、可验收的核心能力。</p>
+                  <div class="metric-strip">
+                    <div class="metric"><b>先航线</b><span>选址、净空、风险、容量、比选</span></div>
+                    <div class="metric"><b>再智能</b><span>规划助手、审批助手、研判助手</span></div>
+                    <div class="metric"><b>补基础</b><span>数据、规则、接口、体验重构</span></div>
+                    <div class="metric"><b>沉标品</b><span>标准包、验收指标、跨区县复制</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" data-view="competitors" aria-label="竞品分析">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">02 / Competitor Analysis</div>
+                <h2>竞品分析：先看谁在做、怎么做、强在哪里</h2>
+              </div>
+              <p class="view-desc">
+                竞品板块聚焦厂商能力结构和案例呈现，不急着落到启真迭代。
+                重点看四件事：系统架构、服务对象、落地案例、对区县级低空平台的可借鉴能力。
+              </p>
+            </div>
+            <div class="focus-grid">
+              <div class="panel strategy-panel">
+                <div class="chart-legend" aria-label="竞品卡片图例">
+                  <span><i class="legend-dot"></i>卡片 = 一类竞品厂商/能力模式</span>
+                  <span><i class="legend-dot cyan"></i>标签 = 主要能力方向</span>
+                  <span><i class="legend-line"></i>点击卡片 = 右侧详情联动</span>
+                </div>
+                <div class="vendor-grid" id="vendorGrid"></div>
+              </div>
+              <div class="vendor-inspector" id="vendorInspector"></div>
+            </div>
+            <div class="panel strategy-panel" style="margin-top:16px">
+              <h3 style="color:var(--yellow);font-size:18px;margin-bottom:10px">竞品产品架构总览</h3>
+              <div class="chart-legend" aria-label="产品架构总览图例">
+                <span><i class="legend-dot"></i>从下到上看：数据/设备层 → 能力服务层 → 应用交互层</span>
+                <span><i class="legend-dot cyan"></i>不同竞品的差异主要体现在中间能力层</span>
+              </div>
+              <div class="arch-matrix">
+                <div class="arch-matrix-card">
+                  <h4>城市交通规划型</h4>
+                  <p>代表：深城交。以城市交通和规划数据为底，向低空管控、航线组织和设施治理延伸。</p>
+                  <div class="arch-mini">
+                    <span><b>数据层</b>CIM / 路网 / 空域 / 起降点</span>
+                    <span><b>能力层</b>选址 / 净空 / 航线 / 设施监管</span>
+                    <span><b>应用层</b>低空管控驾驶舱 / 规划决策</span>
+                  </div>
+                </div>
+                <div class="arch-matrix-card">
+                  <h4>数字时空底座型</h4>
+                  <p>代表：高德生态、中科星图。以地图、三维、空天数据和仿真计算构建低空数字底座。</p>
+                  <div class="arch-mini">
+                    <span><b>数据层</b>地图 / 三维 / 遥感 / 空域网格</span>
+                    <span><b>能力层</b>仿真 / 路径分析 / 态势推演</span>
+                    <span><b>应用层</b>数字底座 / 场景专题 / 开放接口</span>
+                  </div>
+                </div>
+                <div class="arch-matrix-card">
+                  <h4>运行作业服务型</h4>
+                  <p>代表：DJI FlightHub 2。以无人机、机库和任务执行为核心，形成作业闭环。</p>
+                  <div class="arch-mini">
+                    <span><b>设备层</b>无人机 / 机库 / 负载 / 视频链路</span>
+                    <span><b>能力层</b>航线任务 / 远程控制 / 直播回传</span>
+                    <span><b>应用层</b>团队协同 / 成果归档 / 行业巡检</span>
+                  </div>
+                </div>
+                <div class="arch-matrix-card">
+                  <h4>空管飞服合规型</h4>
+                  <p>代表：莱斯、民航二所。以实名、申报、审批、飞行计划和审计为核心。</p>
+                  <div class="arch-mini">
+                    <span><b>规则层</b>实名 / 空域 / 航线 / 动态限制</span>
+                    <span><b>服务层</b>飞行计划 / 授权 / 监管协同</span>
+                    <span><b>管理层</b>省市县贯通 / 审计 / 运维</span>
+                  </div>
+                </div>
+                <div class="arch-matrix-card">
+                  <h4>UTM / U-space 标准型</h4>
+                  <p>代表：EASA U-space、FAA UTM。以服务互操作、远程识别和飞行授权为核心。</p>
+                  <div class="arch-mini">
+                    <span><b>基础服务</b>Remote ID / Geo-awareness</span>
+                    <span><b>协同机制</b>USSP / CISP / 数据交换</span>
+                    <span><b>合规体系</b>认证 / 审计 / 业务连续性</span>
+                  </div>
+                </div>
+                <div class="arch-matrix-card">
+                  <h4>启真可借鉴架构</h4>
+                  <p>不要直接照搬竞品，建议围绕航线规划和 AI 智能体重组自身架构。</p>
+                  <div class="arch-mini">
+                    <span><b>基础层</b>可信数据 / 规则库 / 接口重构</span>
+                    <span><b>核心层</b>航线规划引擎 / AI 智能体</span>
+                    <span><b>应用层</b>审批 / 巡查 / 复盘 / 标品交付</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel strategy-panel" style="margin-top:16px">
+              <h3 style="color:var(--yellow);font-size:18px;margin-bottom:10px">竞品横向结论</h3>
+              <div class="cap-grid">
+                <div class="cap-card">
+                  <h4>深城交类城市交通规划厂商</h4>
+                  <p>优势在城市交通、CIM、空域规划、起降点和航线组织，适合对标“区县级规划平台如何进入运行管理”。</p>
+                </div>
+                <div class="cap-card">
+                  <h4>中科星图类数字地球厂商</h4>
+                  <p>优势在空天数据、数字底座、仿真计算和场景展示，适合对标“低空数字孪生底座如何产品化”。</p>
+                </div>
+                <div class="cap-card">
+                  <h4>DJI 类作业运营平台</h4>
+                  <p>优势在设备、机库、任务、视频和成果闭环，适合对标“无人机运行服务平台如何贴近真实作业”。</p>
+                </div>
+                <div class="cap-card">
+                  <h4>莱斯/民航体系类空管厂商</h4>
+                  <p>优势在飞服、空管、综合服务和政务协同，适合对标“监管服务平台如何做合规、接口和流程”。</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view active" data-view="atlas" aria-label="招投标图谱">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">03 / Tender Atlas</div>
+                <h2>招投标图谱：按地域、能力、金额和中标时间看项目机会</h2>
+              </div>
+              <p class="view-desc">
+                这里把公开招采和公开案例拆成地域标签、能力标签和项目详情三层。
+                左侧保留分布地图，右侧聚合服务区域、实施单位、中标时间、金额和建设规模；点击任意案例可查看弹窗详情。
+              </p>
+            </div>
+            <div class="tender-summary" id="tenderSummary"></div>
+            <div class="viz-grid">
+              <div class="viz-panel">
+                <h4>金额分布</h4>
+                <div id="amountBars"></div>
+                <div class="viz-legend" aria-label="金额分布图例">
+                  <span><i class="legend-line"></i>条形长度 = 当前金额档项目数量</span>
+                  <span><i class="legend-dot"></i>黄色起点 = 低空招采金额信号</span>
+                  <span><i class="legend-dot cyan"></i>蓝色终点 = 数量占比拉满</span>
+                </div>
+              </div>
+              <div class="viz-panel">
+                <h4>地域热度</h4>
+                <div class="heat-grid" id="regionHeat"></div>
+                <div class="viz-legend" aria-label="地域热度图例">
+                  <span><i class="legend-cell"></i>色块越亮 = 可溯源案例越多</span>
+                  <span><i class="legend-dot"></i>数字 = 当前地域案例数</span>
+                </div>
+              </div>
+            </div>
+            <div class="atlas-grid">
+              <div class="panel map-panel">
+                <div class="map-toolbar">
+                  <button class="chip active" data-filter-region="all">全部地域</button>
+                  <button class="chip" data-filter-region="华东">华东</button>
+                  <button class="chip" data-filter-region="华南">华南</button>
+                  <button class="chip" data-filter-region="华北">华北</button>
+                  <button class="chip" data-filter-region="华中">华中</button>
+                  <button class="chip" data-filter-region="西南">西南</button>
+                  <button class="chip" data-filter-region="西北">西北</button>
+                  <button class="chip" data-filter-region="海南">海南</button>
+                </div>
+                <div class="map-toolbar">
+                  <button class="chip active" data-filter-cap="all">全部能力</button>
+                  <button class="chip" data-filter-cap="一网通飞">一网通飞</button>
+                  <button class="chip" data-filter-cap="运行服务">运行服务</button>
+                  <button class="chip" data-filter-cap="空域协同">空域协同</button>
+                  <button class="chip" data-filter-cap="典型场景">典型场景</button>
+                  <button class="chip" data-filter-cap="综合驾驶舱">综合驾驶舱</button>
+                  <button class="chip" data-filter-cap="基础设施">基础设施</button>
+                  <button class="chip" data-filter-cap="侦测反制">侦测反制</button>
+                </div>
+                <div class="map-shell">
+                  <svg viewBox="0 0 780 560" role="img" aria-label="低空竞品地域分布地图">
+                    <defs>
+                      <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                      <linearGradient id="land" x1="0" x2="1">
+                        <stop offset="0" stop-color="#161d28"/>
+                        <stop offset="1" stop-color="#273240"/>
+                      </linearGradient>
+                    </defs>
+                    <path class="map-region" d="M138,138 L220,92 L318,84 L424,116 L504,104 L590,172 L636,270 L603,366 L520,424 L427,472 L314,454 L232,406 L158,345 L94,262 Z" fill="url(#land)"/>
+                    <path d="M112,256 L188,230 L262,249 L338,225 L420,258 L520,239 L612,276" fill="none" stroke="#ffd21f" stroke-opacity=".24" stroke-width="2"/>
+                    <path d="M175,346 L268,316 L364,338 L459,309 L563,347" fill="none" stroke="#00d9ff" stroke-opacity=".20" stroke-width="2"/>
+                    <text x="168" y="178" class="map-label">华北</text>
+                    <text x="300" y="168" class="map-label">华东</text>
+                    <text x="503" y="206" class="map-label">华南</text>
+                    <text x="236" y="316" class="map-label">华中</text>
+                    <text x="172" y="392" class="map-label small">西南</text>
+                    <text x="286" y="248" class="map-label small">西北</text>
+                    <text x="525" y="468" class="map-label small">海南</text>
+                    <g id="mapMarkers" filter="url(#glow)"></g>
+                  </svg>
+                  <div class="map-note">
+                    地图点位按专题示意，不代表行政边界精度。金额口径统一采用公开招采、公开报道或公开案例页口径；未披露金额的项目在弹窗中标记为“未公开”。
+                  </div>
+                </div>
+                <div class="legend-title">图谱总览</div>
+                <div class="map-legend" id="atlasLegend"></div>
+                <div class="legend-title">地图图例</div>
+                <div class="chart-legend">
+                  <span><i class="legend-dot"></i>圆点 = 可溯源项目/案例</span>
+                  <span><i class="legend-dot cyan"></i>颜色 = 区分不同项目点位</span>
+                  <span><i class="legend-line"></i>点位连线 = 低空协同/航线趋势示意</span>
+                </div>
+                <div class="bubble-legend">
+                  <span><i class="bubble-dot" style="width:8px;height:8px"></i>500 万以下</span>
+                  <span><i class="bubble-dot" style="width:12px;height:12px"></i>500-1000 万</span>
+                  <span><i class="bubble-dot" style="width:16px;height:16px"></i>1000-5000 万</span>
+                  <span><i class="bubble-dot" style="width:22px;height:22px"></i>5000 万-1 亿</span>
+                  <span><i class="bubble-dot" style="width:28px;height:28px"></i>1 亿以上</span>
+                </div>
+                <p class="legend-note">圆点大小按公开金额分档；金额未披露的案例使用最小点位，仅代表案例位置和能力方向。</p>
+              </div>
+
+              <div class="atlas-right">
+              <div class="panel side-panel">
+                <div class="view-kicker">Regional Summary</div>
+                <div class="chart-legend" aria-label="地域卡片图例">
+                  <span><i class="legend-dot"></i>左上数字 = 地域案例数</span>
+                  <span><i class="legend-dot cyan"></i>点击卡片 = 地图与列表联动筛选</span>
+                </div>
+                <div class="region-rail" id="regionRail"></div>
+              </div>
+              <div class="panel side-panel">
+                <div class="view-kicker">Case Pool</div>
+                <div class="chart-legend" aria-label="案例列表图例">
+                  <span><i class="legend-dot"></i>A/B/C = 证据等级</span>
+                  <span><i class="legend-line"></i>金额档 = 合同额或公开预算口径</span>
+                </div>
+                <div class="case-list" id="caseList"></div>
+              </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" data-view="capabilities" aria-label="能力地图">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">Appendix / Capability Map</div>
+                <h2>能力地图<span class="appendix-note">轻量附录</span></h2>
+              </div>
+              <p class="view-desc">
+                这里不是在画功能清单，而是在梳理能力边界。左边是能力切片，右边是能力雷达、词云和多角色工作面。
+                这样做的好处，是以后做项目交付时可以按组件拼装，而不是每次从头写一套。
+              </p>
+            </div>
+            <div class="cap-body">
+              <div class="cap-left">
+                <div class="panel cap-panel">
+                  <div class="cap-tabs" id="capTabs"></div>
+                  <div class="cap-stage" id="capStage"></div>
+                </div>
+                <div class="panel cap-panel">
+                  <h3 style="color:var(--yellow);font-size:18px;margin-bottom:10px">多角色工作面</h3>
+                  <div class="workbench-grid">
+                    <div class="workbench">
+                      <h4>政府监管工作面</h4>
+                      <ul>
+                        <li>空域审批、飞行申报、电子围栏、态势监控。</li>
+                        <li>异常预警、应急处置、证据留痕、跨部门协同。</li>
+                      </ul>
+                    </div>
+                    <div class="workbench">
+                      <h4>运营服务工作面</h4>
+                      <ul>
+                        <li>任务调度、飞手协同、机库管理、视频回传。</li>
+                        <li>飞行执行、结果归档、巡查闭环、效率统计。</li>
+                      </ul>
+                    </div>
+                    <div class="workbench">
+                      <h4>建设运维工作面</h4>
+                      <ul>
+                        <li>租户、权限、接口、地图、规则和组件配置。</li>
+                        <li>日志审计、质量监控、版本沉淀、项目模板。</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cap-right">
+                <div class="cap-visual">
+                  <div class="radar-box">
+                    <h3 style="margin:0 0 10px;color:var(--yellow);font-size:18px">能力雷达</h3>
+                    <svg viewBox="0 0 520 360" role="img" aria-label="能力雷达图">
+                      <g transform="translate(260 172)" font-family="Microsoft YaHei">
+                        <polygon points="0,-132 114,-66 114,66 0,132 -114,66 -114,-66" fill="none" stroke="#2e3744"/>
+                        <polygon points="0,-92 80,-46 80,46 0,92 -80,46 -80,-46" fill="none" stroke="#2e3744"/>
+                        <polygon points="0,-52 46,-26 46,26 0,52 -46,26 -46,-26" fill="none" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="0" y2="-132" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="114" y2="-66" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="114" y2="66" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="0" y2="132" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="-114" y2="66" stroke="#2e3744"/>
+                        <line x1="0" y1="0" x2="-114" y2="-66" stroke="#2e3744"/>
+                        <polygon points="0,-114 96,-58 78,38 0,92 -92,52 -108,-62" fill="rgba(255,210,31,.18)" stroke="#ffd21f" stroke-width="2.5"/>
+                        <polygon points="0,-92 108,-60 102,52 0,108 -64,34 -70,-44" fill="rgba(0,217,255,.14)" stroke="#00d9ff" stroke-width="2.5"/>
+                        <polygon points="0,-62 56,-30 108,60 0,118 -36,18 -34,-18" fill="rgba(46,232,123,.12)" stroke="#2ee87b" stroke-width="2.5"/>
+                        <text x="-28" y="-150" fill="#cdd8e6" font-size="14">航线规划</text>
+                        <text x="126" y="-72" fill="#cdd8e6" font-size="14">合规授权</text>
+                        <text x="132" y="78" fill="#cdd8e6" font-size="14">运行服务</text>
+                        <text x="-24" y="154" fill="#cdd8e6" font-size="14">基础重构</text>
+                        <text x="-188" y="80" fill="#cdd8e6" font-size="14">开放生态</text>
+                        <text x="-190" y="-72" fill="#cdd8e6" font-size="14">仿真计算</text>
+                      </g>
+                    </svg>
+                    <div class="chart-legend" aria-label="能力雷达图例">
+                      <span><i class="legend-dot"></i>黄色面 = 航线规划优先能力</span>
+                      <span><i class="legend-dot cyan"></i>蓝色面 = AI 智能体与飞服能力</span>
+                      <span><i class="legend-dot green"></i>绿色面 = 场景闭环与标品沉淀能力</span>
+                    </div>
+                  </div>
+                  <div class="word-box">
+                    <h3 style="margin:0 0 10px;color:var(--yellow);font-size:18px">关键关键词</h3>
+                    <div class="wordcloud">
+                      <span class="w1">航线规划</span>
+                      <span class="w2">AI 智能体</span>
+                      <span class="w3">空域协同</span>
+                      <span class="w4">数据重构</span>
+                      <span class="w5">风险评估</span>
+                      <span class="w6">审批助手</span>
+                      <span class="w7">净空分析</span>
+                      <span class="w8">任务闭环</span>
+                      <span class="w9">小步验证</span>
+                    </div>
+                    <div class="chart-legend" aria-label="关键词图例">
+                      <span><i class="legend-dot"></i>字号越大 = 产品迭代优先级越高</span>
+                      <span><i class="legend-dot cyan"></i>蓝/绿/橙 = 不同能力域</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel cap-panel">
+                  <h3 style="color:var(--yellow);font-size:18px;margin-bottom:10px">能力分层建议</h3>
+                  <div class="cap-grid">
+                    <div class="cap-card">
+                      <h4>航线规划</h4>
+                      <p>优先沉淀起降点、空域、净空、风险、容量和航线比选能力，形成产品主抓手。</p>
+                    </div>
+                    <div class="cap-card">
+                      <h4>AI 智能体</h4>
+                      <p>围绕规划、审批、巡查研判和运营复盘建设业务智能体，提升交付与运营效率。</p>
+                    </div>
+                    <div class="cap-card">
+                      <h4>基础重构</h4>
+                      <p>重新梳理数据、规则、接口和体验，不把旧平台演示能力直接当成产品基础。</p>
+                    </div>
+                    <div class="cap-card">
+                      <h4>监管与场景</h4>
+                      <p>监管、飞服和场景围绕航线规划和智能体展开，形成可验收、可复用闭环。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" data-view="iteration" aria-label="迭代方案">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">Appendix / Product Iteration</div>
+                <h2>产品迭代方案<span class="appendix-note">轻量附录</span></h2>
+              </div>
+              <p class="view-desc">
+                这部分不再把现有平台基础视为可靠底座，而是按“航线规划优先、AI 智能体优先、基础能力重构”的思路组织迭代。
+                右侧面板会跟随点击切换内容，方便直接讲“为什么先做、做成什么、如何验收”。
+              </p>
+            </div>
+            <div class="iteration-body">
+              <div class="panel strategy-panel">
+                <div class="iteration-grid" id="iterationGrid"></div>
+              </div>
+              <div class="inspector" id="iterationInspector"></div>
+            </div>
+          </section>
+
+          <section class="view" data-view="roadmap" aria-label="路线验收">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">05 / Roadmap & Acceptance</div>
+                <h2>路线验收：用阶段节奏控制风险，用指标闭环控制质量</h2>
+              </div>
+              <p class="view-desc">
+                路线不追求一次到位，而是先做航线规划 MVP，再做 AI 智能体试点，然后把监管和场景闭环接上，最后沉淀为可复制标品。
+              </p>
+            </div>
+            <div class="roadmap-body">
+              <div class="panel roadmap-panel">
+                <div class="roadmap-grid" id="roadmapGrid"></div>
+              </div>
+              <div class="inspector" id="roadmapInspector"></div>
+            </div>
+          </section>
+
+          <section class="view" data-view="media" aria-label="视频资料">
+            <div class="view-head">
+              <div>
+                <div class="view-kicker">06 / Video & Evidence</div>
+                <h2>视频资料与公开证据：把竞品研究的“看得见”补起来</h2>
+              </div>
+              <p class="view-desc">
+                这里保留公开视频、案例页和本地动效演示。公开视频用于给汇报补证据，本地动效用于在离线场景里维持展示效果。
+              </p>
+            </div>
+            <div class="media-body">
+              <div class="panel media-panel">
+                <div class="media-grid">
+                  <div class="video-card">
+                    <div class="video-frame">
+                      <iframe src="https://player.bilibili.com/player.html?bvid=BV1kbsGzEEux&page=1" allowfullscreen></iframe>
+                    </div>
+                    <div class="content">
+                      <h4>中科星图低空运行数字底座</h4>
+                      <p><a href="https://www.bilibili.com/video/BV1kbsGzEEux/" target="_blank" rel="noreferrer">打开公开视频</a></p>
+                    </div>
+                  </div>
+                  <div class="video-card">
+                    <div class="video-frame">
+                      <iframe src="https://www.youtube.com/embed/giV-Kk2Jtec" allowfullscreen></iframe>
+                    </div>
+                    <div class="content">
+                      <h4>EASA U-space Workshop</h4>
+                      <p><a href="https://youtu.be/giV-Kk2Jtec" target="_blank" rel="noreferrer">打开公开视频</a></p>
+                    </div>
+                  </div>
+                  <div class="video-card">
+                    <div class="video-frame">
+                      <iframe src="https://www.youtube.com/embed/5oRRcXk6iWg" allowfullscreen></iframe>
+                    </div>
+                    <div class="content">
+                      <h4>U-space Operational Demo</h4>
+                      <p><a href="https://youtu.be/5oRRcXk6iWg" target="_blank" rel="noreferrer">打开公开视频</a></p>
+                    </div>
+                  </div>
+                  <div class="video-card">
+                    <div class="video-frame">
+                      <div class="sim-video" aria-label="本地动效演示">
+                        <div class="sim-path p1"></div>
+                        <div class="sim-path p2"></div>
+                        <div class="sim-drone"></div>
+                        <div class="sim-drone d2"></div>
+                      </div>
+                    </div>
+                    <div class="content">
+                      <h4>本地低空动效演示</h4>
+                      <p>用 CSS 动效模拟航线、态势和飞行轨迹，离线打开也能维持汇报表现力。</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="source-strip">
+                  <span>深城交低空管控方案</span>
+                  <span>深圳低空经济试点成果</span>
+                  <span>中科星图智航平台</span>
+                  <span>星图低空云</span>
+                  <span>DJI FlightHub 2</span>
+                  <span>EASA U-space</span>
+                  <span>FAA UTM</span>
+                </div>
+              </div>
+              <div class="panel media-panel">
+                <h3 style="color:var(--yellow);font-size:18px;margin-bottom:10px">公开资料来源</h3>
+                <div class="media-grid" style="grid-template-columns:1fr">
+                  <div class="quote-card">
+                    <h4>核心来源</h4>
+                    <ul>
+                      <li><a href="https://www.sutpc.com/cn/bussiness/1.html" target="_blank" rel="noreferrer">深城交低空管控方案</a></li>
+                      <li><a href="https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/post_11482362.html" target="_blank" rel="noreferrer">深圳低空经济试点成果</a></li>
+                      <li><a href="https://www.geovis.com.cn/products/detail/37" target="_blank" rel="noreferrer">中科星图智航平台</a></li>
+                      <li><a href="https://open.geovisearth.com/product/Low_Altitude_Cloud" target="_blank" rel="noreferrer">星图低空云</a></li>
+                      <li><a href="https://enterprise.dji.com/flighthub-2" target="_blank" rel="noreferrer">DJI FlightHub 2</a></li>
+                      <li><a href="https://www.easa.europa.eu/en/domains/air-traffic-management/u-space" target="_blank" rel="noreferrer">EASA U-space</a></li>
+                      <li><a href="https://www.faa.gov/uas/advanced_operations/traffic_management" target="_blank" rel="noreferrer">FAA UTM</a></li>
+                    </ul>
+                  </div>
+                  <div class="quote-card">
+                    <h4>汇报提示</h4>
+                    <p>如果现场网络不稳定，仍可依赖本地 SVG、CSS 动效和案例弹窗完成讲解；公开视频更多作为“有证据、有同行、有对标”的补充材料。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-mask" id="caseModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+      <div class="modal-head">
+        <div>
+          <div class="view-kicker" id="caseType">CASE</div>
+          <h3 id="caseTitle">项目详情</h3>
+        </div>
+        <button class="modal-close" id="caseClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-scroll">
+        <div class="modal-grid" id="caseFields"></div>
+        <p class="modal-desc" id="caseDesc"></p>
+        <div class="modal-links" id="caseLinks"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page">
+    本页为低空数字孪生平台竞品分析与系统功能需求分析的 Web 汇报版，更新于 2026-05-18。地域点位为专题示意，金额和实施单位以公开招采、公开报道或公开案例页口径为准。
+  </footer>
+
+  <script>
+    const caseData = [
+      {
+        id: 'shenzhen',
+        name: '深圳低空管控与低空经济试点',
+        short: '深圳',
+        region: '华南',
+        caps: ['一网通飞', '空域协同', '综合驾驶舱'],
+        color: '#ffd21f',
+        x: 548, y: 385, r: 10,
+        type: '城市级低空管控平台',
+        serviceArea: '深圳市',
+        serviceUnit: '城市低空管控相关部门、运营主体、飞行服务单位',
+        amount: '公开资料未披露统一平台总金额',
+        bidDate: '非单一招采项目，公开资料未披露统一中标时间',
+        scale: '公开披露接入 140 个无人机起降点、209 条无人机航线、6 万余架飞行器与 5 万余个监测气象设施',
+        evidenceLevel: 'B｜政府公开报道/方案页',
+        highlights: ['规划', '起降点', '航线', '设施', '监管闭环'],
+        desc: '深圳是城市级低空管控的代表案例。它最有参考价值的地方，不是单一模块，而是把空域规划、航线设计、运行监控、设施治理和试点运营一起纳入同一套底座。',
+        links: [
+          ['深城交方案', 'https://www.sutpc.com/cn/bussiness/1.html'],
+          ['深圳试点成果', 'https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/post_11482362.html']
+        ]
+      },
+      {
+        id: 'longgang',
+        name: '深圳龙岗低空经济数字时空底座',
+        short: '龙岗',
+        region: '华南',
+        caps: ['综合驾驶舱', '典型场景', '空域协同'],
+        color: '#f7a817',
+        x: 565, y: 367, r: 8,
+        type: '数字时空底座',
+        serviceArea: '深圳市龙岗区',
+        serviceUnit: '采购公告口径；公开资料显示龙岗与高德、低空产业链单位协同推进',
+        amount: '采购预算约 4190.5443 万元',
+        bidDate: '2025-07-17（采购公告/公开报道口径）',
+        scale: '低空经济数字时空底座及应用场景建设服务采购，公告口径为采购预算/需求，不等同于最终中标合同额',
+        evidenceLevel: 'A-｜采购公告/政府公开信息',
+        highlights: ['区县', '底座', '场景', '协同'],
+        desc: '龙岗项目更接近启真的区县落地语境。这里按采购需求和公开报道口径使用，重点观察“底座 + 场景”组合，不将预算额直接表述为最终中标金额。',
+        links: [['采购公告', 'https://www.lg.gov.cn/xxgk/zwgk/tzgg/content/post_12193488.html'], ['公开报道', 'https://www.cls.cn/detail/2244489']]
+      },
+      {
+        id: 'linan',
+        name: '杭州临安低空综合治理项目',
+        short: '临安',
+        region: '华东',
+        caps: ['典型场景', '一网通飞', '空域协同'],
+        color: '#6aa7ff',
+        x: 470, y: 329, r: 8,
+        type: '区县级综合治理',
+        serviceArea: '杭州市临安区',
+        serviceUnit: '公开中标信息待进一步核验',
+        amount: '739.88 万元',
+        bidDate: '2025-12-18（结果公告口径）',
+        scale: '区县低空综合治理与一网统飞能力建设',
+        highlights: ['区县', '治理', '轻量平台', '可复制'],
+        verifyStatus: '待核验',
+        evidenceLevel: 'D｜仅检索入口，暂不纳入主图谱',
+        desc: '临安更像启真未来在区县侧的典型落地对象，但当前链接仍是检索入口，单位和公告原文未完整核验，暂不进入主图谱统计。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E4%B8%B4%E5%AE%89%20%E4%BD%8E%E7%A9%BA%E7%BB%BC%E5%90%88%E6%B2%BB%E7%90%86%E9%A1%B9%E7%9B%AE%20739.88%E4%B8%87']]
+      },
+      {
+        id: 'shaoxing',
+        name: '绍兴低空飞行综合监管服务平台',
+        short: '绍兴',
+        region: '华东',
+        caps: ['运行服务', '综合驾驶舱', '一网通飞'],
+        color: '#2ee87b',
+        x: 507, y: 332, r: 8,
+        type: '市级监管服务平台',
+        serviceArea: '绍兴市',
+        serviceUnit: '公开招采信息待进一步核验',
+        amount: '约 329 万元',
+        bidDate: '2024-09-12',
+        scale: '低空飞行综合监管服务平台建设',
+        highlights: ['监管', '服务', '轻量化', '标准化'],
+        verifyStatus: '待核验',
+        evidenceLevel: 'D｜仅检索入口，暂不纳入主图谱',
+        desc: '绍兴案例说明中小规模平台更关注入口、流程和可运维性，但当前链接仍是检索入口，暂不进入主图谱统计。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E7%BB%8D%E5%85%B4%20%E4%BD%8E%E7%A9%BA%E9%A3%9E%E8%A1%8C%E7%BB%BC%E5%90%88%E7%9B%91%E7%AE%A1%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0%20329%E4%B8%87']]
+      },
+      {
+        id: 'anhui',
+        name: '安徽低空空域与航线试点',
+        short: '安徽',
+        region: '华东',
+        caps: ['空域协同', '一网通飞', '典型场景'],
+        color: '#ffd21f',
+        x: 430, y: 326, r: 9,
+        type: '省级试点',
+        serviceArea: '安徽省多个地市',
+        serviceUnit: '省级主管部门与地方协同推进',
+        amount: '公开资料未披露统一金额',
+        bidDate: '试点/报道类案例，公开资料未披露统一中标时间',
+        scale: '公开报道提到安徽获批 21 个低空空域、28 条航线',
+        evidenceLevel: 'B｜权威媒体报道',
+        highlights: ['省级', '空域', '航线', '协同'],
+        desc: '安徽更像“空域制度与航线试点”的样本。它提醒我们，若要做跨区县联动，必须先把空域、线路和审批关系讲清楚。',
+        links: [['央视报道', 'https://news.cctv.com/2024/03/12/ARTIa3ZskfJqisWkathpIJaG240312.shtml']]
+      },
+      {
+        id: 'jinan',
+        name: '济南数字低空飞行管理服务平台低空保障设施建设项目',
+        short: '济南',
+        region: '华北',
+        caps: ['综合驾驶舱', '基础设施', '空域协同'],
+        color: '#ff5a5f',
+        x: 444, y: 253, r: 9,
+        type: '城市级基础设施',
+        serviceArea: '济南市',
+        serviceUnit: '神思电子技术股份有限公司',
+        amount: '约 1.998 亿元',
+        bidDate: '2025-12-17（公开中标结果口径）',
+        scale: '数字低空飞行管理服务平台低空保障设施建设项目，公开披露中标金额约 1.998 亿元',
+        serviceContent: '低空飞行管理服务平台、低空保障设施、城市级监管服务和运行保障能力建设。',
+        evidenceLevel: 'B｜上市公司/媒体公开披露',
+        highlights: ['基础设施', '大项目', '联合体', '平台化'],
+        desc: '济南的价值在于项目规模和系统组合方式。它说明大体量项目更接近“基础设施 + 平台 + 运营”的打包模式，而不只是单一软件采购。',
+        links: [['公开报道', 'https://www.21jingji.com/article/20251223/herald/849751fbd6a140144cb82620251a08cf.html']]
+      },
+      {
+        id: 'zhengzhou',
+        name: '郑州低空飞行监管服务平台',
+        short: '郑州',
+        region: '华中',
+        caps: ['运行服务', '一网通飞', '综合驾驶舱'],
+        color: '#00d9ff',
+        x: 385, y: 287, r: 8,
+        type: '市级监管平台',
+        serviceArea: '郑州市',
+        serviceUnit: '公开招采信息待进一步核验',
+        amount: '933.1 万元',
+        bidDate: '公开资料待复核',
+        scale: '市级低空飞行监管服务平台',
+        highlights: ['审批', '监管', '服务', '市级'],
+        verifyStatus: '待核验',
+        evidenceLevel: 'D｜仅检索入口，暂不纳入主图谱',
+        desc: '郑州案例对应的是典型的市级监管服务平台预算段，但当前仍缺公告原文链接，暂不进入主图谱统计。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E9%83%91%E5%B7%9E%E5%B8%82%E4%BD%8E%E7%A9%BA%E9%A3%9E%E8%A1%8C%E7%9B%91%E7%AE%A1%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0%20933.1%E4%B8%87']]
+      },
+      {
+        id: 'henan',
+        name: '河南省无人驾驶航空器综合服务系统',
+        short: '河南省',
+        region: '华中',
+        caps: ['一网通飞', '空域协同', '综合驾驶舱'],
+        color: '#ffd21f',
+        x: 366, y: 268, r: 8,
+        type: '省级综合服务系统',
+        serviceArea: '河南省',
+        serviceUnit: '民航第二研究所有限公司',
+        amount: '1282.5 万元',
+        bidDate: '2026-01-05',
+        scale: '省级无人驾驶航空器综合服务系统',
+        evidenceLevel: 'A｜政府采购中标公告',
+        highlights: ['省级', '贯通', '协同', '服务'],
+        desc: '河南案例显示，省级系统更强调标准化接口、数据贯通和监管协同。它适合启真借鉴“省市县贯通”的架构思路。',
+        links: [['政府采购中标公告', 'https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202601/t20260105_26307371.htm']]
+      },
+      {
+        id: 'ordos',
+        name: '鄂尔多斯低空飞行服务平台',
+        short: '鄂尔多斯',
+        region: '华北',
+        caps: ['运行服务', '一网通飞', '典型场景'],
+        color: '#f7a817',
+        x: 320, y: 202, r: 8,
+        type: '市级飞行服务平台',
+        serviceArea: '鄂尔多斯市',
+        serviceUnit: '公开招采信息待进一步核验',
+        amount: '566.28 万元',
+        bidDate: '2024-11-27',
+        scale: '市级低空飞行服务平台',
+        highlights: ['轻量', '飞服', '标准化', '交付'],
+        verifyStatus: '待核验',
+        evidenceLevel: 'D｜仅检索入口，暂不纳入主图谱',
+        desc: '鄂尔多斯项目呈现的是轻量化飞服平台的典型预算区间，但当前缺公告原文链接，暂不进入主图谱统计。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E9%84%82%E5%B0%94%E5%A4%9A%E6%96%AF%20%E4%BD%8E%E7%A9%BA%E9%A3%9E%E8%A1%8C%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0%20566.28%E4%B8%87%20%E8%8E%B1%E6%96%AF']]
+      },
+      {
+        id: 'chengdu',
+        name: '成都低空交通管理服务平台',
+        short: '成都',
+        region: '西南',
+        caps: ['运行服务', '综合驾驶舱', '典型场景'],
+        color: '#f7a817',
+        x: 315, y: 315, r: 9,
+        type: '城市级飞行服务平台',
+        serviceArea: '成都市',
+        serviceUnit: '公开报道中的相关平台企业与城市部门',
+        amount: '公开资料未披露统一金额',
+        bidDate: '平台报道类案例，公开资料未披露统一中标时间',
+        scale: '城市低空交通管理服务平台',
+        evidenceLevel: 'B｜权威媒体报道',
+        highlights: ['交通', '服务', '调度', '复盘'],
+        desc: '成都案例的重点是“飞行服务 + 城市治理”耦合。它和启真的场景落地思路高度一致，尤其适合做巡查、交通和应急联动。',
+        links: [['公开报道', 'https://sc.people.com.cn/n2/2024/0621/c379469-40887100.html']]
+      },
+      {
+        id: 'chongqing',
+        name: '重庆低空运行数字底座',
+        short: '重庆',
+        region: '西南',
+        caps: ['综合驾驶舱', '基础设施', '空域协同'],
+        color: '#2ee87b',
+        x: 355, y: 360, r: 9,
+        type: '数字底座',
+        serviceArea: '重庆市',
+        serviceUnit: '中科星图公开展示能力',
+        amount: '公开资料未披露统一金额',
+        bidDate: '公开视频/案例展示，公开资料未披露统一中标时间',
+        scale: '“1网、1中心、N标准、M场景”式展示',
+        evidenceLevel: 'C｜企业公开案例/公开视频',
+        highlights: ['底座', '图谱', '标准', '场景'],
+        desc: '重庆案例更像数字底座范式。它适合启真对比“平台能力如何沉到底座、再向场景分发”的路径。',
+        links: [['公开视频', 'https://www.bilibili.com/video/BV1kbsGzEEux/'], ['中科星图平台', 'https://www.geovis.com.cn/products/detail/37']]
+      },
+      {
+        id: 'hanzhong',
+        name: '中科星图汉中低空经济项目',
+        short: '汉中',
+        region: '西北',
+        caps: ['典型场景', '一网通飞', '综合驾驶舱'],
+        color: '#6aa7ff',
+        x: 280, y: 286, r: 8,
+        type: '低空经济项目',
+        serviceArea: '陕西汉中',
+        serviceUnit: '中科星图公开案例',
+        amount: '约 2.95 亿元口径',
+        bidDate: '公开案例页未披露统一中标时间',
+        scale: '低空经济基础设施与平台能力组合建设',
+        evidenceLevel: 'C｜企业公开案例',
+        highlights: ['大项目', '基础设施', '平台组合', '运营'],
+        desc: '汉中案例提示大体量项目往往不是单一软件，而是基础设施、平台、运营和长期服务的组合交付。',
+        links: [['公开案例', 'https://www.geovis.com.cn/cases/detail/379']]
+      },
+      {
+        id: 'nankang',
+        name: '南康区一网统飞综合治理平台',
+        short: '南康',
+        region: '华南',
+        caps: ['一网通飞', '典型场景', '空域协同'],
+        color: '#ff5a5f',
+        x: 462, y: 374, r: 8,
+        type: '区县级治理平台',
+        serviceArea: '赣州市南康区',
+        serviceUnit: '公开招采信息显示为中标单位实施',
+        amount: '650 万元',
+        bidDate: '2026-02-23（招采信息口径）',
+        scale: '一网统飞综合治理平台',
+        evidenceLevel: 'B｜招采信息/地方公开报道',
+        highlights: ['区县', '治理', '飞控', '闭环'],
+        desc: '南康案例与启真区县级产品思路高度接近，说明区县项目最看重的仍然是治理闭环、统飞能力和可落地程度。',
+        links: [['招采信息', 'https://jx.qianlima.com/zbcontent-590663216.html']]
+      },
+      {
+        id: 'jiaojiang',
+        name: '台州椒江低空智能网联基础设施项目',
+        short: '椒江',
+        region: '华东',
+        caps: ['一网通飞', '综合驾驶舱', '运行服务'],
+        color: '#00d9ff',
+        x: 520, y: 348, r: 8,
+        type: '区县级低空智能网联基础设施',
+        serviceArea: '台州市椒江区',
+        serviceUnit: '浙江移动数智科技有限公司',
+        amount: '898 万元',
+        bidDate: '2025-12-08',
+        scale: '台州市椒江区低空智能网联基础设施建设项目，公开候选/中标信息显示金额 898 万元',
+        serviceContent: '低空飞行服务入口、区县低空运行管理、一网统飞/一网统管能力、综合驾驶舱及低空应用场景支撑。',
+        evidenceLevel: 'A-｜招采结果公开信息',
+        highlights: ['区县', '智能网联', '一网统飞', '驾驶舱'],
+        desc: '椒江案例金额处在千万级以下，适合观察区县轻量化低空基础设施项目的采购边界。它更强调可快速落地的运行服务入口和区县综合管理能力。',
+        links: [['招采结果信息', 'https://m.yfbzb.com/winbid/detail/20251208_557988357.html']]
+      },
+      {
+        id: 'zhijiang',
+        name: '枝江市低空经济建设项目',
+        short: '枝江',
+        region: '华中',
+        caps: ['典型场景', '基础设施', '综合驾驶舱'],
+        color: '#ff5a5f',
+        x: 395, y: 331, r: 12,
+        type: '低空经济基础设施建设',
+        serviceArea: '湖北省枝江市',
+        serviceUnit: '吉峰三农科技服务股份有限公司牵头联合体',
+        amount: '2.889107 亿元',
+        bidDate: '2026-04-03（公开中标结果口径）',
+        scale: '低空经济基础设施、平台能力与场景建设组合项目',
+        serviceContent: '低空基础设施建设、起降设施与配套工程、平台系统建设、运营场景导入及区域低空经济综合服务能力建设。',
+        evidenceLevel: 'B｜上市公司公告/招采结果公开信息',
+        highlights: ['大项目', '基础设施', '场景建设', '工程总包'],
+        desc: '枝江案例代表“大基建 + 平台 + 场景”组合采购模式，合同额远高于常规软件平台，说明低空经济项目正从信息化采购扩展到基础设施建设和长期运营组合。',
+        links: [['公开披露', 'https://finance.sina.com.cn/roll/2026-04-03/doc-infrppwm1473782.shtml']]
+      },
+      {
+        id: 'xiamen',
+        name: '厦门低空智能融合基础设施项目',
+        short: '厦门',
+        region: '华东',
+        caps: ['空域协同', '综合驾驶舱', '运行服务'],
+        color: '#2ee87b',
+        x: 505, y: 395, r: 9,
+        type: '低空智能融合基础设施',
+        serviceArea: '厦门市',
+        serviceUnit: '公开招采信息以中标公告为准',
+        amount: '公开资料待复核',
+        bidDate: '公开资料待复核',
+        scale: '低空智能融合基础设施及平台能力建设',
+        serviceContent: '低空感知、通信、导航、监管服务、飞行服务和综合态势展示等融合基础设施能力。',
+        highlights: ['融合基础设施', '感知通信', '飞服监管', '驾驶舱'],
+        verifyStatus: '剔除',
+        desc: '厦门案例用于补充沿海城市低空融合基础设施方向，体现从单一平台向感知、通信、导航、监管和飞服融合建设的趋势。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E5%8E%A6%E9%97%A8%20%E4%BD%8E%E7%A9%BA%E6%99%BA%E8%83%BD%E8%9E%8D%E5%90%88%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%20%E4%B8%AD%E6%A0%87']]
+      },
+      {
+        id: 'qingdao',
+        name: '青岛低空飞行服务与监管平台项目',
+        short: '青岛',
+        region: '华北',
+        caps: ['运行服务', '空域协同', '一网通飞'],
+        color: '#6aa7ff',
+        x: 470, y: 238, r: 8,
+        type: '城市低空飞行服务平台',
+        serviceArea: '青岛市',
+        serviceUnit: '公开资料待复核',
+        amount: '公开资料待复核',
+        bidDate: '公开资料待复核',
+        scale: '城市低空飞行服务、监管协同与场景应用项目',
+        serviceContent: '飞行计划服务、空域航线管理、飞行活动监管、态势展示、运营主体服务和典型低空场景接入。',
+        highlights: ['飞服', '监管', '城市级', '场景接入'],
+        verifyStatus: '剔除',
+        desc: '青岛案例用于补充北方沿海城市飞服平台方向，重点观察城市级飞行服务平台如何衔接监管和运营主体。',
+        links: [['公开检索入口', 'https://www.baidu.com/s?wd=%E9%9D%92%E5%B2%9B%20%E4%BD%8E%E7%A9%BA%E9%A3%9E%E8%A1%8C%E6%9C%8D%E5%8A%A1%20%E7%9B%91%E7%AE%A1%E5%B9%B3%E5%8F%B0%20%E4%B8%AD%E6%A0%87']]
+      },
+      {
+        id: 'hainan',
+        name: '海南低空飞行服务与综合监管系统',
+        short: '海南',
+        region: '海南',
+        caps: ['运行服务', '空域协同', '侦测反制'],
+        color: '#ff5a5f',
+        x: 500, y: 452, r: 9,
+        type: '省域飞服与监管系统',
+        serviceArea: '海南省',
+        serviceUnit: '公开报道中的相关平台企业与主管部门',
+        amount: '公开资料未披露统一金额',
+        bidDate: '飞服/监管运行报道类案例，公开资料未披露统一中标时间',
+        scale: '飞行计划、企业服务、监管数据和长期运营统计',
+        evidenceLevel: 'B｜公开报道',
+        highlights: ['省域', '飞服', '监管', '长期运营'],
+        desc: '海南案例的重点在于省域飞行服务与长期运营统计。它强调平台上线只是起点，真正的价值在于长期运行后的数据沉淀。',
+        links: [['公开报道', 'https://hain.chinadaily.com.cn/a/202512/03/WS6930145da310942cc4994cbe.html'], ['通航资源网', 'https://www.ccaonline.cn/tongyong/tyhot/1141839.html']]
+      }
+    ];
+
+    const atlasLegendData = [
+      { value: '13', label: '可溯源案例' },
+      { value: '7', label: '地域分布' },
+      { value: '8', label: '金额可查' },
+      { value: '6', label: '能力方向' }
+    ];
+
+    const vendorData = [
+      {
+        id: 'sutpc',
+        name: '深城交：城市交通规划视角的低空管控',
+        tags: ['城市级管控', 'CIM', '空域规划', '航线设计'],
+        summary: '深城交的优势在于把低空交通放进城市交通治理体系里看，强调空域规划、航线组织、起降设施、运行监管和事故分析。',
+        service: '服务城市级、区县级低空管控部门与低空经济试点区域。',
+        architecture: [
+          ['数据底座', 'CIM、道路交通、空域、设施、航线、飞行器、气象与通导监等数据融合。'],
+          ['业务能力', '空域规划、航路航线设计、起降点布局、运行监管、设施监管和事故预测分析。'],
+          ['展示形态', '城市低空综合管控大屏、专题图层、运行态势和辅助决策面板。']
+        ],
+        lesson: ['启真区县低空规划平台可以向运行监管前移。', '起降场选址、净空分析和航线适配要服务化输出。', '规划成果要沉淀成后续审批、围栏和态势监控的规则来源。'],
+        video: '公开资料以官网方案和报道为主，暂无统一公开视频入口。',
+        links: [['深城交低空管控方案', 'https://www.sutpc.com/cn/bussiness/1.html']]
+      },
+      {
+        id: 'geovis',
+        name: '中科星图：空天数据驱动的低空数字底座',
+        tags: ['数字底座', '空天数据', '仿真计算', '场景开放'],
+        summary: '中科星图更偏数字地球和空天信息底座，强调“数据、计算、管控、调度、算法、运营开放”的底层能力组合。',
+        service: '服务地方政府低空经济建设、低空运行底座、行业场景与平台开放生态。',
+        architecture: [
+          ['数据底座', '遥感、地理信息、三维场景、空域网格、低空设施和飞行活动数据。'],
+          ['业务能力', '低空数字孪生、仿真推演、运行监管、算法分析、场景应用和开放接口。'],
+          ['展示形态', '低空数字底座、城市驾驶舱、空域态势、场景专题和视频演示。']
+        ],
+        lesson: ['启真低空数据算法管理平台要突出可计算、可服务。', '数字孪生不只是三维展示，要支撑仿真、评估和监管。', '场景开放能力可作为后续生态接口预留。'],
+        video: '已有中科星图低空运行数字底座公开演示视频，可作为汇报素材。',
+        links: [['智航平台', 'https://www.geovis.com.cn/products/detail/37'], ['星图低空云', 'https://open.geovisearth.com/product/Low_Altitude_Cloud'], ['公开视频', 'https://www.bilibili.com/video/BV1kbsGzEEux/']]
+      },
+      {
+        id: 'dji',
+        name: 'DJI FlightHub 2：无人机作业运营闭环标杆',
+        tags: ['无人机运行服务', '机库', '视频回传', '任务闭环'],
+        summary: 'DJI 的强项不在政府监管，而在真实作业侧：设备、机库、飞手、航线、任务、视频、成果和第三方集成形成完整闭环。',
+        service: '服务运营单位、行业用户、无人机作业团队、应急和巡检等高频任务场景。',
+        architecture: [
+          ['设备层', '无人机、机场/机库、负载、视频链路和飞行控制。'],
+          ['任务层', '航线规划、任务下发、远程控制、视频回传、团队协同和数据归档。'],
+          ['生态层', '开放接口、第三方系统集成和行业工作流接入。']
+        ],
+        lesson: ['启真飞行综合运营平台要更贴近任务执行，不只服务监管视角。', '任务、设备、视频和成果归档要形成闭环。', '运营服务工作面可以借鉴 FlightHub 2 的轻量交互方式。'],
+        video: 'DJI 官方提供 FlightHub 2 产品视频和演示资料。',
+        links: [['DJI FlightHub 2', 'https://enterprise.dji.com/flighthub-2'], ['视频页', 'https://enterprise.dji.com/flighthub-2/video']]
+      },
+      {
+        id: 'les',
+        name: '莱斯/民航体系：空管与综合服务系统能力',
+        tags: ['飞行服务', '空管接口', '省市协同', '合规流程'],
+        summary: '莱斯和民航体系厂商的优势在空管信息化、飞行服务、综合服务系统和省市协同，对低空监管平台的流程合规性有参考价值。',
+        service: '服务省级、市级无人驾驶航空器综合服务、飞行服务和监管协同部门。',
+        architecture: [
+          ['规则层', '实名、申报、审批、空域、航线、计划和动态限制。'],
+          ['服务层', '飞行计划、运行服务、监管协同、统计查询和接口对接。'],
+          ['管理层', '省市县贯通、部门协同、日志审计和运维管理。']
+        ],
+        lesson: ['启真监管能力要把合规流程和接口标准前置。', '区县平台既要能独立运行，也要预留上级系统贯通。', '招投标项目中这类厂商常出现在省市级综合服务系统。'],
+        video: '公开资料以招采公告、公司案例和行业报道为主。',
+        links: [['河南省项目公告', 'https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202601/t20260105_26307371.htm']]
+      },
+      {
+        id: 'uspace',
+        name: '国际 UTM / U-space：标准化服务与授权体系',
+        tags: ['UTM', 'U-space', '远程识别', '授权服务'],
+        summary: '国际体系更关注服务标准、运行授权、远程识别、地理感知和互操作性，适合作为启真未来接口和规则设计的参考。',
+        service: '服务监管机构、飞行服务提供商、无人机运营商和空域服务网络。',
+        architecture: [
+          ['基础服务', '远程识别、地理感知、飞行授权、交通信息和一致性监控。'],
+          ['协同机制', 'CISP/USSP 或 UTM 生态中不同服务方之间的数据互操作。'],
+          ['合规体系', '认证、审计、业务连续性、安全边界和授权责任。']
+        ],
+        lesson: ['启真不必照搬国际体系，但要提前考虑标准接口和审计能力。', '飞行申报、动态放行和态势监控要保留对外接口。', '未来数据服务化离不开身份、授权和可追溯机制。'],
+        video: 'EASA U-space Workshop 可作为国际标准讲解视频素材。',
+        links: [['EASA U-space', 'https://www.easa.europa.eu/en/domains/air-traffic-management/u-space'], ['FAA UTM', 'https://www.faa.gov/uas/advanced_operations/traffic_management']]
+      }
+    ];
+
+    const vendorDeepData = [
+      {
+        id: 'sutpc',
+        name: '深城交：城市交通规划型低空管控平台',
+        tags: ['城市级管控', 'CIM', '空域规划', '航线组织'],
+        summary: '深城交的低空方案以城市交通治理为入口，强项是把低空空域、起降点、航线、设施和监管纳入城市交通规划与运行体系。',
+        service: '面向城市交通主管部门、低空专班、区县低空治理部门，以及需要统筹起降设施和航路航线的地方政府。',
+        architecture: [
+          ['数据层', '城市 CIM、路网交通、低空适飞空域、起降点、航线、气象、通导监和飞行器数据。'],
+          ['能力层', '空域规划、航路航线设计、起降设施布局、运行监管、设施监管、事故预测与分析。'],
+          ['应用层', '低空综合管控驾驶舱、规划辅助决策、运行态势监控和多部门协同监管。']
+        ],
+        cases: [
+          ['深圳低空管控方案', '公开披露接入 140 个无人机起降点、209 条航线、6 万余架飞行器、5 万余个监测气象设施。'],
+          ['深圳/龙岗类区县数字时空底座', '公开市场案例显示区县侧正在从单一大屏转向数字时空底座和场景应用组合。']
+        ],
+        scores: [
+          ['规划能力', 95],
+          ['监管闭环', 82],
+          ['运营作业', 62],
+          ['数字孪生', 82],
+          ['区县适配', 86],
+          ['交付复用', 76]
+        ],
+        lesson: ['启真的区县低空规划平台应继续强化“规划成果进入运行规则”的链路。', '起降场选址、净空分析、航线适配应作为上层监管和飞服系统的能力服务。', '竞品强在城市交通和规划底座，启真可在区县场景、数据算法和云守护闭环上做差异化。'],
+        video: '以官网方案和公开报道为主，适合在汇报中作为城市级低空管控对标案例。',
+        links: [['深城交低空管控方案', 'https://www.sutpc.com/cn/bussiness/1.html'], ['深圳低空经济试点成果', 'https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/post_11482362.html']]
+      },
+      {
+        id: 'amap',
+        name: '高德/云高智联：空地一体地图与运营聚合',
+        tags: ['数字时空底座', '空地一体', '区县场景', '地图服务'],
+        summary: '高德及其生态公司更偏地图数据、空地一体导航、低空时空底座和应用场景聚合，适合观察区县低空底座如何从地图能力延伸到运营服务。',
+        service: '面向区县低空经济建设单位、低空应用场景运营方，以及需要地图、航线、起降点和运营入口的区域平台。',
+        architecture: [
+          ['地图底座', '地理信息、POI、道路交通、三维空间、起降点、航路航线和低空设施。'],
+          ['服务能力', '空地一体路径规划、低空飞行服务、场景应用接入、运营入口和数据更新。'],
+          ['应用形态', '区县低空数字时空底座、低空经济应用场景、综合驾驶舱和公众/企业服务入口。']
+        ],
+        cases: [
+          ['深圳龙岗低空经济数字时空底座', '公开报道口径显示项目金额约 4190.5443 万元，重点是数字时空底座与应用场景建设。'],
+          ['空中高德相关能力', '强调低空地图、航路航线、空地协同和飞行服务入口，适合对标区县底座型产品。']
+        ],
+        scores: [
+          ['规划能力', 84],
+          ['监管闭环', 68],
+          ['运营作业', 78],
+          ['数字孪生', 86],
+          ['区县适配', 90],
+          ['交付复用', 82]
+        ],
+        lesson: ['启真需要把时空大数据选址和低空规划能力包装成可调用、可更新的底座服务。', '地图入口类竞品会强化用户心智，启真应突出政府监管闭环和区县治理深度。', '低空数字时空底座不应只做地图，应连到审批、任务、监管、侦测和复盘。'],
+        video: '公开资料以新闻报道和项目招采信息为主，可与龙岗项目弹窗联动讲解。',
+        links: [['龙岗公开报道', 'https://www.cls.cn/detail/2244489']]
+      },
+      {
+        id: 'geovis',
+        name: '中科星图：空天数据驱动的低空数字底座',
+        tags: ['数字地球', '空天数据', '仿真计算', '场景开放'],
+        summary: '中科星图以空天数据和数字地球能力见长，强调低空数字底座、仿真推演、运行监管、算法分析和场景开放。',
+        service: '面向地方低空经济建设、低空运行数字底座、城市驾驶舱、行业场景和平台开放生态。',
+        architecture: [
+          ['数据层', '遥感影像、地理信息、三维场景、空域网格、低空设施、飞行活动和行业专题数据。'],
+          ['计算层', '数字孪生、空域仿真、路径分析、态势推演、算法模型和数据服务。'],
+          ['应用层', '低空运行数字底座、综合驾驶舱、场景专题、开放平台和行业应用。']
+        ],
+        cases: [
+          ['重庆低空运行数字底座', '公开演示材料展示低空运行数字底座形态，突出数字孪生和场景调度。'],
+          ['汉中低空经济项目', '公开案例页显示低空经济基础设施与平台能力组合建设，体现大项目打包交付趋势。']
+        ],
+        scores: [
+          ['规划能力', 78],
+          ['监管闭环', 76],
+          ['运营作业', 64],
+          ['数字孪生', 96],
+          ['区县适配', 74],
+          ['交付复用', 80]
+        ],
+        lesson: ['启真低空数据算法管理平台要强调“可计算、可服务、可复盘”。', '数字孪生不应停留在三维展示，应服务于仿真评估、态势分析和辅助决策。', '中科星图强在底座和展示，启真可在区县业务流程闭环和治理场景落地上形成差异。'],
+        video: '已有公开演示视频，可作为竞品展示素材。',
+        links: [['智航平台', 'https://www.geovis.com.cn/products/detail/37'], ['星图低空云', 'https://open.geovisearth.com/product/Low_Altitude_Cloud'], ['公开演示视频', 'https://www.bilibili.com/video/BV1kbsGzEEux/']]
+      },
+      {
+        id: 'dji',
+        name: 'DJI FlightHub 2：无人机运行服务与作业闭环',
+        tags: ['运行服务', '机库', '视频回传', '任务闭环'],
+        summary: 'DJI FlightHub 2 的优势在真实作业侧，围绕设备、机库、航线、任务、视频、团队协同和成果归档形成高频运行闭环。',
+        service: '面向运营单位、行业客户、无人机作业团队、应急巡检、能源巡检、安防巡查等任务型场景。',
+        architecture: [
+          ['设备层', '无人机、机场/机库、负载、视频链路、遥控和设备状态。'],
+          ['任务层', '航线规划、任务下发、远程控制、直播回传、团队协同、成果归档。'],
+          ['集成层', '云平台、第三方系统集成、开放接口和行业工作流接入。']
+        ],
+        cases: [
+          ['FlightHub 2 产品体系', '官方资料强调云端协同、直播、航线、设备管理、机场联动和开放集成。'],
+          ['行业巡检与应急场景', '适合对标无人机运行服务平台的任务执行体验和闭环颗粒度。']
+        ],
+        scores: [
+          ['规划能力', 52],
+          ['监管闭环', 58],
+          ['运营作业', 96],
+          ['数字孪生', 62],
+          ['区县适配', 70],
+          ['交付复用', 88]
+        ],
+        lesson: ['启真飞行综合运营平台要向真实作业靠拢，而不是只服务监管视角。', '任务、设备、飞手、视频、成果和复盘要形成一条线。', 'DJI 强在设备生态，启真应通过监管合规、区县数据和多部门协同形成互补。'],
+        video: 'DJI 官方有产品视频和演示素材。',
+        links: [['DJI FlightHub 2', 'https://enterprise.dji.com/flighthub-2'], ['DJI 视频页', 'https://enterprise.dji.com/flighthub-2/video']]
+      },
+      {
+        id: 'aviation',
+        name: '莱斯/民航二所等空管体系：飞服与合规监管',
+        tags: ['飞行服务', '空管接口', '省市协同', '合规流程'],
+        summary: '空管和民航体系厂商强在飞行服务、空域规则、综合服务系统、接口规范和省市协同，是监管平台合规性的主要参考系。',
+        service: '面向省级、市级无人驾驶航空器综合服务系统、飞行服务平台、监管协同和空管信息化项目。',
+        architecture: [
+          ['规则层', '实名、申报、审批、空域、航线、飞行计划、动态限制和审计规则。'],
+          ['服务层', '飞行计划、运行服务、监管协同、统计查询、接口对接和综合服务门户。'],
+          ['协同层', '省市县贯通、多部门协同、上级系统对接、日志审计和运维管理。']
+        ],
+        cases: [
+          ['河南省无人驾驶航空器综合服务系统', '公开中标金额 1282.5 万元，中标时间 2026-01-05，中标单位为民航第二研究所有限公司。'],
+          ['鄂尔多斯低空飞行服务平台', '公开中标金额 566.28 万元，中标时间 2024-11-27，体现轻量飞服平台预算区间。']
+        ],
+        scores: [
+          ['规划能力', 70],
+          ['监管闭环', 92],
+          ['运营作业', 72],
+          ['数字孪生', 58],
+          ['区县适配', 78],
+          ['交付复用', 84]
+        ],
+        lesson: ['启真监管能力要把合规流程、接口标准、审计留痕前置。', '区县平台要能独立运行，也要预留省市县贯通能力。', '空管体系厂商强在合规和流程，启真应突出时空数据、区县治理和快速交付。'],
+        video: '公开资料以招采公告和行业报道为主，适合作为招投标图谱证据。',
+        links: [['河南省项目公告', 'https://www.ccgp.gov.cn/cggg/dfgg/zbgg/202601/t20260105_26307371.htm']]
+      },
+      {
+        id: 'utmuspace',
+        name: '国际 UTM / U-space：标准服务与互操作体系',
+        tags: ['UTM', 'U-space', '远程识别', '授权服务'],
+        summary: '国际 UTM/U-space 更关注服务标准、飞行授权、远程识别、地理感知、交通信息和互操作性，适合为启真接口设计和未来监管标准化提供参照。',
+        service: '面向监管机构、U-space/UTM 服务提供商、无人机运营商和空域服务网络。',
+        architecture: [
+          ['基础服务', '远程识别、地理感知、飞行授权、交通信息和一致性监控。'],
+          ['协同机制', 'CISP/USSP 或 UTM 生态中不同服务方之间的数据互操作。'],
+          ['合规体系', '认证、审计、业务连续性、安全边界和授权责任。']
+        ],
+        cases: [
+          ['EASA U-space', '强调 U-space 服务、互操作和受控空域内的无人机运行服务体系。'],
+          ['FAA UTM', '强调高级无人机运行下的交通管理、数据交换和服务提供方协同。']
+        ],
+        scores: [
+          ['规划能力', 72],
+          ['监管闭环', 90],
+          ['运营作业', 70],
+          ['数字孪生', 56],
+          ['区县适配', 58],
+          ['交付复用', 78]
+        ],
+        lesson: ['启真不必照搬国际体系，但应提前考虑标准接口和审计能力。', '飞行申报、动态放行和态势监控要保留对外接口。', '未来数据服务化离不开身份、授权、留痕和互操作机制。'],
+        video: 'EASA U-space Workshop 可作为国际标准讲解视频素材。',
+        links: [['EASA U-space', 'https://www.easa.europa.eu/en/domains/air-traffic-management/u-space'], ['FAA UTM', 'https://www.faa.gov/uas/advanced_operations/traffic_management']]
+      }
+    ];
+
+    const capabilitySets = {
+      route: {
+        label: '航线规划',
+        title: '1. 第一优先级：低空航线规划能力',
+        intro: '航线规划是启真低空产品最应该先打穿的能力。现有平台基础不宜直接作为底座，应围绕起降点、空域、净空、风险、容量和运行规则重建一套可计算、可解释、可交付的航线规划能力。',
+        cards: [
+          { h: '航线适配计算', p: '把起降点、航路、禁限飞区、净空、人口密度、地物风险和任务约束纳入统一计算。', items: ['起降点', '净空', '风险'] },
+          { h: '空域与容量评估', p: '支持低空走廊、临时航线、常态航线和多任务冲突检测，为审批和运行提供依据。', items: ['走廊', '容量', '冲突'] },
+          { h: '方案比选与解释', p: '输出推荐航线、备选航线、风险理由、限制条件和可视化报告，便于政府和运营方决策。', items: ['推荐', '比选', '解释'] },
+          { h: '航线服务化 API', p: '把规划结果沉淀为可调用服务，支撑申报、审批、任务调度和场景交付。', items: ['API', '规则', '复用'] }
+        ]
+      },
+      agent: {
+        label: 'AI 智能体',
+        title: '2. 第二优先级：面向低空业务的 AI 智能体',
+        intro: 'AI 智能体不做泛泛问答，先聚焦低空业务中的高频动作：航线规划辅助、审批材料生成、异常研判、巡查任务闭环和运营复盘。它应绑定数据、规则和流程，成为提升交付效率的产品能力。',
+        cards: [
+          { h: '规划智能体', p: '根据任务目标自动生成航线方案、风险说明和材料清单，辅助产品演示和项目交付。', items: ['任务理解', '方案生成', '材料清单'] },
+          { h: '审批智能体', p: '辅助生成申报材料、检查必填项、识别规则冲突并提示补正意见。', items: ['申报', '校验', '补正'] },
+          { h: '巡查研判智能体', p: '结合图像识别、时空位置和历史任务，对巡查结果做自动归类、派单和闭环建议。', items: ['识别', '派单', '闭环'] },
+          { h: '运营复盘智能体', p: '把飞行、任务、设备、告警和处置数据转为复盘报告，支撑项目验收和持续运营。', items: ['统计', '复盘', '报告'] }
+        ]
+      },
+      data: {
+        label: '基础重构',
+        title: '3. 基础重构：不把旧平台当成可靠底座',
+        intro: '已有平台基础存在数据口径、接口规范、业务闭环和用户体验不足的问题，不宜直接作为新产品的基础资源。下一步应按“可用数据、可解释规则、可复用服务、可验收流程”重构底座。',
+        cards: [
+          { h: '数据重新盘点', p: '先评估哪些数据真实可用、持续可更新、能支撑计算，不能把历史演示数据直接产品化。', items: ['可用性', '时效性', '准确性'] },
+          { h: '规则重新建模', p: '把空域、净空、航线、审批和任务规则结构化，减少口径不一和人工解释。', items: ['空域', '审批', '任务'] },
+          { h: '接口重新梳理', p: '把地图、算法、设备、飞服和监管接口按服务边界重整，避免项目制烟囱继续堆叠。', items: ['接口', '服务', '边界'] },
+          { h: '体验重新设计', p: '围绕产品经理、审批人员、运营单位和区县部门重新设计工作流，不再只围绕大屏展示。', items: ['工作流', '角色', '易用性'] }
+        ]
+      },
+      control: {
+        label: '核心监管',
+        title: '4. 核心监管围绕航线和智能体收敛',
+        intro: '监管能力仍然重要，但不再作为泛平台功能铺开。它应围绕航线规划结果、飞行申报、动态围栏、态势监控、异常处置和审计留痕形成闭环。',
+        cards: [
+          { h: '审批与申报', p: '把审批与申报做成标准流程，不追求界面炫，而是追求低耦合、高可靠。', items: ['审批链路', '申报模板', '状态回传'] },
+          { h: '态势与围栏', p: '把电子围栏、态势监控、异常预警和证据留痕联成闭环。', items: ['围栏', '告警', '留痕'] },
+          { h: '应急处置', p: '异常之后先处置、再复盘、后归档，让监管动作可执行、可追踪。', items: ['联动', '处置', '复盘'] },
+          { h: '侦测反制', p: '与低空侦测装备协同，把发现、识别、干预和回传统一纳入监管链路。', items: ['侦测', '识别', '干预'] }
+        ]
+      },
+      delivery: {
+        label: '交付沉淀',
+        title: '5. 交付沉淀：围绕两大优先能力做标准包',
+        intro: '交付沉淀不再铺成大而全功能清单，而是围绕航线规划和 AI 智能体形成可复用标准包，再向监管、运营和场景扩展。',
+        cards: [
+          { h: '航线规划标准包', p: '沉淀起降点选址、净空分析、航线比选、风险报告和申报材料模板。', items: ['选址', '比选', '报告'] },
+          { h: '智能体标准包', p: '沉淀提示词、规则库、工具调用、知识库和报告模板，降低项目复制成本。', items: ['规则库', '工具', '模板'] },
+          { h: '版本可控', p: '所有配置、权限、接口和流程都需要可追踪、可回滚。', items: ['版本', '权限', '日志'] },
+          { h: '运维可视', p: '把运维指标、异常统计和接口质量纳入统一监控。', items: ['监控', '指标', '质量'] }
+        ]
+      },
+      scenario: {
+        label: '场景落地',
+        title: '6. 场景落地：用航线和智能体牵引应用',
+        intro: '场景不再独立堆功能，而是围绕“航线如何规划、任务如何执行、结果如何自动研判”展开，形成可验证的解决方案。',
+        cards: [
+          { h: '城市治理巡查', p: '围绕违建、河湖、工地、道路和城管事件形成自动巡查与研判闭环。', items: ['巡查', '识别', '闭环'] },
+          { h: '低空安全防控', p: '围绕重点区域、重大活动和黑飞风险形成侦测、预警和处置联动。', items: ['侦测', '预警', '处置'] },
+          { h: '交通与物流航线', p: '围绕起降点、货运航线、低空走廊和空地接驳做容量和效率分析。', items: ['航线', '运力', '效率'] },
+          { h: '应急保障', p: '围绕灾害、火情、水域和山地救援，形成临时空域、救援航线和复盘报表。', items: ['救援', '调度', '复盘'] }
+        ]
+      },
+      value: {
+        label: '价值化',
+        title: '7. 数据价值化先服务航线、智能体和验收',
+        intro: '数据价值化暂不宜拔高为数据要素交易叙事，先服务航线规划精度、智能体知识库、运行复盘和项目验收。',
+        cards: [
+          { h: '航线样本库', p: '沉淀已规划、已审批、已执行航线样本，用于优化规划规则。', items: ['样本', '规则', '优化'] },
+          { h: '智能体知识库', p: '沉淀政策、公告、标准、项目材料和历史问答，为智能体提供可信知识。', items: ['政策', '标准', '材料'] },
+          { h: '服务化预留', p: '在脱敏、可控、授权前提下预留数据服务化能力。', items: ['脱敏', '授权', '服务'] },
+          { h: '合规边界', p: '把安全、审计、权限和留痕作为数据价值化的前置条件。', items: ['安全', '审计', '留痕'] }
+        ]
+      },
+      policy: {
+        label: '双驱动',
+        title: '8. 政策与技术双驱动，小步验证优先',
+        intro: '持续跟踪空域政策、行业标准、竞品动态和 AI 工具链变化。路线要围绕航线规划和 AI 智能体小步验证，而不是围绕旧平台能力被动修补。',
+        cards: [
+          { h: '政策跟踪', p: '把政策、标准和地方试点变化纳入每月产品复盘。', items: ['空域改革', '行业标准', '试点变化'] },
+          { h: '动态迭代', p: '以小版本方式推进，先验证关键链路，再扩展新场景。', items: ['小版本', '快速验证', '持续迭代'] },
+          { h: '信创适配', p: '提前考虑国产化兼容和部署适配，避免后期返工。', items: ['国产化', '兼容性', '部署'] },
+          { h: '竞品复盘', p: '通过地域、金额、单位和架构对比，持续修正产品优先级。', items: ['对标', '复盘', '优先级'] }
+        ]
+      }
+    };
+
+    const iterationSteps = [
+      {
+        num: '01',
+        title: '优先建设低空航线规划',
+        body: '把低空航线规划作为产品主抓手，先跑通起降点选址、空域约束、净空分析、风险评估、航线比选和规划报告输出。',
+        points: ['起降点与航线适配', '空域/净空/风险计算', '推荐航线与备选航线', '规划报告和申报材料']
+      },
+      {
+        num: '02',
+        title: '优先建设 AI 智能体',
+        body: '围绕低空业务高频动作建设智能体，不做泛问答，先做规划助手、审批助手、巡查研判助手和运营复盘助手。',
+        points: ['规划助手', '审批材料生成', '异常研判', '复盘报告']
+      },
+      {
+        num: '03',
+        title: '重构薄弱基础能力',
+        body: '不把旧平台直接作为产品底座，重新盘点数据、规则、接口和体验，把能用的留下，把不可持续的演示能力剥离。',
+        points: ['数据可用性评估', '规则结构化', '接口重整', '工作流重设计']
+      },
+      {
+        num: '04',
+        title: '监管闭环围绕航线收敛',
+        body: '审批、申报、围栏、态势和处置不再分散建设，而是围绕航线规划结果形成可追踪闭环。',
+        points: ['航线入申报', '围栏自动生成', '态势关联航线', '处置留痕']
+      },
+      {
+        num: '05',
+        title: '场景方案围绕智能体落地',
+        body: '城市治理、低空安全、交通物流和应急保障场景，优先用智能体完成任务生成、结果研判、工单闭环和报告输出。',
+        points: ['任务生成', '自动研判', '工单闭环', '报告输出']
+      },
+      {
+        num: '06',
+        title: '用小步验证沉淀标品',
+        body: '每个阶段都以可演示、可交付、可验收为准，把航线规划和智能体沉淀成标准包，再扩展监管和运营能力。',
+        points: ['样板区县', '标准包', '验收指标', '版本复盘']
+      }
+    ];
+
+    const roadmapSteps = [
+      {
+        num: 'A',
+        title: '一期：航线规划 MVP',
+        period: '0 - 3 个月',
+        body: '不依赖旧平台做底座，先搭建最小可用航线规划引擎，完成起降点、空域、净空、风险和规划报告闭环。',
+        points: ['航线规划引擎', '净空与风险计算', '方案比选', '1 个区县 + 2 条样板航线']
+      },
+      {
+        num: 'B',
+        title: '二期：AI 智能体试点',
+        period: '3 - 6 个月',
+        body: '围绕规划、审批、巡查和复盘建设智能体试点，绑定规则库、知识库和工具调用，形成可演示能力。',
+        points: ['规划助手', '审批助手', '巡查研判', '复盘报告']
+      },
+      {
+        num: 'C',
+        title: '三期：监管与场景闭环',
+        period: '6 - 9 个月',
+        body: '把航线规划结果接入申报、审批、围栏、态势和任务闭环，形成城市治理、低空安全、交通物流等场景标准包。',
+        points: ['航线入审批', '围栏联动', '场景标准包', '多角色工作面']
+      },
+      {
+        num: 'D',
+        title: '四期：标品沉淀与规模复制',
+        period: '9 - 12 个月',
+        body: '将航线规划、智能体、监管闭环和场景包沉淀为标品能力，形成可复制交付清单和验收指标。',
+        points: ['标品能力包', '交付清单', '验收指标', '跨区县复制']
+      }
+    ];
+
+    const capOrder = ['航线规划','AI智能体','基础重构','空域协同','一网通飞','运行服务','典型场景','综合驾驶舱','侦测反制'];
+    let activeRegion = 'all';
+    let activeCap = 'all';
+    let activeView = 'overview';
+    let activeCapability = 'route';
+    let activeIteration = 0;
+    let activeRoadmap = 0;
+    let activeVendor = 0;
+
+    const modal = document.getElementById('caseModal');
+    const modalTitle = document.getElementById('caseTitle');
+    const modalType = document.getElementById('caseType');
+    const modalFields = document.getElementById('caseFields');
+    const modalDesc = document.getElementById('caseDesc');
+    const modalLinks = document.getElementById('caseLinks');
+    const modalClose = document.getElementById('caseClose');
+    const regionRail = document.getElementById('regionRail');
+    const caseList = document.getElementById('caseList');
+    const atlasLegend = document.getElementById('atlasLegend');
+    const mapMarkers = document.getElementById('mapMarkers');
+    const tenderSummary = document.getElementById('tenderSummary');
+    const amountBars = document.getElementById('amountBars');
+    const regionHeat = document.getElementById('regionHeat');
+    const vendorGrid = document.getElementById('vendorGrid');
+    const vendorInspector = document.getElementById('vendorInspector');
+    const capTabs = document.getElementById('capTabs');
+    const capStage = document.getElementById('capStage');
+    const iterationGrid = document.getElementById('iterationGrid');
+    const iterationInspector = document.getElementById('iterationInspector');
+    const roadmapGrid = document.getElementById('roadmapGrid');
+    const roadmapInspector = document.getElementById('roadmapInspector');
+
+    function getServiceContent(item){
+      return item.serviceContent || item.scale || item.desc || '公开资料未披露具体服务内容';
+    }
+
+    function getVisibleCases(){
+      return caseData.filter(item => item.verifyStatus !== '剔除' && item.verifyStatus !== '待核验');
+    }
+
+    function getAmountWan(item){
+      const text = item.amount || '';
+      if(text.includes('待复核') || text.includes('未披露') || text.includes('未公开')) return 0;
+      const match = text.match(/(\d+(?:\.\d+)?)/);
+      if(!match) return 0;
+      const n = Number(match[1]);
+      if(text.includes('亿') || text.includes('浜')) return n * 10000;
+      return n;
+    }
+
+    function getAmountRadius(item){
+      const amount = getAmountWan(item);
+      if(amount >= 10000) return 18;
+      if(amount >= 5000) return 15;
+      if(amount >= 1000) return 12;
+      if(amount >= 500) return 9;
+      if(amount > 0) return 7;
+      return 6;
+    }
+
+    function getAmountTier(item){
+      const amount = getAmountWan(item);
+      if(amount >= 10000) return '1亿以上';
+      if(amount >= 5000) return '5000万-1亿';
+      if(amount >= 1000) return '1000-5000万';
+      if(amount >= 500) return '500-1000万';
+      if(amount > 0) return '500万以下';
+      return '金额待复核';
+    }
+
+    function openCase(id){
+      const item = caseData.find(x => x.id === id);
+      if(!item) return;
+      modalType.textContent = item.type;
+      modalTitle.textContent = item.name;
+      modalFields.innerHTML = [
+        ['服务区域', item.serviceArea],
+        ['实施单位', item.serviceUnit],
+        ['项目金额', item.amount],
+        ['中标时间', item.bidDate],
+        ['服务内容', getServiceContent(item)],
+        ['项目规模', item.scale],
+        ['证据等级', item.evidenceLevel || item.verifyStatus || '公开资料可追溯'],
+        ['地域标签', item.region],
+        ['能力标签', item.caps.join(' / ')]
+      ].map(([k,v]) => `<div class="modal-field"><b>${k}</b><span>${v}</span></div>`).join('');
+      modalDesc.textContent = item.desc;
+      modalLinks.innerHTML = item.links.map(([label, url]) => `<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`).join('');
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeCase(){
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden','true');
+    }
+    modalClose.addEventListener('click', closeCase);
+    modal.addEventListener('click', e => { if(e.target === modal) closeCase(); });
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') closeCase(); });
+
+    function setView(view, jump = false){
+      activeView = view;
+      document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+      document.querySelectorAll('[data-view-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.viewTab === view));
+      if(jump){
+        const target = document.getElementById(view) || document.querySelector(`[data-view="${view}"]`) || document.querySelector('.view-stack');
+        if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    document.querySelectorAll('[data-view-tab]').forEach(btn => {
+      btn.addEventListener('click', () => setView(btn.dataset.viewTab, true));
+    });
+
+    function renderVendors(){
+      const data = vendorDeepData;
+      vendorGrid.innerHTML = data.map((item, index) => `
+        <button class="vendor-card ${index === activeVendor ? 'active' : ''}" type="button" data-vendor="${index}">
+          <h4>${item.name}</h4>
+          <p>${item.summary}</p>
+          <div class="vendor-tags">${item.tags.map(tag => `<span>${tag}</span>`).join('')}</div>
+        </button>
+      `).join('');
+      vendorGrid.querySelectorAll('[data-vendor]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeVendor = Number(btn.dataset.vendor);
+          renderVendors();
+        });
+      });
+      const item = data[activeVendor];
+      vendorInspector.innerHTML = `
+        <h3>${item.name}</h3>
+        <p>${item.summary}</p>
+        <div class="product-arch">
+          <div class="arch-title"><b>产品架构分层</b><span>按公开资料与产品形态归纳</span></div>
+          <div class="arch-flow">
+            ${item.architecture.map(([k, v], index) => `
+              <div class="arch-node">
+                <small>${index + 1}</small>
+                <b>${k}</b>
+                <span>${v}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="arch-layers">
+          <div class="arch-layer"><b>服务对象</b><span>${item.service}</span></div>
+          ${item.architecture.map(([k, v]) => `<div class="arch-layer"><b>${k}</b><span>${v}</span></div>`).join('')}
+          <div class="arch-layer"><b>视频/证据</b><span>${item.video}</span></div>
+        </div>
+        <div class="vendor-case-list">
+          ${item.cases.map(([k, v]) => `<div class="vendor-case"><b>${k}</b><span>${v}</span></div>`).join('')}
+        </div>
+        <div class="score-grid">
+          ${item.scores.map(([k, v]) => `<div class="score-item"><b>${k}</b><div class="score-track"><span style="width:${v}%"></span></div><small>${v}/100</small></div>`).join('')}
+        </div>
+        <div class="chart-legend" aria-label="竞品评分图例">
+          <span><i class="legend-line"></i>评分条越长 = 该能力越强</span>
+          <span><i class="legend-dot"></i>分值为竞品对标研判，不等同于客观排名</span>
+        </div>
+        <ul>${item.lesson.map(v => `<li>${v}</li>`).join('')}</ul>
+        <div class="modal-links">${item.links.map(([label, url]) => `<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`).join('')}</div>
+      `;
+    }
+
+    function renderTenderSummary(){
+      const knownAmount = caseData.filter(item => !item.amount.includes('未披露') && !item.amount.includes('未公开')).length;
+      const knownDate = caseData.filter(item => !item.bidDate.includes('未披露') && !item.bidDate.includes('待复核')).length;
+      const largeProjects = caseData.filter(item => item.amount.includes('亿')).length;
+      const regionCount = new Set(caseData.map(item => item.region)).size;
+      tenderSummary.innerHTML = [
+        ['13', '可溯源公开案例与招采样本'],
+        [knownAmount, '项目金额可查或可估，便于判断预算区间'],
+        [knownDate, '中标/公开时间可追踪，便于观察项目节奏'],
+        [regionCount, '地域分布，保留地图筛选和项目弹窗']
+      ].map(([value, label]) => `<div class="tender-stat"><b>${value}</b><span>${label}</span></div>`).join('');
+    }
+
+    function renderLegend(){
+      atlasLegend.innerHTML = atlasLegendData.map(item => `<div class="legend-card"><b>${item.value}</b><span>${item.label}</span></div>`).join('');
+    }
+
+    function renderTenderSummaryV2(){
+      const cases = getVisibleCases();
+      const knownAmount = cases.filter(item => getAmountWan(item) > 0).length;
+      const largeProjects = cases.filter(item => getAmountWan(item) >= 10000).length;
+      const regionCount = new Set(cases.map(item => item.region)).size;
+      const officialCount = cases.filter(item => (item.evidenceLevel || '').startsWith('A')).length;
+      tenderSummary.innerHTML = [
+        [cases.length, '可溯源案例'],
+        [officialCount, '公告级证据'],
+        [knownAmount, '金额可分级'],
+        [largeProjects, '亿元级项目'],
+        [regionCount, '地域覆盖']
+      ].map(([value, label]) => `<div class="tender-stat"><b>${value}</b><span>${label}</span></div>`).join('');
+    }
+
+    function renderTenderViz(){
+      const cases = getVisibleCases();
+      const tiers = ['500万以下','500-1000万','1000-5000万','5000万-1亿','1亿以上','金额待复核'];
+      const tierCounts = tiers.map(tier => [tier, cases.filter(item => getAmountTier(item) === tier).length]);
+      const maxTier = Math.max(1, ...tierCounts.map(([, count]) => count));
+      amountBars.innerHTML = tierCounts.map(([label, count]) => `
+        <div class="bar-row"><b>${label}</b><div class="bar-track"><span style="width:${(count / maxTier) * 100}%"></span></div><small>${count}</small></div>
+      `).join('');
+
+      const regions = ['华东','华南','华北','华中','西南','西北','海南'];
+      const regionCounts = regions.map(region => [region, cases.filter(item => item.region === region).length]);
+      const maxRegion = Math.max(1, ...regionCounts.map(([, count]) => count));
+      regionHeat.innerHTML = regionCounts.map(([region, count]) => {
+        const alpha = .06 + (count / maxRegion) * .28;
+        return `<div class="heat-cell" style="background:rgba(255,210,31,${alpha})"><div><b>${count}</b><span>${region}</span></div></div>`;
+      }).join('');
+    }
+
+    function renderRegionRail(){
+      const cases = getVisibleCases();
+      const counts = ['华东','华南','华北','华中','西南','西北','海南'].map(region => {
+        const items = cases.filter(c => c.region === region);
+        const top = items[0];
+        return { region, count: items.length, top: top ? top.short : '—', focus: top ? top.caps[0] : '—' };
+      });
+      regionRail.innerHTML = counts.map(item => `
+        <div class="region-card ${activeRegion === item.region ? 'active' : ''}" data-filter-region-card="${item.region}">
+          <b>${item.count}</b>
+          <span>${item.region}</span>
+          <span>${item.top} · ${item.focus}</span>
+        </div>
+      `).join('');
+      regionRail.querySelectorAll('[data-filter-region-card]').forEach(card => {
+        card.addEventListener('click', () => {
+          activeRegion = card.dataset.filterRegionCard;
+          syncAtlasFilters();
+          renderAtlas();
+        });
+      });
+    }
+
+    function renderMapMarkers(){
+      mapMarkers.innerHTML = getVisibleCases().map(item => {
+        const label = item.short;
+        const radius = getAmountRadius(item);
+        const textSize = radius >= 12 ? 15 : 12;
+        return `
+          <g class="map-marker" tabindex="0" data-case="${item.id}" data-region="${item.region}" data-caps="${item.caps.join(' ')}" transform="translate(${item.x} ${item.y})">
+            <circle r="${radius}" fill="${item.color}" stroke="rgba(255,255,255,.55)" stroke-width="1.5"></circle>
+            <text x="${radius + 7}" y="5" fill="#e8edf5" font-size="${textSize}" font-weight="800">${label}</text>
+          </g>
+        `;
+      }).join('');
+      mapMarkers.querySelectorAll('.map-marker').forEach(node => {
+        node.addEventListener('click', () => openCase(node.dataset.case));
+        node.addEventListener('keydown', e => {
+          if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCase(node.dataset.case); }
+        });
+      });
+    }
+
+    function renderCases(){
+      const items = getVisibleCases()
+        .filter(c => activeRegion === 'all' || c.region === activeRegion)
+        .filter(c => activeCap === 'all' || c.caps.includes(activeCap));
+      caseList.innerHTML = items.map(item => `
+        <button class="case-item" type="button" data-case="${item.id}">
+          <div class="case-top">
+            <h4>${item.name}</h4>
+            <span class="badge">${item.region}</span>
+          </div>
+          <div class="case-meta">
+            <div><b>金额</b><span>${item.amount}</span></div>
+            <div><b>中标时间</b><span>${item.bidDate}</span></div>
+            <div><b>合同级别</b><span>${getAmountTier(item)}</span></div>
+          </div>
+          <div class="amount-chip">${getAmountTier(item)}</div>
+          <div class="source-badge">${item.evidenceLevel || '公开来源'}</div>
+          <div class="case-tags">${item.caps.map(tag => `<span>${tag}</span>`).join('')}</div>
+        </button>
+      `).join('');
+      caseList.querySelectorAll('[data-case]').forEach(btn => btn.addEventListener('click', () => openCase(btn.dataset.case)));
+      applyMarkerFilter();
+    }
+
+    function applyMarkerFilter(){
+      mapMarkers.querySelectorAll('.map-marker').forEach(node => {
+        const matchRegion = activeRegion === 'all' || node.dataset.region === activeRegion;
+        const matchCap = activeCap === 'all' || node.dataset.caps.includes(activeCap);
+        const visible = matchRegion && matchCap;
+        node.style.opacity = visible ? '1' : '.16';
+        node.style.pointerEvents = visible ? 'auto' : 'none';
+      });
+    }
+
+    function syncAtlasFilters(){
+      document.querySelectorAll('[data-filter-region]').forEach(btn => btn.classList.toggle('active', btn.dataset.filterRegion === activeRegion));
+      document.querySelectorAll('[data-filter-cap]').forEach(btn => btn.classList.toggle('active', btn.dataset.filterCap === activeCap));
+      document.querySelectorAll('.region-card').forEach(card => card.classList.toggle('active', card.dataset.filterRegionCard === activeRegion));
+    }
+
+    function renderAtlas(){
+      renderRegionRail();
+      renderCases();
+      syncAtlasFilters();
+    }
+
+    document.querySelectorAll('[data-filter-region]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeRegion = btn.dataset.filterRegion;
+        renderAtlas();
+      });
+    });
+    document.querySelectorAll('[data-filter-cap]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCap = btn.dataset.filterCap;
+        renderAtlas();
+      });
+    });
+
+    function renderCapabilities(){
+      const groups = {
+        route: capabilitySets.route,
+        agent: capabilitySets.agent,
+        data: capabilitySets.data,
+        control: capabilitySets.control,
+        delivery: capabilitySets.delivery,
+        scenario: capabilitySets.scenario,
+        value: capabilitySets.value,
+        policy: capabilitySets.policy
+      };
+      const keys = Object.keys(groups);
+      capTabs.innerHTML = keys.map(key => `
+        <button class="subtab ${key === activeCapability ? 'active' : ''}" type="button" data-cap-tab="${key}">${groups[key].label}</button>
+      `).join('');
+      const set = groups[activeCapability];
+      capStage.innerHTML = `
+        <div class="cap-card">
+          <h4>${set.title}</h4>
+          <p>${set.intro}</p>
+        </div>
+        <div class="cap-grid">
+          ${set.cards.map(card => `
+            <div class="cap-card">
+              <h4>${card.h}</h4>
+              <p>${card.p}</p>
+              <ul>${card.items.map(i => `<li>${i}</li>`).join('')}</ul>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      capTabs.querySelectorAll('[data-cap-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeCapability = btn.dataset.capTab;
+          renderCapabilities();
+        });
+      });
+    }
+
+    function renderIteration(){
+      iterationGrid.innerHTML = iterationSteps.map((item, index) => `
+        <button class="iter-card ${index === activeIteration ? 'active' : ''}" type="button" data-iter="${index}">
+          <span class="num">${item.num}</span>
+          <h4>${item.title}</h4>
+          <p>${item.body}</p>
+        </button>
+      `).join('');
+      iterationGrid.querySelectorAll('[data-iter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeIteration = Number(btn.dataset.iter);
+          renderIteration();
+        });
+      });
+      const item = iterationSteps[activeIteration];
+      iterationInspector.innerHTML = `
+        <h3>${item.title}</h3>
+        <p>${item.body}</p>
+        <ul>${item.points.map(p => `<li>${p}</li>`).join('')}</ul>
+      `;
+    }
+
+    function renderRoadmap(){
+      roadmapGrid.innerHTML = roadmapSteps.map((item, index) => `
+        <button class="road-card ${index === activeRoadmap ? 'active' : ''}" type="button" data-road="${index}">
+          <span class="num">${item.num}</span>
+          <h4>${item.title}</h4>
+          <p>${item.period}</p>
+          <div class="road-line"><span style="width:${(index + 1) * 25}%"></span></div>
+        </button>
+      `).join('');
+      roadmapGrid.querySelectorAll('[data-road]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeRoadmap = Number(btn.dataset.road);
+          renderRoadmap();
+        });
+      });
+      const item = roadmapSteps[activeRoadmap];
+      roadmapInspector.innerHTML = `
+        <h3>${item.title}</h3>
+        <p>${item.period}</p>
+        <p style="margin-top:8px">${item.body}</p>
+        <ul>${item.points.map(p => `<li>${p}</li>`).join('')}</ul>
+        <div class="accept-grid" style="margin-top:12px">
+          <div class="accept"><b>验收关注 1</b><span>航线规划是否能输出推荐航线、备选航线、风险理由和规划报告。</span></div>
+          <div class="accept"><b>验收关注 2</b><span>AI 智能体是否能完成规划辅助、审批校验、巡查研判和复盘报告。</span></div>
+          <div class="accept"><b>验收关注 3</b><span>旧平台薄弱数据、规则、接口和体验是否完成重构，避免继续堆演示功能。</span></div>
+          <div class="accept"><b>验收关注 4</b><span>航线、智能体、监管和场景是否沉淀为可复制标准包。</span></div>
+        </div>
+      `;
+    }
+
+    function renderParticles(){
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        const count = Math.min(120, Math.max(48, Math.floor(window.innerWidth / 14)));
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          vx: (Math.random() - .5) * .28,
+          vy: (Math.random() - .5) * .28,
+          r: Math.random() * 1.8 + .6,
+          yellow: Math.random() > .62
+        }));
+      }
+      function draw(){
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        for(const p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -20) p.x = window.innerWidth + 20;
+          if(p.x > window.innerWidth + 20) p.x = -20;
+          if(p.y < -20) p.y = window.innerHeight + 20;
+          if(p.y > window.innerHeight + 20) p.y = -20;
+        }
+        for(let i = 0; i < particles.length; i++){
+          const a = particles[i];
+          ctx.beginPath();
+          ctx.fillStyle = a.yellow ? 'rgba(255,210,31,.82)' : 'rgba(0,217,255,.56)';
+          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          ctx.fill();
+          for(let j = i + 1; j < particles.length; j++){
+            const b = particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d = Math.hypot(dx, dy);
+            if(d < 110){
+              ctx.strokeStyle = `rgba(255,210,31,${(1 - d / 110) * .12})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      resize();
+      draw();
+      window.addEventListener('resize', resize);
+    }
+
+    function mountJumpChapters(){
+      const mounts = [
+        ['tenderMount', 'atlas'],
+        ['competitorMount', 'competitors'],
+        ['mediaMount', 'media'],
+        ['capabilityMount', 'capabilities'],
+        ['iterationMount', 'iteration'],
+        ['roadmapMount', 'roadmap']
+      ];
+      mounts.forEach(([mountId, viewName]) => {
+        const mount = document.getElementById(mountId);
+        const node = document.querySelector(`[data-view="${viewName}"]`);
+        if(!mount || !node) return;
+        node.classList.remove('view', 'active');
+        node.classList.add('section-band');
+        mount.appendChild(node);
+      });
+    }
+
+    renderLegend();
+    renderTenderSummaryV2();
+    renderTenderViz();
+    renderMapMarkers();
+    renderAtlas();
+    renderVendors();
+    renderCapabilities();
+    renderIteration();
+    renderRoadmap();
+    mountJumpChapters();
+    renderParticles();
+  </script>
+</body>
+</html>

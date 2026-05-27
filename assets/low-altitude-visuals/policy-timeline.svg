@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06131f"/>
+      <stop offset=".52" stop-color="#10253a"/>
+      <stop offset="1" stop-color="#102d24"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="920" fill="url(#bg)"/>
+  <g opacity=".18" stroke="#53e0d2">
+    <path d="M0 160H1600M0 280H1600M0 400H1600M0 520H1600M0 640H1600M0 760H1600"/>
+    <path d="M160 0V920M320 0V920M480 0V920M640 0V920M800 0V920M960 0V920M1120 0V920M1280 0V920M1440 0V920"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial" font-weight="900">
+    <text x="90" y="110" fill="#eef7f8" font-size="44">低空治理政策时间轴</text>
+    <text x="92" y="152" fill="#aac1c2" font-size="20">产业发展、运行监管、实名登记、运行识别、安全健康发展，逐步形成闭环</text>
+  </g>
+  <line x1="180" y1="470" x2="1420" y2="470" stroke="#53e0d2" stroke-width="8" stroke-linecap="round"/>
+  <g font-family="Microsoft YaHei, Arial" font-weight="900">
+    <g transform="translate(180 470)">
+      <circle r="26" fill="#53e0d2"/>
+      <circle r="56" fill="none" stroke="#53e0d2" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="-20" y="-180" width="240" height="120" rx="24" fill="#07131f" opacity=".86" stroke="#53e0d2"/>
+      <text x="22" y="-132" fill="#53e0d2" font-size="28">2024</text>
+      <text x="22" y="-96" fill="#eef7f8" font-size="22">政府工作报告</text>
+      <text x="22" y="-64" fill="#aac1c2" font-size="18">低空经济等新增长引擎</text>
+    </g>
+    <g transform="translate(540 470)">
+      <circle r="26" fill="#5bb8ff"/>
+      <circle r="56" fill="none" stroke="#5bb8ff" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="-20" y="-180" width="260" height="120" rx="24" fill="#07131f" opacity=".86" stroke="#5bb8ff"/>
+      <text x="22" y="-132" fill="#5bb8ff" font-size="28">2024</text>
+      <text x="22" y="-96" fill="#eef7f8" font-size="22">暂行条例 + CCAR-92</text>
+      <text x="22" y="-64" fill="#aac1c2" font-size="18">可识别、可监管、可追溯</text>
+    </g>
+    <g transform="translate(920 470)">
+      <circle r="26" fill="#ffcc66"/>
+      <circle r="56" fill="none" stroke="#ffcc66" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="-20" y="60" width="280" height="120" rx="24" fill="#07131f" opacity=".86" stroke="#ffcc66"/>
+      <text x="22" y="108" fill="#ffcc66" font-size="28">2025</text>
+      <text x="22" y="144" fill="#eef7f8" font-size="22">安全健康发展</text>
+      <text x="22" y="176" fill="#aac1c2" font-size="18">从鼓励发展走向安全治理</text>
+    </g>
+    <g transform="translate(1280 470)">
+      <circle r="26" fill="#ff8a4b"/>
+      <circle r="56" fill="none" stroke="#ff8a4b" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="-20" y="60" width="300" height="120" rx="24" fill="#07131f" opacity=".86" stroke="#ff8a4b"/>
+      <text x="22" y="108" fill="#ff8a4b" font-size="28">2026</text>
+      <text x="22" y="144" fill="#eef7f8" font-size="22">强制标准实施</text>
+      <text x="22" y="176" fill="#aac1c2" font-size="18">身份、位置、速度、状态报送</text>
+    </g>
+  </g>
+  <g>
+    <rect x="88" y="736" width="1424" height="102" rx="28" fill="#07131f" opacity=".76" stroke="#53e0d2" stroke-opacity=".22"/>
+    <text x="126" y="781" fill="#eef7f8" font-family="Microsoft YaHei, Arial" font-size="24" font-weight="900">治理逻辑：飞行合法性管理 → 运行过程安全管理 → 事后审计复盘管理</text>
+    <text x="126" y="819" fill="#aac1c2" font-family="Microsoft YaHei, Arial" font-size="18">侦测产品位于第二层与第三层结合部，是把法规制度转化为现场治理能力的关键工具</text>
+  </g>
+</svg>

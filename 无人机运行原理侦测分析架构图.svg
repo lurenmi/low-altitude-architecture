@@ -1,0 +1,353 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">无人机运行原理与侦测分析架构图</title>
+  <desc id="desc">左侧为无人机系统配图，中间为运行链路与关键可侦测参数，右侧为适用分析技术，适配1920x1080展示。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08111d"/>
+      <stop offset="55%" stop-color="#0c2237"/>
+      <stop offset="100%" stop-color="#102c44"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10253a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0d1d2d" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#19c5b0"/>
+      <stop offset="100%" stop-color="#1c86ff"/>
+    </linearGradient>
+    <linearGradient id="accentGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f8e7f"/>
+      <stop offset="100%" stop-color="#15664f"/>
+    </linearGradient>
+    <linearGradient id="accentAmber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8a5a28"/>
+      <stop offset="100%" stop-color="#50321b"/>
+    </linearGradient>
+    <linearGradient id="droneShell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d9e7f1"/>
+      <stop offset="22%" stop-color="#6a7d90"/>
+      <stop offset="55%" stop-color="#243648"/>
+      <stop offset="100%" stop-color="#0f1825"/>
+    </linearGradient>
+    <linearGradient id="droneArm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#617083"/>
+      <stop offset="100%" stop-color="#182331"/>
+    </linearGradient>
+    <linearGradient id="droneRotor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a6bfd2"/>
+      <stop offset="100%" stop-color="#23374a"/>
+    </linearGradient>
+    <linearGradient id="droneCamera" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff9ff"/>
+      <stop offset="100%" stop-color="#91adc2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#020b14" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7ae0ff"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7ce6c8"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+      }
+      .title {
+        font-size: 34px;
+        font-weight: 700;
+        fill: #f4fbff;
+        letter-spacing: 1px;
+      }
+      .subtitle {
+        font-size: 16px;
+        fill: #bcd3e7;
+      }
+      .panel-title {
+        font-size: 22px;
+        font-weight: 700;
+        fill: #f6fbff;
+      }
+      .panel-sub {
+        font-size: 13px;
+        fill: #95b8d6;
+      }
+      .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        fill: #f7fcff;
+      }
+      .card-tag {
+        font-size: 12px;
+        font-weight: 700;
+        fill: #8fd0ff;
+      }
+      .card-text {
+        font-size: 13px;
+        fill: #d5e6f4;
+      }
+      .tech-title {
+        font-size: 17px;
+        font-weight: 700;
+        fill: #f8fcff;
+      }
+      .tech-text {
+        font-size: 12px;
+        fill: #d5e4f1;
+      }
+      .tiny {
+        font-size: 11px;
+        fill: #a7c2da;
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 700;
+        fill: #85cfff;
+        letter-spacing: .5px;
+      }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <g opacity="0.2">
+    <path d="M0 180H1920M0 360H1920M0 540H1920M0 720H1920M0 900H1920" stroke="#5aa5d0" stroke-width="1"/>
+    <path d="M170 0V1080M480 0V1080M790 0V1080M1100 0V1080M1410 0V1080M1720 0V1080" stroke="#5aa5d0" stroke-width="1"/>
+  </g>
+
+  <text x="80" y="84" class="title">无人机运行原理与侦测分析架构图</text>
+  <text x="80" y="118" class="subtitle">采用“配图 + 流程 + 技术”三栏式表达，避免环形压盖，更适合 1920×1080 汇报展示</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="150" width="500" height="800" rx="28" fill="url(#panel)" stroke="#2e567a" stroke-width="1.5"/>
+    <text x="92" y="196" class="panel-title">配图：无人机系统构成</text>
+    <text x="92" y="222" class="panel-sub">用简化示意说明飞行平台、通信链路和任务载荷的关系</text>
+
+    <g transform="translate(310 485)">
+      <ellipse cx="0" cy="168" rx="150" ry="30" fill="#020b14" opacity="0.38"/>
+      <circle cx="0" cy="0" r="180" fill="none" stroke="#7ae0ff" stroke-width="2" stroke-dasharray="10 10" opacity="0.12"/>
+      <circle cx="0" cy="0" r="146" fill="none" stroke="#7ce6c8" stroke-width="1.5" stroke-dasharray="4 14" opacity="0.10"/>
+      <path d="M -158 130 C -110 74, -70 34, 0 0 C 70 -34, 110 -74, 158 -130" fill="none" stroke="#7ae0ff" stroke-width="2" stroke-dasharray="7 8" opacity="0.24"/>
+      <circle cx="-158" cy="130" r="5" fill="#7ae0ff" opacity="0.75"/>
+      <circle cx="158" cy="-130" r="5" fill="#7ce6c8" opacity="0.75"/>
+
+      <g opacity="0.45">
+        <ellipse cx="-122" cy="-102" rx="48" ry="10" fill="#8fd3ff"/>
+        <ellipse cx="122" cy="-102" rx="48" ry="10" fill="#8fd3ff"/>
+        <ellipse cx="122" cy="102" rx="48" ry="10" fill="#8fd3ff"/>
+        <ellipse cx="-122" cy="102" rx="48" ry="10" fill="#8fd3ff"/>
+      </g>
+
+      <path d="M 0 -6 L -113 -92" stroke="url(#droneArm)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M 0 -6 L 113 -92" stroke="url(#droneArm)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M 0 8 L 113 92" stroke="url(#droneArm)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M 0 8 L -113 92" stroke="url(#droneArm)" stroke-width="18" stroke-linecap="round"/>
+
+      <circle cx="-113" cy="-92" r="28" fill="url(#droneRotor)" stroke="#8fd3ff" stroke-width="2"/>
+      <circle cx="113" cy="-92" r="28" fill="url(#droneRotor)" stroke="#8fd3ff" stroke-width="2"/>
+      <circle cx="113" cy="92" r="28" fill="url(#droneRotor)" stroke="#8fd3ff" stroke-width="2"/>
+      <circle cx="-113" cy="92" r="28" fill="url(#droneRotor)" stroke="#8fd3ff" stroke-width="2"/>
+
+      <path d="M -143 -92 H -83" stroke="#d8e8f4" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+      <path d="M 143 -92 H 83" stroke="#d8e8f4" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+      <path d="M 143 92 H 83" stroke="#d8e8f4" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+      <path d="M -143 92 H -83" stroke="#d8e8f4" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+
+      <path d="M -68 -18 Q 0 -60 68 -18 Q 88 0 76 26 Q 0 48 -76 26 Q -88 0 -68 -18 Z" fill="url(#droneShell)" stroke="#88a2b8" stroke-width="2"/>
+      <ellipse cx="0" cy="-2" rx="44" ry="18" fill="#ffffff" opacity="0.08"/>
+      <rect x="-18" y="-16" width="36" height="24" rx="8" fill="#dff7ff" opacity="0.92"/>
+      <rect x="-16" y="-11" width="32" height="8" rx="4" fill="#27425c" opacity="0.35"/>
+      <rect x="-10" y="-34" width="20" height="16" rx="4" fill="#4a5d70" opacity="0.95"/>
+      <path d="M -8 -34 L -8 -56" stroke="#8fd3ff" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 8 -34 L 8 -56" stroke="#8fd3ff" stroke-width="4" stroke-linecap="round"/>
+
+      <rect x="-30" y="40" width="60" height="16" rx="8" fill="#294055" opacity="0.95"/>
+      <rect x="-18" y="56" width="36" height="18" rx="8" fill="#d9e7f1" opacity="0.88"/>
+      <circle cx="0" cy="69" r="7" fill="#1b3b5c"/>
+      <path d="M 0 72 L 0 102" stroke="#8ef1dd" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="0" cy="118" r="17" fill="#0d2236" stroke="#8ef1dd" stroke-width="3"/>
+      <rect x="-12" y="125" width="24" height="12" rx="6" fill="#8ef1dd" opacity="0.36"/>
+
+      <path d="M -58 30 C -78 74, -78 110, -56 138" fill="none" stroke="#7d8ea1" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 58 30 C 78 74, 78 110, 56 138" fill="none" stroke="#7d8ea1" stroke-width="4" stroke-linecap="round"/>
+      <path d="M -38 136 H 38" stroke="#7d8ea1" stroke-width="4" stroke-linecap="round"/>
+
+      <circle cx="-94" cy="-10" r="5" fill="#ff6d73"/>
+      <circle cx="94" cy="-10" r="5" fill="#7cf0c5"/>
+    </g>
+
+    <g>
+      <line x1="310" y1="320" x2="310" y2="365" stroke="#7ae0ff" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="212" y="264" width="196" height="60" rx="16" fill="#143450" stroke="#79c9ff" stroke-width="1.5"/>
+      <text x="310" y="289" text-anchor="middle" class="label">GNSS / 惯导</text>
+      <text x="310" y="309" text-anchor="middle" class="tiny">位置、姿态、航向</text>
+
+      <line x1="154" y1="485" x2="208" y2="485" stroke="#7ce6c8" stroke-width="2" marker-end="url(#arrowGreen)"/>
+      <rect x="86" y="448" width="160" height="74" rx="16" fill="#184640" stroke="#7ce6c8" stroke-width="1.5"/>
+      <text x="166" y="478" text-anchor="middle" class="label">图传 / 数传</text>
+      <text x="166" y="500" text-anchor="middle" class="tiny">链路质量、码率、时延</text>
+
+      <line x1="412" y1="485" x2="466" y2="485" stroke="#ffcb87" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="424" y="444" width="150" height="82" rx="16" fill="#4a341d" stroke="#ffcb87" stroke-width="1.5"/>
+      <text x="499" y="476" text-anchor="middle" class="label">载荷 / 云台</text>
+      <text x="499" y="498" text-anchor="middle" class="tiny">视频、红外、抛投</text>
+
+      <line x1="220" y1="662" x2="268" y2="612" stroke="#ffcb87" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="82" y="652" width="180" height="72" rx="16" fill="#4a341d" stroke="#ffcb87" stroke-width="1.5"/>
+      <text x="172" y="682" text-anchor="middle" class="label">电池 / 电调</text>
+      <text x="172" y="704" text-anchor="middle" class="tiny">电压、电流、温度</text>
+
+      <line x1="402" y1="666" x2="356" y2="612" stroke="#7ae0ff" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="420" y="652" width="150" height="72" rx="16" fill="#143450" stroke="#79c9ff" stroke-width="1.5"/>
+      <text x="495" y="682" text-anchor="middle" class="label">遥控器 / 机库</text>
+      <text x="495" y="704" text-anchor="middle" class="tiny">操控源、任务下发</text>
+    </g>
+
+    <g opacity="0.95" fill="none" stroke-width="2" stroke-dasharray="7 8">
+      <path d="M 408 294 C 500 300, 560 330, 660 412" stroke="#7ae0ff" marker-end="url(#arrow)"/>
+      <path d="M 246 485 C 430 520, 540 650, 660 826" stroke="#7ce6c8" marker-end="url(#arrowGreen)"/>
+      <path d="M 574 485 C 592 500, 622 520, 660 550" stroke="#ffcb87" marker-end="url(#arrow)"/>
+      <path d="M 262 688 C 422 690, 544 690, 660 688" stroke="#ffcb87" marker-end="url(#arrow)"/>
+      <path d="M 570 688 C 620 620, 640 500, 660 274" stroke="#7ae0ff" marker-end="url(#arrow)"/>
+    </g>
+
+    <g>
+      <text x="438" y="760" text-anchor="middle" class="label">与中部链路映射</text>
+      <text x="438" y="780" text-anchor="middle" class="tiny">左侧要素 -> 中部步骤 1/2/3/4/5</text>
+    </g>
+
+    <g transform="translate(92 820)">
+      <rect width="436" height="96" rx="18" fill="#0f2235" stroke="#335d82" stroke-width="1.2"/>
+      <text x="20" y="28" class="card-title">核心运行逻辑</text>
+      <text x="20" y="56" class="card-text">感知定位 -> 飞控决策 -> 动力执行 -> 状态回传 -> 再次修正</text>
+      <text x="20" y="78" class="card-text">侦测时重点看：链路、姿态、航迹、外特征和载荷动作</text>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="590" y="150" width="700" height="800" rx="28" fill="url(#panel)" stroke="#2e567a" stroke-width="1.5"/>
+    <text x="622" y="196" class="panel-title">运行链路与关键可侦测参数</text>
+    <text x="622" y="222" class="panel-sub">用时间顺序串起无人机飞行闭环，适合直接映射侦测指标体系</text>
+
+    <line x1="660" y1="270" x2="660" y2="840" stroke="#35617f" stroke-width="3" stroke-dasharray="8 10"/>
+
+    <g transform="translate(620 254)">
+      <circle cx="40" cy="20" r="20" fill="#7ae0ff"/>
+      <text x="40" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#072133">1</text>
+      <rect x="76" y="0" width="560" height="108" rx="20" fill="url(#accentAmber)" stroke="#ffcb87" stroke-width="1.5"/>
+      <text x="100" y="32" class="card-title">任务输入与空域约束</text>
+      <text x="100" y="56" class="card-tag">关键参数</text>
+      <text x="190" y="56" class="card-text">任务计划、禁限飞区、航线、起降点、天气、地理围栏</text>
+      <text x="100" y="82" class="card-tag">侦测关注</text>
+      <text x="190" y="82" class="card-text">计划一致性、区域越界、临时管制触发</text>
+    </g>
+
+    <g transform="translate(620 392)">
+      <circle cx="40" cy="20" r="20" fill="#7ce6c8"/>
+      <text x="40" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#072133">2</text>
+      <rect x="76" y="0" width="560" height="108" rx="20" fill="url(#accentGreen)" stroke="#7ce6c8" stroke-width="1.5"/>
+      <text x="100" y="32" class="card-title">感知定位与姿态估计</text>
+      <text x="100" y="56" class="card-tag">关键参数</text>
+      <text x="190" y="56" class="card-text">GNSS 频点 / SNR、IMU、气压高度、速度、航向、漂移</text>
+      <text x="100" y="82" class="card-tag">侦测关注</text>
+      <text x="190" y="82" class="card-text">定位异常、姿态抖动、失链返航、异常悬停</text>
+    </g>
+
+    <g transform="translate(620 530)">
+      <circle cx="40" cy="20" r="20" fill="#7ae0ff"/>
+      <text x="40" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#072133">3</text>
+      <rect x="76" y="0" width="560" height="108" rx="20" fill="#143450" stroke="#79c9ff" stroke-width="1.5"/>
+      <text x="100" y="32" class="card-title">飞控决策与姿态控制</text>
+      <text x="100" y="56" class="card-tag">关键参数</text>
+      <text x="190" y="56" class="card-text">姿态角变化率、PWM 输出、控制延迟、偏航修正、振动</text>
+      <text x="100" y="82" class="card-tag">侦测关注</text>
+      <text x="190" y="82" class="card-text">控制抖动、异常转向、编队协同、机动模式变化</text>
+    </g>
+
+    <g transform="translate(620 668)">
+      <circle cx="40" cy="20" r="20" fill="#ffcb87"/>
+      <text x="40" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#072133">4</text>
+      <rect x="76" y="0" width="560" height="108" rx="20" fill="url(#accentAmber)" stroke="#ffcb87" stroke-width="1.5"/>
+      <text x="100" y="32" class="card-title">动力执行与能源管理</text>
+      <text x="100" y="56" class="card-tag">关键参数</text>
+      <text x="190" y="56" class="card-text">电压、电流、温度、剩余电量、RPM、桨叶谐波、热特征</text>
+      <text x="100" y="82" class="card-tag">侦测关注</text>
+      <text x="190" y="82" class="card-text">续航衰减、低电告警、过载、失稳、动力异常</text>
+    </g>
+
+    <g transform="translate(620 806)">
+      <circle cx="40" cy="20" r="20" fill="#7ce6c8"/>
+      <text x="40" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#072133">5</text>
+      <rect x="76" y="0" width="560" height="108" rx="20" fill="#18463f" stroke="#7ce6c8" stroke-width="1.5"/>
+      <text x="100" y="32" class="card-title">状态回传与任务闭环</text>
+      <text x="100" y="56" class="card-tag">关键参数</text>
+      <text x="190" y="56" class="card-text">图传码率、链路质量、丢包率、Remote ID、任务状态、返航点</text>
+      <text x="100" y="82" class="card-tag">侦测关注</text>
+      <text x="190" y="82" class="card-text">身份识别、操控源追溯、行为复盘、证据留存</text>
+    </g>
+
+    <g transform="translate(642 944)">
+      <rect width="516" height="42" rx="14" fill="#0f2235" stroke="#335d82" stroke-width="1.1"/>
+      <text x="258" y="27" text-anchor="middle" class="card-text">输出结果：告警识别、轨迹重建、风险分级、处置联动、事后复盘</text>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1320" y="150" width="540" height="800" rx="28" fill="url(#panel)" stroke="#2e567a" stroke-width="1.5"/>
+    <text x="1352" y="196" class="panel-title">适用分析技术</text>
+    <text x="1352" y="222" class="panel-sub">围绕“发现 - 识别 - 定位 - 研判 - 关联”构建多源分析能力</text>
+
+    <g transform="translate(1344 252)">
+      <rect width="492" height="92" rx="18" fill="#143450" stroke="#79c9ff" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">无线电频谱感知</text>
+      <text x="20" y="54" class="tech-text">频段占用、跳频识别、突发检测、遥控 / 图传信号发现</text>
+      <text x="20" y="76" class="tech-text">适合远距预警和链路存在性判断</text>
+    </g>
+
+    <g transform="translate(1344 360)">
+      <rect width="492" height="92" rx="18" fill="#18463f" stroke="#7ce6c8" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">协议解码与身份指纹</text>
+      <text x="20" y="54" class="tech-text">厂商特征、Remote ID、遥控器画像、设备序列关联</text>
+      <text x="20" y="76" class="tech-text">适合身份确认与来源追溯</text>
+    </g>
+
+    <g transform="translate(1344 468)">
+      <rect width="492" height="92" rx="18" fill="#4a341d" stroke="#ffcb87" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">雷达微多普勒分析</text>
+      <text x="20" y="54" class="tech-text">低慢小识别、旋翼调制、速度特征、轨迹起批</text>
+      <text x="20" y="76" class="tech-text">适合中远距发现和持续跟踪</text>
+    </g>
+
+    <g transform="translate(1344 576)">
+      <rect width="492" height="92" rx="18" fill="#143450" stroke="#79c9ff" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">光电 / 红外检测</text>
+      <text x="20" y="54" class="tech-text">可见光识别、热斑提取、目标复核、取证留痕</text>
+      <text x="20" y="76" class="tech-text">适合近距确认和现场取证</text>
+    </g>
+
+    <g transform="translate(1344 684)">
+      <rect width="492" height="92" rx="18" fill="#18463f" stroke="#7ce6c8" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">声学阵列定位</text>
+      <text x="20" y="54" class="tech-text">声纹匹配、波束形成、噪声方位估计、近距补盲</text>
+      <text x="20" y="76" class="tech-text">适合低空近场和遮挡环境</text>
+    </g>
+
+    <g transform="translate(1344 792)">
+      <rect width="492" height="92" rx="18" fill="#4a341d" stroke="#ffcb87" stroke-width="1.3"/>
+      <text x="20" y="28" class="tech-title">多源融合与轨迹重建</text>
+      <text x="20" y="54" class="tech-text">雷达 + 射频 + 光电 + Remote ID 统一坐标和时间轴</text>
+      <text x="20" y="76" class="tech-text">适合形成完整证据链和态势图</text>
+    </g>
+
+    <g transform="translate(1352 910)">
+      <rect width="476" height="26" rx="10" fill="#0f2235" stroke="#335d82" stroke-width="1.1"/>
+      <text x="238" y="18" text-anchor="middle" class="tiny">推荐组合：频谱预警 + 雷达发现 + 光电复核 + 行为研判 + 轨迹重建</text>
+    </g>
+  </g>
+
+  <g transform="translate(80 980)">
+    <rect width="1760" height="64" rx="18" fill="#0c1d2c" stroke="#355f84" stroke-width="1.2" opacity="0.96"/>
+    <text x="24" y="28" class="panel-title" font-size="18">结论</text>
+    <text x="92" y="29" class="subtitle">无人机侦测不要只看单一目标，而要同时看“外形特征、链路特征、行为特征、能源特征和任务特征”；反制方案则应围绕这些依赖链分层设计。</text>
+  </g>
+</svg>

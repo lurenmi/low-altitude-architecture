@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>低空数字孪生平台 1.0</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">LA</div>
+      <div>
+        <h1>低空数字孪生平台 1.0</h1>
+        <p>低空一张图 / 飞行服务 / 空域设施</p>
+      </div>
+    </div>
+    <div class="source-pill">杭州样例数据 + 本地业务数据库</div>
+  </header>
+
+  <nav class="main-nav">
+    <button class="tab active" data-tab="map">低空一张图</button>
+    <button class="tab" data-tab="flight">飞行服务</button>
+    <button class="tab" data-tab="airspace">空域设施</button>
+  </nav>
+
+  <main class="page">
+    <section id="view-map" class="view active">
+      <aside class="card side">
+        <h2>图层与检索</h2>
+        <div id="layer-list" class="layer-list"></div>
+        <div class="field-group">
+          <label for="map-filter">对象检索</label>
+          <input id="map-filter" type="text" placeholder="输入对象名称关键字">
+        </div>
+        <button id="refresh-map" class="btn">刷新态势</button>
+      </aside>
+
+      <section class="card center">
+        <div class="section-head">
+          <h2>杭州低空态势地图</h2>
+          <div id="map-summary" class="chip-row"></div>
+        </div>
+        <div id="map-canvas" class="map-canvas">
+          <div id="map-popup" class="map-popup hidden"></div>
+        </div>
+      </section>
+
+      <aside class="card side scrollable">
+        <h2>实时目标</h2>
+        <div id="aircraft-list" class="list"></div>
+        <h2>地图对象</h2>
+        <div id="object-list" class="list"></div>
+        <h2>地图编辑器</h2>
+        <form id="map-edit-form" class="form">
+          <input name="operator" value="地图编辑员" placeholder="操作人">
+          <select id="map-object-select">
+            <option value="">新建对象（不选现有对象）</option>
+          </select>
+          <input name="object_code" placeholder="对象编码（新建可留空自动生成）">
+          <input name="object_name" placeholder="对象名称" required>
+          <input name="object_type" placeholder="对象类型，例如 route / restricted_zone" required>
+          <select name="geometry_type">
+            <option value="polyline">polyline</option>
+            <option value="polygon">polygon</option>
+            <option value="point">point</option>
+          </select>
+          <input name="district" value="Hangzhou" placeholder="所属区域">
+          <select name="risk_level">
+            <option value="low">low</option>
+            <option value="medium" selected>medium</option>
+            <option value="high">high</option>
+          </select>
+          <select name="status">
+            <option value="enabled" selected>enabled</option>
+            <option value="disabled">disabled</option>
+          </select>
+          <label>几何数据 JSON</label>
+          <textarea name="geometry_json">[[30.2068,120.1828],[30.2198,120.1964],[30.2335,120.2128]]</textarea>
+          <div class="btn-row">
+            <button id="btn-map-create" class="btn primary" type="button">新建对象</button>
+            <button id="btn-map-update" class="btn" type="button">保存更新</button>
+            <button id="btn-map-delete" class="btn danger" type="button">删除对象</button>
+          </div>
+        </form>
+        <h2>编辑留痕</h2>
+        <div id="map-edit-log" class="list"></div>
+      </aside>
+    </section>
+
+    <section id="view-flight" class="view">
+      <aside class="card side scrollable">
+        <h2>新建飞行计划</h2>
+        <form id="plan-form" class="form">
+          <input name="task_name" placeholder="任务名称" required>
+          <select name="task_type">
+            <option value="city_inspection">城市巡检</option>
+            <option value="logistics">物流配送</option>
+            <option value="emergency">应急保障</option>
+          </select>
+          <select name="org_code">
+            <option value="ORG_HZ_CG">杭州城市治理巡检中心</option>
+            <option value="ORG_HZ_LOGI">杭州低空物流示范公司</option>
+            <option value="ORG_HZ_EMG">杭州应急救援航空保障队</option>
+          </select>
+          <select name="pilot_code">
+            <option value="PILOT_ZHANGSAN">张三</option>
+            <option value="PILOT_LISI">李四</option>
+            <option value="PILOT_WANGWU">王五</option>
+          </select>
+          <select name="aircraft_code">
+            <option value="UAV-HZ-021">UAV-HZ-021</option>
+            <option value="UAV-HZ-022">UAV-HZ-022</option>
+            <option value="UAV-HZ-023">UAV-HZ-023</option>
+          </select>
+          <input name="district" value="Binjiang-Shangcheng" placeholder="执行区域">
+          <label>开始时间（UTC）</label>
+          <input name="start_time_utc" value="2026-05-20T06:30:00Z">
+          <label>结束时间（UTC）</label>
+          <input name="end_time_utc" value="2026-05-20T07:10:00Z">
+          <label>最小高度 (m)</label>
+          <input name="min_altitude_m" type="number" value="60">
+          <label>最大高度 (m)</label>
+          <input name="max_altitude_m" type="number" value="120">
+          <label>航线（JSON）</label>
+          <textarea name="route">[[30.2068,120.1828],[30.2198,120.1964],[30.2335,120.2128],[30.2458,120.2265]]</textarea>
+          <button class="btn primary" type="submit">创建计划</button>
+        </form>
+
+        <h2>审批规则配置</h2>
+        <form id="rule-form" class="form">
+          <input name="updated_by" value="规则管理员" placeholder="更新人">
+          <input name="max_altitude_high_m" type="number" value="120" placeholder="高风险高度阈值">
+          <input name="max_altitude_warn_m" type="number" value="100" placeholder="预警高度阈值">
+          <input name="route_required_score" type="number" value="45" placeholder="空航线扣分">
+          <input name="zone_intersect_high_score" type="number" value="40" placeholder="高风险空域相交扣分">
+          <input name="zone_intersect_medium_score" type="number" value="20" placeholder="一般空域相交扣分">
+          <input name="peak_window_score" type="number" value="12" placeholder="高峰时段扣分">
+          <label>高峰时段（JSON）</label>
+          <textarea name="peak_windows_utc">[[6,8],[14,16]]</textarea>
+          <label>风险等级阈值（JSON）</label>
+          <textarea name="risk_level_thresholds">{"medium":30,"high":60}</textarea>
+          <button id="save-rules" class="btn primary" type="button">保存规则</button>
+        </form>
+      </aside>
+
+      <section class="card center">
+        <div class="section-head">
+          <h2>飞行计划与状态流转</h2>
+          <div class="chip-row">
+            <button class="chip-btn flight-filter" data-status="">全部</button>
+            <button class="chip-btn flight-filter" data-status="draft">草稿</button>
+            <button class="chip-btn flight-filter" data-status="pending_review">待审批</button>
+            <button class="chip-btn flight-filter" data-status="approved">已通过</button>
+            <button class="chip-btn flight-filter" data-status="released">已放行</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>计划编号</th>
+                <th>任务</th>
+                <th>单位</th>
+                <th>飞手/航空器</th>
+                <th>时段</th>
+                <th>状态</th>
+                <th>动作</th>
+              </tr>
+            </thead>
+            <tbody id="plan-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="card side scrollable">
+        <h2>风险校验结果</h2>
+        <div id="risk-panel" class="list muted">请在计划列表点击“风险校验”</div>
+        <h2>任务回放</h2>
+        <div id="replay-meta" class="capacity-box">请选择计划并点击“回放”</div>
+        <div class="replay-controls">
+          <button id="replay-play" class="btn">播放</button>
+          <button id="replay-pause" class="btn">暂停</button>
+          <button id="replay-reset" class="btn">重置</button>
+          <button id="replay-generate" class="btn">重建轨迹</button>
+        </div>
+        <div class="replay-controls">
+          <label for="replay-speed">倍速</label>
+          <select id="replay-speed">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+          </select>
+        </div>
+        <input id="replay-slider" type="range" min="0" max="0" value="0">
+        <div id="replay-time" class="muted">-</div>
+        <div id="replay-canvas" class="replay-canvas"></div>
+        <h2>审批留痕</h2>
+        <div id="approval-list" class="list"></div>
+      </aside>
+    </section>
+
+    <section id="view-airspace" class="view">
+      <aside class="card side scrollable">
+        <h2>空域容量态势</h2>
+        <div id="capacity-box" class="capacity-box"></div>
+        <h2>高度切片</h2>
+        <div class="field-group">
+          <input id="airspace-altitude" type="range" min="0" max="300" step="10" value="120">
+          <div class="muted">当前高度：<span id="airspace-altitude-value">120</span>m</div>
+        </div>
+        <h2>时段态势</h2>
+        <select id="airspace-time-slice">
+          <option value="morning">早高峰（06:00-09:00）</option>
+          <option value="day" selected>日间（09:00-17:00）</option>
+          <option value="evening">晚高峰（17:00-20:00）</option>
+          <option value="night">夜间（20:00-06:00）</option>
+        </select>
+        <h2>图层控制</h2>
+        <div class="layer-list">
+          <label class="layer-item"><span>空域管制区</span><input id="layer-zones" type="checkbox" checked></label>
+          <label class="layer-item"><span>四维网格</span><input id="layer-grids" type="checkbox" checked></label>
+          <label class="layer-item"><span>起降点与设施</span><input id="layer-facilities" type="checkbox" checked></label>
+          <label class="layer-item"><span>气象热力</span><input id="layer-weather" type="checkbox" checked></label>
+        </div>
+        <button id="refresh-airspace" class="btn">刷新可视化</button>
+        <h2>微气象风险</h2>
+        <div id="weather-list" class="list"></div>
+      </aside>
+
+      <section class="card center">
+        <div class="section-head">
+          <h2>空域可视化主图（杭州）</h2>
+          <div id="airspace-kpis" class="chip-row"></div>
+        </div>
+        <div id="airspace-canvas" class="map-canvas airspace-canvas">
+          <div id="airspace-popup" class="map-popup"></div>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>空域管制区</h3>
+            <div class="table-wrap compact">
+              <table>
+                <thead><tr><th>区域</th><th>类型</th><th>高度(m)</th><th>状态</th></tr></thead>
+                <tbody id="zone-table"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>四维网格容量</h3>
+            <div class="table-wrap compact">
+              <table>
+                <thead><tr><th>网格</th><th>区域</th><th>负载</th><th>风险</th></tr></thead>
+                <tbody id="grid-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card side scrollable">
+        <h2>设施资源</h2>
+        <div class="table-wrap compact">
+          <table>
+            <thead><tr><th>设施</th><th>类型</th><th>区域</th><th>容量</th><th>状态</th></tr></thead>
+            <tbody id="facility-table"></tbody>
+          </table>
+        </div>
+        <h2>底座数据资源</h2>
+        <div id="source-list" class="list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>服务健康：</span>
+    <span id="health">检测中...</span>
+    <span class="divider">|</span>
+    <span>API: <code>/api/v1/*</code></span>
+  </footer>
+
+  <script src="https://unpkg.com/three@0.183.2/build/three.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

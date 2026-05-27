@@ -1,0 +1,1317 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>低空数字孪生平台 UI 框架图</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d8dee8;
+      --line-strong: #aab5c5;
+      --text: #1e293b;
+      --muted: #64748b;
+      --soft: #eef3f8;
+      --brand: #1f7a8c;
+      --brand-soft: #dff3f5;
+      --warn: #b7791f;
+      --danger: #b42318;
+      --ok: #237b4b;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: min(1480px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .cover {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .cover-main,
+    .cover-side,
+    .frame {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .cover-main { padding: 26px; }
+    .cover-side { padding: 20px; }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    p { margin: 0; color: var(--muted); }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .toc {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .toc a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
+      text-decoration: none;
+      background: #fbfdff;
+      font-size: 13px;
+    }
+
+    .toc span { color: var(--muted); }
+
+    .frame {
+      margin-top: 22px;
+      overflow: hidden;
+    }
+
+    .frame-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .frame-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .screen {
+      display: grid;
+      min-height: 780px;
+      background: #eef2f6;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      min-height: 780px;
+      border-top: 1px solid #edf1f6;
+    }
+
+    .sidebar {
+      background: #172334;
+      color: #dbe5f1;
+      padding: 16px 12px;
+    }
+
+    .brand {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 14px;
+      font-weight: 720;
+      color: #fff;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--brand);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .nav-item {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-radius: 6px;
+      color: #b9c6d5;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      background: rgba(31, 122, 140, 0.28);
+      color: #fff;
+      border: 1px solid rgba(139, 213, 224, 0.25);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: 56px 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .crumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn,
+    .icon-btn,
+    .seg {
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    .btn.danger {
+      color: var(--danger);
+      border-color: #f2b8b5;
+      background: #fff8f7;
+    }
+
+    .icon-btn {
+      width: 32px;
+      padding: 0;
+      font-weight: 700;
+    }
+
+    .content {
+      padding: 16px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .kpi-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi,
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-width: 0;
+    }
+
+    .kpi {
+      min-height: 90px;
+      padding: 12px;
+    }
+
+    .kpi .value {
+      margin-top: 8px;
+      font-size: 26px;
+      font-weight: 780;
+    }
+
+    .kpi .hint {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .panel-head {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .panel-body { padding: 12px; }
+
+    .map {
+      position: relative;
+      min-height: 520px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+        #f8fbfd;
+      background-size: 44px 44px;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .map:before {
+      content: "";
+      position: absolute;
+      inset: 34px 52px 60px 48px;
+      border: 2px solid rgba(31, 122, 140, 0.45);
+      border-radius: 38% 62% 48% 52%;
+      background: rgba(31, 122, 140, 0.06);
+    }
+
+    .route {
+      position: absolute;
+      height: 4px;
+      background: var(--brand);
+      border-radius: 99px;
+      transform-origin: left center;
+      opacity: 0.9;
+    }
+
+    .route.r1 { width: 320px; left: 160px; top: 210px; transform: rotate(18deg); }
+    .route.r2 { width: 210px; left: 480px; top: 310px; transform: rotate(-22deg); }
+    .route.r3 { width: 260px; left: 260px; top: 390px; transform: rotate(-8deg); background: #718096; }
+
+    .marker {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 3px solid #fff;
+      background: var(--brand);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+    }
+
+    .marker.warn { background: var(--warn); }
+    .marker.danger { background: var(--danger); }
+    .marker.ok { background: var(--ok); }
+
+    .m1 { left: 170px; top: 202px; }
+    .m2 { left: 430px; top: 286px; }
+    .m3 { left: 640px; top: 244px; }
+    .m4 { left: 330px; top: 404px; }
+    .m5 { left: 550px; top: 360px; }
+
+    .map-card {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 240px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+    }
+
+    .layer-box {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 190px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 26px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .fake-check {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+    }
+
+    .fake-check.on {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-item {
+      display: grid;
+      grid-template-columns: 10px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #fff;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .pill.ok { color: var(--ok); border-color: #bbdec8; background: #f2fbf5; }
+    .pill.warn { color: var(--warn); border-color: #f3d49a; background: #fff9ec; }
+    .pill.danger { color: var(--danger); border-color: #f2b8b5; background: #fff8f7; }
+    .pill.info { color: var(--brand); border-color: #b8dde2; background: var(--brand-soft); }
+
+    .chart-bars {
+      height: 240px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding-top: 16px;
+    }
+
+    .bar {
+      flex: 1;
+      min-width: 14px;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, #7ab9c4, var(--brand));
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 290px 1fr 340px;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .input {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .textarea {
+      height: 84px;
+      align-items: flex-start;
+      padding-top: 8px;
+    }
+
+    .stepper {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .step.active .step-num {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .workflow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .workflow .node {
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .workflow .arrow {
+      color: var(--line-strong);
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      height: 36px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 700;
+      background: #fbfdff;
+    }
+
+    .split-map-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 330px;
+      height: 100%;
+      gap: 14px;
+    }
+
+    .list-panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 0;
+    }
+
+    .search {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mini-map {
+      min-height: 560px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .timeline-item strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .grid-map {
+      position: relative;
+      min-height: 560px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(31, 122, 140, 0.14) 1px, transparent 1px),
+        linear-gradient(rgba(31, 122, 140, 0.14) 1px, transparent 1px),
+        #f9fcfd;
+      background-size: 48px 48px;
+    }
+
+    .heat {
+      position: absolute;
+      border-radius: 8px;
+      opacity: 0.78;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .h1 { left: 150px; top: 120px; width: 160px; height: 112px; background: rgba(35, 123, 75, 0.3); }
+    .h2 { left: 320px; top: 230px; width: 210px; height: 144px; background: rgba(183, 121, 31, 0.34); }
+    .h3 { left: 560px; top: 180px; width: 180px; height: 180px; background: rgba(180, 35, 24, 0.28); }
+
+    .command-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr 360px;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .video-wall {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .video-box {
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(31, 122, 140, 0.16), rgba(30, 41, 59, 0.05)),
+        #fff;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .wire-note {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fbfdff;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .cover,
+      .dashboard-grid,
+      .two-col,
+      .three-col,
+      .split-map-layout,
+      .command-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .screen,
+      .app-shell {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="cover">
+      <div class="cover-main">
+        <h1>低空数字孪生平台 UI 框架图</h1>
+        <p>基于 1.0 需求规格说明书整理的低保真页面框架，覆盖监管驾驶舱、低空一张图、飞行服务、运行监控、告警处置、空域容量、应急指挥、接口运营等核心界面。</p>
+        <div class="tag-row">
+          <span class="tag">监管驾驶舱</span>
+          <span class="tag">低空一张图</span>
+          <span class="tag">飞行申报审批</span>
+          <span class="tag">实时运行监控</span>
+          <span class="tag">告警处置</span>
+          <span class="tag">四维空域容量</span>
+          <span class="tag">应急指挥</span>
+          <span class="tag">开放接口与运营</span>
+        </div>
+      </div>
+      <div class="cover-side">
+        <h2>框架目录</h2>
+        <div class="toc">
+          <a href="#frame-dashboard">01 监管驾驶舱 <span>总览</span></a>
+          <a href="#frame-map">02 低空一张图 <span>态势</span></a>
+          <a href="#frame-approval">03 飞行申报审批 <span>流程</span></a>
+          <a href="#frame-monitor">04 运行监控告警 <span>处置</span></a>
+          <a href="#frame-airspace">05 四维空域容量 <span>评估</span></a>
+          <a href="#frame-command">06 应急指挥 <span>调度</span></a>
+          <a href="#frame-portal">07 接口运营门户 <span>生态</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-dashboard">
+      <div class="frame-head">
+        <div>
+          <h2>01 监管驾驶舱</h2>
+          <p>面向监管部门和值班中心，展示全局态势、运行指标、风险告警和重点任务。</p>
+        </div>
+        <div class="frame-meta"><span class="pill info">桌面端</span><span>1440 x 900</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>监管驾驶舱</div>
+            <div class="nav-item"><span class="dot"></span>低空一张图</div>
+            <div class="nav-item"><span class="dot"></span>飞行服务</div>
+            <div class="nav-item"><span class="dot"></span>运行监控</div>
+            <div class="nav-item"><span class="dot"></span>告警中心</div>
+            <div class="nav-item"><span class="dot"></span>空域与设施</div>
+            <div class="nav-item"><span class="dot"></span>应急指挥</div>
+            <div class="nav-item"><span class="dot"></span>开放接口</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">监管驾驶舱 / 全局态势</div>
+              <div class="top-actions">
+                <span class="seg">今日</span>
+                <span class="seg">市域</span>
+                <button class="btn">刷新</button>
+                <button class="btn primary">导出报告</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="dashboard-grid">
+                <div class="kpi-row">
+                  <div class="kpi"><h3>当前飞行器</h3><div class="value">128</div><div class="hint">在线 116 / 告警 7</div></div>
+                  <div class="kpi"><h3>今日飞行架次</h3><div class="value">642</div><div class="hint">较昨日 +12%</div></div>
+                  <div class="kpi"><h3>待审批计划</h3><div class="value">36</div><div class="hint">平均等待 18 分钟</div></div>
+                  <div class="kpi"><h3>空域占用率</h3><div class="value">43%</div><div class="hint">高峰 14:00-16:00</div></div>
+                  <div class="kpi"><h3>告警闭环率</h3><div class="value">91%</div><div class="hint">待处置 11 条</div></div>
+                  <div class="kpi"><h3>设备在线率</h3><div class="value">96%</div><div class="hint">机库离线 2 台</div></div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>全局运行态势</span><span class="pill info">一张图联动</span></div>
+                  <div class="map">
+                    <div class="route r1"></div><div class="route r2"></div><div class="route r3"></div>
+                    <span class="marker ok m1"></span><span class="marker m2"></span><span class="marker warn m3"></span><span class="marker danger m4"></span><span class="marker ok m5"></span>
+                    <div class="layer-box">
+                      <h3>图层</h3>
+                      <div class="check-row"><span class="fake-check on"></span>实时飞行器</div>
+                      <div class="check-row"><span class="fake-check on"></span>空域/航线</div>
+                      <div class="check-row"><span class="fake-check on"></span>禁限飞区</div>
+                      <div class="check-row"><span class="fake-check"></span>气象风险</div>
+                    </div>
+                    <div class="map-card">
+                      <h3>重点风险</h3>
+                      <p>越界 2、超高 3、失联 1、低电量 4。点击指标或点位进入告警中心。</p>
+                      <div class="tag-row"><span class="pill danger">高风险</span><span class="pill warn">待派发</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>运行趋势</span><button class="btn">查看明细</button></div>
+                  <div class="panel-body">
+                    <div class="chart-bars">
+                      <div class="bar" style="height: 42%"></div>
+                      <div class="bar" style="height: 58%"></div>
+                      <div class="bar" style="height: 72%"></div>
+                      <div class="bar" style="height: 48%"></div>
+                      <div class="bar" style="height: 84%"></div>
+                      <div class="bar" style="height: 66%"></div>
+                      <div class="bar" style="height: 74%"></div>
+                    </div>
+                    <div class="status-list">
+                      <div class="status-item"><span class="dot" style="color: var(--danger)"></span><span>重大活动保障区发现未授权目标</span><span class="pill danger">紧急</span></div>
+                      <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>物流航线 L-03 通信覆盖不足</span><span class="pill warn">关注</span></div>
+                      <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>巡检任务 R-102 已完成归档</span><span class="pill ok">完成</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-map">
+      <div class="frame-head">
+        <div>
+          <h2>02 低空一张图</h2>
+          <p>三维底图、空域、航线、起降点、禁限飞区、实时飞行器和告警事件统一入口。</p>
+        </div>
+        <div class="frame-meta"><span class="pill info">地图工作台</span><span>图层 / 检索 / 点选详情</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>低空一张图</div>
+            <div class="nav-item"><span class="dot"></span>图层管理</div>
+            <div class="nav-item"><span class="dot"></span>空间检索</div>
+            <div class="nav-item"><span class="dot"></span>标绘管理</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">低空一张图 / 一张图态势</div>
+              <div class="top-actions">
+                <button class="icon-btn">2D</button>
+                <button class="icon-btn">3D</button>
+                <button class="icon-btn">尺</button>
+                <button class="icon-btn">面</button>
+                <button class="btn">回到全域</button>
+                <button class="btn primary">新增标绘</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="split-map-layout">
+                <div class="panel list-panel">
+                  <div class="search"><div class="input">搜索航空器/航线/空域</div><button class="btn">搜</button></div>
+                  <div class="panel-body">
+                    <h3>图层树</h3>
+                    <div class="check-row"><span class="fake-check on"></span>三维底图</div>
+                    <div class="check-row"><span class="fake-check on"></span>空域网格</div>
+                    <div class="check-row"><span class="fake-check on"></span>航线航路</div>
+                    <div class="check-row"><span class="fake-check on"></span>起降点/机库</div>
+                    <div class="check-row"><span class="fake-check on"></span>禁限飞区</div>
+                    <div class="check-row"><span class="fake-check"></span>障碍物</div>
+                    <div class="check-row"><span class="fake-check"></span>通信覆盖</div>
+                    <div class="wire-note">图层支持开关、透明度、详情、版本、数据来源。</div>
+                  </div>
+                </div>
+                <div class="map mini-map">
+                  <div class="route r1"></div><div class="route r2"></div><div class="route r3"></div>
+                  <span class="marker ok m1"></span><span class="marker warn m2"></span><span class="marker danger m3"></span><span class="marker ok m4"></span>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>对象详情</span><span class="pill warn">告警中</span></div>
+                  <div class="panel-body">
+                    <div class="form-grid" style="grid-template-columns: 1fr;">
+                      <div class="field"><span>飞行器编号</span><div class="input">UAV-20260518-032</div></div>
+                      <div class="field"><span>所属企业</span><div class="input">低空运营示范公司</div></div>
+                      <div class="field"><span>位置/高度</span><div class="input">118.82, 32.05 / 118m</div></div>
+                      <div class="field"><span>任务状态</span><div class="input">执行中 / 城市巡检</div></div>
+                    </div>
+                    <div class="tag-row">
+                      <button class="btn primary">跟随</button>
+                      <button class="btn">查看任务</button>
+                      <button class="btn">查看航迹</button>
+                      <button class="btn danger">处理告警</button>
+                    </div>
+                    <div class="wire-note">地图对象详情卡片关联台账、任务、航迹、告警和处置入口。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-approval">
+      <div class="frame-head">
+        <div>
+          <h2>03 飞行计划申报与审批</h2>
+          <p>覆盖计划草稿、航线绘制、规则校验、风险报告、审批受理、补正、通过、驳回和会签。</p>
+        </div>
+        <div class="frame-meta"><span class="pill info">业务工作台</span><span>表单 / 流程 / 风险报告</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>飞行计划</div>
+            <div class="nav-item"><span class="dot"></span>审批工作台</div>
+            <div class="nav-item"><span class="dot"></span>航线规划</div>
+            <div class="nav-item"><span class="dot"></span>风险评估</div>
+            <div class="nav-item"><span class="dot"></span>动态放行</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">飞行服务 / 新建飞行计划</div>
+              <div class="top-actions">
+                <button class="btn">保存草稿</button>
+                <button class="btn">规则校验</button>
+                <button class="btn primary">提交申请</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="three-col">
+                <div class="panel">
+                  <div class="panel-head">申报步骤</div>
+                  <div class="stepper">
+                    <div class="step active"><span class="step-num">1</span><div><strong>基本信息</strong><br>任务、时间、申请单位</div></div>
+                    <div class="step active"><span class="step-num">2</span><div><strong>航线信息</strong><br>绘制/导入航线</div></div>
+                    <div class="step"><span class="step-num">3</span><div><strong>航空器</strong><br>设备与操控员</div></div>
+                    <div class="step"><span class="step-num">4</span><div><strong>风险校验</strong><br>禁限飞、障碍物、敏感区</div></div>
+                    <div class="step"><span class="step-num">5</span><div><strong>提交确认</strong><br>材料与审批流</div></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>申报表单</span><span class="pill warn">草稿</span></div>
+                  <div class="panel-body">
+                    <div class="workflow">
+                      <span class="node">草稿</span><span class="arrow">></span><span class="node">待受理</span><span class="arrow">></span><span class="node">审批中</span><span class="arrow">></span><span class="node">已通过</span><span class="arrow">></span><span class="node">执行</span>
+                    </div>
+                    <div class="form-grid">
+                      <div class="field"><span>任务名称</span><div class="input">河道巡检 2026-05-18</div></div>
+                      <div class="field"><span>任务类型</span><div class="input">城市治理巡检</div></div>
+                      <div class="field"><span>计划起飞时间</span><div class="input">2026-05-18 14:30</div></div>
+                      <div class="field"><span>计划结束时间</span><div class="input">2026-05-18 15:10</div></div>
+                      <div class="field"><span>航空器</span><div class="input">UAV-A8 / 已实名</div></div>
+                      <div class="field"><span>操控员</span><div class="input">张三 / 资质有效</div></div>
+                      <div class="field" style="grid-column: 1 / -1;"><span>应急预案</span><div class="input textarea">低电量返航、失联悬停、越界人工接管...</div></div>
+                    </div>
+                    <div class="tag-row">
+                      <button class="btn">绘制航线</button>
+                      <button class="btn">导入航线</button>
+                      <button class="btn">选择模板</button>
+                      <button class="btn">查看流程</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>风险报告</span><button class="btn">导出</button></div>
+                  <div class="panel-body">
+                    <div class="status-list">
+                      <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>资质有效性通过</span><span class="pill ok">通过</span></div>
+                      <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>航线邻近人口密集区</span><span class="pill warn">中风险</span></div>
+                      <div class="status-item"><span class="dot" style="color: var(--danger)"></span><span>高度层接近限制上限</span><span class="pill danger">需审批</span></div>
+                      <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>未穿越禁飞区</span><span class="pill ok">通过</span></div>
+                    </div>
+                    <div class="wire-note">审批侧按钮：受理、通过、驳回、退回补正、转办、会签、下载附件。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-monitor">
+      <div class="frame-head">
+        <div>
+          <h2>04 运行监控与告警处置</h2>
+          <p>实时航迹、计划一致性、冲突检测、告警确认、派发、处置、关闭和复盘。</p>
+        </div>
+        <div class="frame-meta"><span class="pill danger">值班场景</span><span>实时 / 告警 / 闭环</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>实时监控</div>
+            <div class="nav-item"><span class="dot"></span>航迹列表</div>
+            <div class="nav-item"><span class="dot"></span>冲突检测</div>
+            <div class="nav-item"><span class="dot"></span>告警列表</div>
+            <div class="nav-item"><span class="dot"></span>事件复盘</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">运行监控 / 实时监控</div>
+              <div class="top-actions">
+                <span class="seg">显示计划航线</span>
+                <span class="seg">显示实际航迹</span>
+                <button class="btn">刷新</button>
+                <button class="btn danger">紧急处置</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="split-map-layout">
+                <div class="panel list-panel">
+                  <div class="panel-head">飞行器列表</div>
+                  <div class="panel-body status-list">
+                    <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>UAV-018 城市巡检</span><span class="pill ok">正常</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--danger)"></span><span>UAV-032 河道巡检</span><span class="pill danger">越界</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>UAV-061 物流配送</span><span class="pill warn">低电量</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>UAV-077 巡检返航</span><span class="pill warn">偏航</span></div>
+                  </div>
+                </div>
+                <div class="map mini-map">
+                  <div class="route r1"></div><div class="route r2"></div><div class="route r3"></div>
+                  <span class="marker ok m1"></span><span class="marker danger m2"></span><span class="marker warn m3"></span><span class="marker ok m5"></span>
+                  <div class="map-card">
+                    <h3>UAV-032</h3>
+                    <p>越界告警，偏离审批区域 86 米，建议立即联系操控员返航。</p>
+                    <div class="tag-row"><button class="btn">跟随</button><button class="btn danger">处理</button></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>告警处置</span><span class="pill danger">未确认</span></div>
+                  <div class="panel-body">
+                    <div class="timeline">
+                      <div class="timeline-item"><span>14:22:08</span><div><strong>告警触发</strong><br>实际航迹越出电子围栏</div></div>
+                      <div class="timeline-item"><span>14:22:12</span><div><strong>系统建议</strong><br>通知操控员降低高度并返航</div></div>
+                      <div class="timeline-item"><span>14:22:30</span><div><strong>待确认</strong><br>值班员确认后生成处置工单</div></div>
+                    </div>
+                    <div class="tag-row">
+                      <button class="btn primary">确认</button>
+                      <button class="btn">派发</button>
+                      <button class="btn">升级</button>
+                      <button class="btn">处置反馈</button>
+                      <button class="btn danger">关闭</button>
+                    </div>
+                    <div class="wire-note">状态流转：未确认 -> 已确认 -> 已派发 -> 处置中 -> 待关闭 -> 已关闭 -> 已复盘。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-airspace">
+      <div class="frame-head">
+        <div>
+          <h2>05 四维空域网格与容量评估</h2>
+          <p>围绕空间、高度、时间、容量占用构建空域计算界面，并支持容量热力、瓶颈定位和报告导出。</p>
+        </div>
+        <div class="frame-meta"><span class="pill info">规划计算</span><span>网格 / 容量 / 仿真</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>四维网格</div>
+            <div class="nav-item"><span class="dot"></span>容量评估</div>
+            <div class="nav-item"><span class="dot"></span>起降点</div>
+            <div class="nav-item"><span class="dot"></span>通导监设施</div>
+            <div class="nav-item"><span class="dot"></span>选址仿真</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">空域与设施 / 四维空域网格</div>
+              <div class="top-actions">
+                <button class="btn">生成网格</button>
+                <button class="btn">容量配置</button>
+                <button class="btn primary">开始计算</button>
+                <button class="btn">导出报告</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="three-col">
+                <div class="panel">
+                  <div class="panel-head">评估参数</div>
+                  <div class="panel-body">
+                    <div class="form-grid" style="grid-template-columns: 1fr;">
+                      <div class="field"><span>区域</span><div class="input">主城区低空管控区</div></div>
+                      <div class="field"><span>高度层</span><div class="input">60m / 120m / 300m</div></div>
+                      <div class="field"><span>时间粒度</span><div class="input">15 分钟</div></div>
+                      <div class="field"><span>任务规模</span><div class="input">高峰 300 架次/小时</div></div>
+                    </div>
+                    <div class="wire-note">参数变化后需重新计算，并保留历史评估版本。</div>
+                  </div>
+                </div>
+                <div class="grid-map">
+                  <div class="heat h1"></div>
+                  <div class="heat h2"></div>
+                  <div class="heat h3"></div>
+                  <div class="map-card">
+                    <h3>网格 A-18-120</h3>
+                    <p>容量 12，计划占用 10，实际占用 8，风险：中。</p>
+                    <div class="tag-row"><button class="btn">查看占用</button><button class="btn">查看任务</button></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>容量瓶颈</span><button class="btn">定位</button></div>
+                  <div class="panel-body status-list">
+                    <div class="status-item"><span class="dot" style="color: var(--danger)"></span><span>A-23 14:00-14:15 容量超限</span><span class="pill danger">高</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>B-08 物流航线交汇</span><span class="pill warn">中</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>C-12 起降点周转不足</span><span class="pill warn">中</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>D-05 空域余量充足</span><span class="pill ok">低</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-command">
+      <div class="frame-head">
+        <div>
+          <h2>06 应急空域与应急指挥</h2>
+          <p>突发事件下快速划设临时空域、启动预案、派发任务、查看现场视频并生成复盘。</p>
+        </div>
+        <div class="frame-meta"><span class="pill danger">应急模式</span><span>事件 / 空域 / 调度</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>应急事件</div>
+            <div class="nav-item"><span class="dot"></span>应急空域</div>
+            <div class="nav-item"><span class="dot"></span>预案库</div>
+            <div class="nav-item"><span class="dot"></span>指挥调度</div>
+            <div class="nav-item"><span class="dot"></span>保障复盘</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">应急指挥 / 事件指挥台</div>
+              <div class="top-actions">
+                <button class="btn primary">新建事件</button>
+                <button class="btn">启动预案</button>
+                <button class="btn danger">发布管制</button>
+                <button class="btn">生成复盘</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="command-layout">
+                <div class="panel">
+                  <div class="panel-head">事件与任务</div>
+                  <div class="panel-body status-list">
+                    <div class="status-item"><span class="dot" style="color: var(--danger)"></span><span>重大活动保障</span><span class="pill danger">进行中</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>救援航线开通</span><span class="pill warn">待确认</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--ok)"></span><span>无人机 3 架已到位</span><span class="pill ok">完成</span></div>
+                    <div class="status-item"><span class="dot" style="color: var(--warn)"></span><span>现场图传待接入</span><span class="pill warn">处理中</span></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>应急态势图</span><span class="pill danger">临时管制区已发布</span></div>
+                  <div class="map">
+                    <div class="route r1"></div><div class="route r2"></div>
+                    <span class="marker danger m2"></span><span class="marker ok m4"></span><span class="marker warn m5"></span>
+                    <div class="layer-box">
+                      <h3>应急操作</h3>
+                      <div class="tag-row"><button class="btn">一键划设</button><button class="btn">解除管制</button><button class="btn">派发任务</button></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">现场视频与反馈</div>
+                  <div class="panel-body">
+                    <div class="video-wall">
+                      <div class="video-box">无人机视频 1</div>
+                      <div class="video-box">无人机视频 2</div>
+                      <div class="video-box">机库视频</div>
+                      <div class="video-box">移动端回传</div>
+                    </div>
+                    <div class="timeline">
+                      <div class="timeline-item"><span>14:05</span><div><strong>预案启动</strong><br>生成 6 项任务</div></div>
+                      <div class="timeline-item"><span>14:12</span><div><strong>空域发布</strong><br>普通计划自动受限</div></div>
+                      <div class="timeline-item"><span>14:28</span><div><strong>现场反馈</strong><br>上传图文和位置</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame" id="frame-portal">
+      <div class="frame-head">
+        <div>
+          <h2>07 开放接口、租户与运营门户</h2>
+          <p>面向设备厂商、第三方应用和平台运营人员，管理接入申请、密钥、调用统计、租户和运营指标。</p>
+        </div>
+        <div class="frame-meta"><span class="pill info">运营生态</span><span>接口 / 租户 / 指标</span></div>
+      </div>
+      <div class="screen">
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">LA</span><span>低空孪生平台</span></div>
+            <div class="nav-item active"><span class="dot"></span>接口配置</div>
+            <div class="nav-item"><span class="dot"></span>设备接入</div>
+            <div class="nav-item"><span class="dot"></span>GIS 导入</div>
+            <div class="nav-item"><span class="dot"></span>开发者门户</div>
+            <div class="nav-item"><span class="dot"></span>租户管理</div>
+            <div class="nav-item"><span class="dot"></span>运营看板</div>
+          </aside>
+          <section class="main">
+            <div class="topbar">
+              <div class="crumb">开放接口 / 接入应用</div>
+              <div class="top-actions">
+                <button class="btn primary">新增应用</button>
+                <button class="btn">生成密钥</button>
+                <button class="btn">测试连接</button>
+                <button class="btn">导出日志</button>
+              </div>
+            </div>
+            <div class="content">
+              <div class="two-col">
+                <div class="panel">
+                  <div class="panel-head"><span>接入应用</span><span class="pill info">6 个应用</span></div>
+                  <div class="panel-body">
+                    <table>
+                      <thead><tr><th>应用名称</th><th>类型</th><th>状态</th><th>操作</th></tr></thead>
+                      <tbody>
+                        <tr><td>大疆机库接入</td><td>设备</td><td><span class="pill ok">启用</span></td><td>查看 / 停用</td></tr>
+                        <tr><td>GIS 图层导入</td><td>数据</td><td><span class="pill ok">启用</span></td><td>查看 / 日志</td></tr>
+                        <tr><td>应急平台同步</td><td>业务</td><td><span class="pill warn">测试</span></td><td>测试 / 启用</td></tr>
+                        <tr><td>物流订单系统</td><td>场景</td><td><span class="pill ok">启用</span></td><td>查看 / 重置</td></tr>
+                        <tr><td>气象服务</td><td>数据</td><td><span class="pill danger">异常</span></td><td>诊断 / 日志</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="wire-note">密钥仅生成时完整展示；重置密钥需二次确认并记录审计。</div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span>运营与调用统计</span><button class="btn">查看明细</button></div>
+                  <div class="panel-body">
+                    <div class="kpi-row" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+                      <div class="kpi"><h3>租户数量</h3><div class="value">18</div><div class="hint">园区 9 / 行业 6 / 企业 3</div></div>
+                      <div class="kpi"><h3>今日调用量</h3><div class="value">82k</div><div class="hint">成功率 99.2%</div></div>
+                      <div class="kpi"><h3>接入设备</h3><div class="value">356</div><div class="hint">在线 341</div></div>
+                    </div>
+                    <div class="chart-bars">
+                      <div class="bar" style="height: 52%"></div>
+                      <div class="bar" style="height: 64%"></div>
+                      <div class="bar" style="height: 48%"></div>
+                      <div class="bar" style="height: 88%"></div>
+                      <div class="bar" style="height: 73%"></div>
+                      <div class="bar" style="height: 60%"></div>
+                      <div class="bar" style="height: 78%"></div>
+                    </div>
+                    <div class="tag-row">
+                      <button class="btn">新增租户</button>
+                      <button class="btn">配置权限</button>
+                      <button class="btn">查看文档</button>
+                      <button class="btn primary">导出运营报表</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冬奥会数据可视化分析报告</title>
+    
+    <!-- 静态资源引用 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 内联数据区 -->
+    <script>
+        // 样例数据
+        const sample_data = [
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "速度滑冰男子500米", "金牌国家": "美国", "银牌国家": "芬兰", "铜牌国家": "挪威"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "速度滑冰男子1500米", "金牌国家": "芬兰", "银牌国家": "挪威", "铜牌国家": "芬兰"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "速度滑冰男子5000米", "金牌国家": "芬兰", "银牌国家": "挪威", "铜牌国家": "瑞典"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "速度滑冰男子10000米", "金牌国家": "挪威", "银牌国家": "芬兰", "铜牌国家": "瑞典"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "速度滑冰男子全能", "金牌国家": "挪威", "银牌国家": "芬兰", "铜牌国家": "瑞典"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "花样滑冰男子单人滑", "金牌国家": "瑞典", "银牌国家": "奥地利", "铜牌国家": "芬兰"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "花样滑冰女子单人滑", "金牌国家": "奥地利", "银牌国家": "挪威", "铜牌国家": "芬兰"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑冰", "小项名称": "花样滑冰双人滑", "金牌国家": "挪威", "银牌国家": "芬兰", "铜牌国家": "奥地利"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑雪", "小项名称": "越野滑雪男子18公里", "金牌国家": "挪威", "银牌国家": "芬兰", "铜牌国家": "瑞典"},
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "大项名称": "滑雪", "小项名称": "越野滑雪男子50公里", "金牌国家": "挪威", "银牌国家": "芬兰", "铜牌国家": "瑞典"}
+        ];
+
+        // 数据总览
+        const overview_stats = {
+            total_editions: 25,
+            total_years: 25,
+            total_hosts: 22,
+            total_sports: 10,
+            total_events: 140,
+            total_countries: 45,
+            total_medals: 3503,
+            total_golds: 1170,
+            total_silvers: 1169,
+            total_bronzes: 1164
+        };
+
+        // 国家排名数据
+        const country_rankings = [
+            {"国家": "挪威", "金牌": 148, "银牌": 134, "铜牌": 123, "总数": 405},
+            {"国家": "美国", "金牌": 114, "银牌": 121, "铜牌": 94, "总数": 329},
+            {"国家": "德国", "金牌": 101, "银牌": 96, "铜牌": 63, "总数": 260},
+            {"国家": "奥地利", "金牌": 71, "银牌": 88, "铜牌": 91, "总数": 250},
+            {"国家": "加拿大", "金牌": 77, "银牌": 72, "铜牌": 76, "总数": 225},
+            {"国家": "苏联", "金牌": 78, "银牌": 57, "铜牌": 59, "总数": 194},
+            {"国家": "瑞典", "金牌": 65, "银牌": 51, "铜牌": 60, "总数": 176},
+            {"国家": "芬兰", "金牌": 45, "银牌": 65, "铜牌": 63, "总数": 173},
+            {"国家": "瑞士", "金牌": 63, "银牌": 47, "铜牌": 58, "总数": 168},
+            {"国家": "荷兰", "金牌": 53, "银牌": 49, "铜牌": 45, "总数": 147}
+        ];
+
+        // 冬奥会发展趋势数据
+        const winter_olympics_trends = [
+            {"届数": 1, "年份": 1924, "举办地": "法国夏慕尼", "参赛国家": 16, "大项": 6, "小项": 16},
+            {"届数": 2, "年份": 1928, "举办地": "瑞士圣莫里茨", "参赛国家": 25, "大项": 4, "小项": 14},
+            {"届数": 3, "年份": 1932, "举办地": "美国普莱西德湖", "参赛国家": 17, "大项": 4, "小项": 14},
+            {"届数": 4, "年份": 1936, "举办地": "德国加米施-帕滕基兴", "参赛国家": 28, "大项": 4, "小项": 17},
+            {"届数": 5, "年份": 1948, "举办地": "瑞士圣莫里茨", "参赛国家": 28, "大项": 9, "小项": 22},
+            {"届数": 6, "年份": 1952, "举办地": "挪威奥斯陆", "参赛国家": 30, "大项": 8, "小项": 22},
+            {"届数": 7, "年份": 1956, "举办地": "意大利科尔蒂纳丹佩佐", "参赛国家": 32, "大项": 8, "小项": 24},
+            {"届数": 8, "年份": 1960, "举办地": "美国斯阔谷", "参赛国家": 30, "大项": 8, "小项": 27},
+            {"届数": 9, "年份": 1964, "举办地": "奥地利因斯布鲁克", "参赛国家": 36, "大项": 6, "小项": 34},
+            {"届数": 10, "年份": 1968, "举办地": "法国格勒诺布尔", "参赛国家": 37, "大项": 6, "小项": 35},
+            {"届数": 11, "年份": 1972, "举办地": "日本札幌", "参赛国家": 35, "大项": 6, "小项": 35},
+            {"届数": 12, "年份": 1976, "举办地": "奥地利因斯布鲁克", "参赛国家": 37, "大项": 6, "小项": 37},
+            {"届数": 13, "年份": 1980, "举办地": "美国普莱西德湖", "参赛国家": 37, "大项": 6, "小项": 38},
+            {"届数": 14, "年份": 1984, "举办地": "南斯拉夫萨拉热窝", "参赛国家": 49, "大项": 6, "小项": 39},
+            {"届数": 15, "年份": 1988, "举办地": "加拿大卡尔加里", "参赛国家": 57, "大项": 7, "小项": 46},
+            {"届数": 16, "年份": 1992, "举办地": "法国阿尔贝维尔", "参赛国家": 64, "大项": 7, "小项": 57},
+            {"届数": 17, "年份": 1994, "举办地": "挪威利勒哈默尔", "参赛国家": 67, "大项": 7, "小项": 61},
+            {"届数": 18, "年份": 1998, "举办地": "日本长野", "参赛国家": 72, "大项": 7, "小项": 68},
+            {"届数": 19, "年份": 2002, "举办地": "美国盐湖城", "参赛国家": 77, "大项": 7, "小项": 78},
+            {"届数": 20, "年份": 2006, "举办地": "意大利都灵", "参赛国家": 80, "大项": 7, "小项": 84},
+            {"届数": 21, "年份": 2010, "举办地": "加拿大温哥华", "参赛国家": 82, "大项": 7, "小项": 86},
+            {"届数": 22, "年份": 2014, "举办地": "俄罗斯索契", "参赛国家": 88, "大项": 7, "小项": 98},
+            {"届数": 23, "年份": 2018, "举办地": "韩国平昌", "参赛国家": 92, "大项": 7, "小项": 102},
+            {"届数": 24, "年份": 2022, "举办地": "中国北京", "参赛国家": 91, "大项": 7, "小项": 109},
+            {"届数": 25, "年份": 2026, "举办地": "意大利米兰-科尔蒂纳丹佩佐", "参赛国家": 92, "大项": 8, "小项": 116}
+        ];
+
+        // 中国表现数据
+        const china_performance = [
+            {"年份": 1980, "金牌": 0, "银牌": 0, "铜牌": 0, "总数": 0},
+            {"年份": 1984, "金牌": 0, "银牌": 0, "铜牌": 0, "总数": 0},
+            {"年份": 1988, "金牌": 0, "银牌": 0, "铜牌": 0, "总数": 0},
+            {"年份": 1992, "金牌": 0, "银牌": 3, "铜牌": 0, "总数": 3},
+            {"年份": 1994, "金牌": 0, "银牌": 1, "铜牌": 2, "总数": 3},
+            {"年份": 1998, "金牌": 0, "银牌": 6, "铜牌": 2, "总数": 8},
+            {"年份": 2002, "金牌": 2, "银牌": 2, "铜牌": 4, "总数": 8},
+            {"年份": 2006, "金牌": 2, "银牌": 4, "铜牌": 5, "总数": 11},
+            {"年份": 2010, "金牌": 5, "银牌": 2, "铜牌": 4, "总数": 11},
+            {"年份": 2014, "金牌": 3, "银牌": 4, "铜牌": 2, "总数": 9},
+            {"年份": 2018, "金牌": 1, "银牌": 6, "铜牌": 2, "总数": 9},
+            {"年份": 2022, "金牌": 9, "银牌": 4, "铜牌": 2, "总数": 15}
+        ];
+
+        // 项目趋势数据
+        const sport_distribution = [
+            {"项目": "滑雪", "比例": 44},
+            {"项目": "滑冰", "比例": 32},
+            {"项目": "冰球", "比例": 8},
+            {"项目": "雪橇", "比例": 7},
+            {"项目": "冬季两项", "比例": 5},
+            {"项目": "雪车", "比例": 4}
+        ];
+
+        // 2026年预测数据
+        const prediction_2026 = {
+            host: "意大利米兰-科尔蒂纳丹佩佐",
+            expected_countries: 95,
+            expected_events: 120,
+            expected_medals: 360,
+            top_countries: ["挪威", "德国", "美国", "瑞典", "荷兰"],
+            china_expectation: "有望保持前10，在优势项目上冲击奖牌"
+        };
+    </script>
+
+    <style>
+        /* 自定义动画效果 */
+        @keyframes gradient-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #9333EA, #C084FC, #F0ABFC, #C084FC);
+            background-size: 400% 400%;
+            animation: gradient-bg 15s ease infinite;
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse-animation {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(147, 51, 234, 0.3), 0 10px 10px -5px rgba(147, 51, 234, 0.1);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, #9333EA, #F0ABFC);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .number-counter {
+            counter-reset: num 0;
+            animation: count 2s forwards;
+        }
+        
+        /* 确保页面平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(#9333EA, #C084FC);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(#7E22CE, #A855F7);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-snowflake text-2xl text-purple-600"></i>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                        冬奥会数据洞察
+                    </h1>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#overview" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">数据总览</a>
+                    <a href="#rankings" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">排名分析</a>
+                    <a href="#trends" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">发展趋势</a>
+                    <a href="#china" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">中国表现</a>
+                    <a href="#sports" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">项目趋势</a>
+                    <a href="#prediction" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">2026预测</a>
+                    <a href="#insights" class="nav-link text-gray-700 hover:text-purple-600 transition-colors">深度洞察</a>
+                </nav>
+                
+                <!-- 移动端菜单按钮 -->
+                <button id="menu-toggle" class="md:hidden text-gray-700 hover:text-purple-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute w-full">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#overview" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">数据总览</a>
+                <a href="#rankings" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">排名分析</a>
+                <a href="#trends" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">发展趋势</a>
+                <a href="#china" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">中国表现</a>
+                <a href="#sports" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">项目趋势</a>
+                <a href="#prediction" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">2026预测</a>
+                <a href="#insights" class="py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors">深度洞察</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="pt-28 pb-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <div class="float-animation">
+                <i class="fas fa-trophy text-6xl mb-6 opacity-90"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 pulse-animation">冬奥会百年数据洞察</h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
+                探索1924-2026年冬奥会的发展历程、奖牌分布与未来趋势
+            </p>
+            <div class="mt-10 flex justify-center space-x-6">
+                <a href="#overview" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-full text-lg font-medium transition-all hover:shadow-lg">
+                    <i class="fas fa-chart-bar mr-2"></i>开始探索
+                </a>
+                <a href="#insights" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-full text-lg font-medium transition-all hover:shadow-lg">
+                    <i class="fas fa-lightbulb mr-2"></i>深度洞察
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据总览 -->
+    <section id="overview" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-globe-americas mr-3"></i>数据总览
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    全面了解冬奥会百年发展历程的核心数据指标
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 统计卡片 -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover fade-in-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-calendar-alt text-3xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">届数</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-purple-800 mb-2 counter" data-target="25">0</h3>
+                    <p class="text-gray-600">冬奥会举办总届数</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover fade-in-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-flag text-3xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">国家</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-purple-800 mb-2 counter" data-target="45">0</h3>
+                    <p class="text-gray-600">参与国家和地区</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover fade-in-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-medal text-3xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">奖牌</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-purple-800 mb-2 counter" data-target="3503">0</h3>
+                    <p class="text-gray-600">奖牌总数</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover fade-in-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-snowboard text-3xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">项目</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-purple-800 mb-2 counter" data-target="140">0</h3>
+                    <p class="text-gray-600">小项总数</p>
+                </div>
+            </div>
+
+            <!-- 样例数据表格 -->
+            <div class="mt-16 bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-600 to-pink-500 px-8 py-6">
+                    <h3 class="text-2xl font-bold text-white">
+                        <i class="fas fa-table mr-3"></i>样例数据
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">年份</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">举办地</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">大项</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">小项</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">金牌</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">银牌</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">铜牌</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sample-table-body" class="divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 深度分析 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>深度分析：冬奥会的百年演进
+                </h3>
+                <p class="text-lg leading-relaxed">
+                    从1924年法国夏慕尼的首届冬奥会到2026年意大利米兰-科尔蒂纳丹佩佐，冬奥会经历了翻天覆地的变化。
+                    参赛国家从16个增长到92个，小项数量从16个扩展到116个，展现了冬季运动的全球化发展趋势。
+                    挪威以405枚奖牌领跑历史奖牌榜，体现了其在冬季运动领域的传统优势。
+                    中国自1980年首次参赛以来，实现了从0金到9金的跨越式发展，特别是在2022年北京冬奥会上取得了历史性突破。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 排名分析 -->
+    <section id="rankings" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-trophy mr-3"></i>排名分析
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    深入分析各国在冬奥会历史上的奖牌表现和竞争格局
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 奖牌榜图表 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-bar mr-2 text-purple-600"></i>历史奖牌榜前十
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="medalRankingChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 奖牌分布饼图 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-pie mr-2 text-purple-600"></i>奖牌类型分布
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="medalTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 排名表格 -->
+            <div class="mt-12 bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-600 to-pink-500 px-8 py-6">
+                    <h3 class="text-2xl font-bold text-white">
+                        <i class="fas fa-list-ol mr-3"></i>详细排名
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">排名</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">国家/地区</th>
+                                <th class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">金牌</th>
+                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-400">银牌</th>
+                                <th class="px-6 py-4 text-center text-sm font-semibold text-amber-700">铜牌</th>
+                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">总数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-table-body" class="divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 深度分析 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>深度分析：奖牌格局的演变
+                </h3>
+                <p class="text-lg leading-relaxed">
+                    冬奥会的奖牌格局呈现出明显的地域特征和历史变迁。挪威凭借其优越的自然条件和深厚的冬季运动传统，长期占据奖牌榜首位。
+                    美国和德国作为体育强国，在多个项目中保持竞争力。值得注意的是，随着冬奥会的全球化发展，奖牌分布逐渐多元化，
+                    越来越多的国家开始在特定项目中崭露头角。中国、韩国等亚洲国家的崛起，打破了传统欧美国家的垄断局面，
+                    为冬奥会注入了新的活力。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 发展趋势 -->
+    <section id="trends" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-trending-up mr-3"></i>发展趋势
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    探索冬奥会规模、参赛国家和项目数量的历史演变
+                </p>
+            </div>
+
+            <!-- 发展趋势图表 -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <h3 class="text-xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-chart-line mr-2 text-purple-600"></i>冬奥会发展趋势（1924-2026）
+                </h3>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="developmentTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 举办地分布 -->
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-map-marker-alt text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">欧洲</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">14届</h3>
+                    <p class="text-gray-600">冬奥会举办次数</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-map-marker-alt text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">北美洲</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">6届</h3>
+                    <p class="text-gray-600">冬奥会举办次数</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-map-marker-alt text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">亚洲</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">4届</h3>
+                    <p class="text-gray-600">冬奥会举办次数</p>
+                </div>
+            </div>
+
+            <!-- 深度分析 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>深度分析：冬奥会的扩张与变革
+                </h3>
+                <p class="text-lg leading-relaxed">
+                    冬奥会的发展历程可以分为几个关键阶段：初创期（1924-1948）、稳定发展期（1952-1988）、
+                    快速扩张期（1992-2014）和成熟创新期（2018至今）。特别值得关注的是1994年开始的
+                    冬奥会与夏季奥运会错开举办的改革，极大地提升了冬奥会的影响力和商业价值。
+                    从地域分布看，欧洲依然是冬奥会的主导地区，但亚洲和北美的崛起也不容忽视，
+                    反映了冬季运动的全球普及趋势。项目设置的不断创新，如新增自由式滑雪、单板滑雪等，
+                    使冬奥会更加年轻化、时尚化。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 中国表现 -->
+    <section id="china" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-flag mr-3"></i>中国表现
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    全面分析中国在冬奥会历史上的发展轨迹和突破性成就
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 中国奖牌趋势 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-purple-600"></i>中国奖牌发展趋势
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chinaMedalChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 中国奖牌分布 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-pie mr-2 text-purple-600"></i>中国奖牌类型分布
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chinaMedalTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中国里程碑 -->
+            <div class="mt-16 bg-white rounded-2xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold mb-8 text-gray-800 text-center">
+                    <i class="fas fa-star mr-2 text-yellow-500"></i>中国冬奥会里程碑
+                </h3>
+                <div class="relative">
+                    <!-- 时间线 -->
+                    <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
+                    
+                    <!-- 里程碑事件 -->
+                    <div class="space-y-12">
+                        <div class="relative flex flex-col md:flex-row items-center">
+                            <div class="w-full md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
+                                <h4 class="text-xl font-bold text-purple-800 mb-2">1980年</h4>
+                                <p class="text-gray-600">中国首次参加冬奥会，在普莱西德湖冬奥会实现冬奥之旅零的突破</p>
+                            </div>
+                            <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center z-10">
+                                <i class="fas fa-flag text-white"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-12"></div>
+                        </div>
+
+                        <div class="relative flex flex-col md:flex-row items-center">
+                            <div class="w-full md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right"></div>
+                            <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center z-10">
+                                <i class="fas fa-medal text-white"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-12">
+                                <h4 class="text-xl font-bold text-purple-800 mb-2">2002年</h4>
+                                <p class="text-gray-600">杨扬在盐湖城冬奥会获得短道速滑女子500米金牌，实现中国冬奥会金牌零的突破</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex flex-col md:flex-row items-center">
+                            <div class="w-full md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
+                                <h4 class="text-xl font-bold text-purple-800 mb-2">2010年</h4>
+                                <p class="text-gray-600">温哥华冬奥会，中国代表团获得5金2银4铜，创历史最佳战绩</p>
+                            </div>
+                            <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center z-10">
+                                <i class="fas fa-trophy text-white"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-12"></div>
+                        </div>
+
+                        <div class="relative flex flex-col md:flex-row items-center">
+                            <div class="w-full md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right"></div>
+                            <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center z-10">
+                                <i class="fas fa-globe text-white"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-12">
+                                <h4 class="text-xl font-bold text-purple-800 mb-2">2022年</h4>
+                                <p class="text-gray-600">北京成功举办第24届冬奥会，中国代表团获得9金4银2铜，首次进入奖牌榜前3</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 深度分析 -->
+                <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                    <h3 class="text-2xl font-bold mb-4">
+                        <i class="fas fa-chart-line mr-3"></i>深度分析：中国冬奥崛起之路
+                    </h3>
+                    <p class="text-lg leading-relaxed">
+                        中国冬奥会的发展历程是一部从追赶到引领的奋斗史。从1980年首次参赛的默默无闻，
+                        到2002年杨扬实现金牌零突破，再到2022年北京冬奥会的历史性突破，中国在短短42年间
+                        完成了从冬奥弱国到体育强国的华丽转身。这一转变不仅体现在奖牌数量的增长上，
+                        更体现在项目覆盖面的扩大和竞技水平的整体提升。短道速滑、花样滑冰、自由式滑雪等
+                        项目已成为中国的优势项目，而冰壶、北欧两项等新兴项目也取得了长足进步。
+                        北京冬奥会的成功举办，不仅提升了中国的国际形象，也极大地推动了冬季运动在中国的普及。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目趋势 -->
+    <section id="sports" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-snowboard mr-3"></i>项目趋势
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    分析冬奥会各项目的发展变化和受欢迎程度
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 项目分布饼图 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-pie mr-2 text-purple-600"></i>项目类型分布
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="sportDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 项目变化趋势 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-area mr-2 text-purple-600"></i>项目数量变化趋势
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="sportTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 热门项目卡片 -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-skiing text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">滑雪</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">44%</h3>
+                    <p class="text-gray-600">占总项目比例</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-skating text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">滑冰</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">32%</h3>
+                    <p class="text-gray-600">占总项目比例</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-hockey-puck text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">冰球</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">8%</h3>
+                    <p class="text-gray-600">占总项目比例</p>
+                </div>
+            </div>
+
+            <!-- 深度分析 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>深度分析：项目发展的创新与传承
+                </h3>
+                <p class="text-lg leading-relaxed">
+                    冬奥会项目设置的演变反映了冬季运动的发展潮流和观众需求的变化。滑雪和滑冰作为传统优势项目，
+                    始终占据主导地位，但具体小项却在不断创新。从早期的速度滑冰、花样滑冰，到后来的短道速滑、
+                    自由式滑雪、单板滑雪等新兴项目，冬奥会正变得越来越年轻化、技巧化和观赏性强。
+                    值得注意的是，为了吸引年轻观众和扩大全球影响力，国际奥委会不断引入新的混合项目和团队项目，
+                    如滑雪登山、冰壶混双等。这些创新不仅丰富了冬奥会的内容，也为更多国家提供了奖牌机会，
+                    促进了冬季运动的全球均衡发展。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2026预测 -->
+    <section id="prediction" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-crystal-ball mr-3"></i>2026预测
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    基于历史数据对2026年米兰-科尔蒂纳丹佩佐冬奥会进行预测分析
+                </p>
+            </div>
+
+            <!-- 预测概览卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-flag text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">参赛国家</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">95+</h3>
+                    <p class="text-gray-600">预计参赛国家数量</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-medal text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">比赛项目</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">120+</h3>
+                    <p class="text-gray-600">预计小项数量</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-users text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">运动员</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">3000+</h3>
+                    <p class="text-gray-600">预计参赛运动员</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-award text-2xl text-purple-600"></i>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">奖牌</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">360+</h3>
+                    <p class="text-gray-600">预计奖牌总数</p>
+                </div>
+            </div>
+
+            <!-- 奖牌预测图表 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-chart-bar mr-2 text-purple-600"></i>2026年奖牌榜预测
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 新增项目预测 -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-plus-circle mr-2 text-purple-600"></i>可能新增项目
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-skiing-nordic text-purple-600 mr-3"></i>
+                                <span class="font-medium">滑雪登山</span>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">高可能性</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-snowmobile text-purple-600 mr-3"></i>
+                                <span class="font-medium">雪地摩托</span>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">中可能性</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-hockey-puck text-purple-600 mr-3"></i>
+                                <span class="font-medium">冰球混双</span>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">中可能性</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-skating text-purple-600 mr-3"></i>
+                                <span class="font-medium">花样滑冰团体赛</span>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">高可能性</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 深度分析 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>深度分析：2026年冬奥会展望
+                </h3>
+                <p class="text-lg leading-relaxed">
+                    2026年米兰-科尔蒂纳丹佩佐冬奥会将延续冬奥会的扩张趋势，预计参赛国家将超过95个，
+                    小项数量将达到120个左右。基于历史数据分析，挪威、德国、美国等传统强国仍将占据
+                    奖牌榜前列，但奖牌分布可能更加分散。中国有望保持在前10名的位置，在短道速滑、
+                    花样滑冰、自由式滑雪等优势项目上继续冲击奖牌。值得关注的是，滑雪登山等新兴项目
+                    可能成为正式比赛项目，这将为更多国家提供奖牌机会。意大利作为东道主，有望在
+                    高山滑雪等传统优势项目上取得突破。总体而言，2026年冬奥会将进一步推动冬季运动的
+                    全球化发展，展现出更加多元化的竞争格局。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 深度洞察 -->
+    <section id="insights" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <i class="fas fa-lightbulb mr-3"></i>深度洞察
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    从数据中提炼的关键洞察和未来发展趋势
+                </p>
+            </div>
+
+            <!-- 洞察卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-globe-americas text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">全球化趋势</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        冬奥会正从欧洲主导的区域性赛事发展为真正的全球性体育盛会。参赛国家从16个增长到92个，
+                        亚洲、北美的崛起打破了传统格局，体现了冬季运动的全球普及。
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-chart-line text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">项目创新</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        冬奥会项目设置不断创新，从小项数量的增加到比赛形式的变革，都体现了对年轻观众的吸引和
+                        对竞技水平的追求。混合项目和团队项目的引入将成为未来趋势。
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-award text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">竞争格局</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        奖牌分布呈现多元化趋势，传统强国仍保持优势，但新兴国家在特定项目上的突破越来越多。
+                        中国的崛起为亚洲冬季运动发展树立了典范。
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-cogs text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">技术革新</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        科技进步对冬奥会产生深远影响，从装备材料的改进到比赛规则的优化，再到转播技术的提升，
+                        都在推动冬季运动向更高水平发展。
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-leaf text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">可持续发展</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        环保和可持续发展已成为冬奥会的重要理念，从场馆建设到赛事运营，都更加注重对环境的保护
+                        和资源的节约利用。
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 card-hover">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-users text-4xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-purple-800">性别平等</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        冬奥会在性别平等方面取得显著进步，女子项目数量不断增加，男女运动员参赛比例更加均衡，
+                        体现了奥林匹克运动的包容性。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 关键数据总结 -->
+            <div class="mt-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-key mr-3"></i>关键数据总结
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <h4 class="text-4xl font-bold mb-2 counter" data-target="100">0</h4>
+                        <p class="text-lg">年历史</p>
+                    </div>
+                    <div>
+                        <h4 class="text-4xl font-bold mb-2 counter" data-target="25">0</h4>
+                        <p class="text-lg">届赛事</p>
+                    </div>
+                    <div>
+                        <h4 class="text-4xl font-bold mb-2 counter" data-target="45">0</h4>
+                        <p class="text-lg">参赛国家</p>
+                    </div>
+                    <div>
+                        <h4 class="text-4xl font-bold mb-2 counter" data-target="3503">0</h4>
+                        <p class="text-lg">奖牌总数</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gradient-to-r from-purple-900 to-pink-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-snowflake text-2xl"></i>
+                        <h3 class="text-xl font-bold">冬奥会数据洞察</h3>
+                    </div>
+                    <p class="text-purple-200">
+                        基于1924-2026年冬奥会历史数据的深度分析与可视化展示，
+                        探索冬奥会的百年发展历程与未来趋势。
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速导航</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#overview" class="text-purple-200 hover:text-white transition-colors">数据总览</a></li>
+                        <li><a href="#rankings" class="text-purple-200 hover:text-white transition-colors">排名分析</a></li>
+                        <li><a href="#trends" class="text-purple-200 hover:text-white transition-colors">发展趋势</a></li>
+                        <li><a href="#china" class="text-purple-200 hover:text-white transition-colors">中国表现</a></li>
+                        <li><a href="#insights" class="text-purple-200 hover:text-white transition-colors">深度洞察</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">数据来源</h3>
+                    <p class="text-purple-200 mb-4">
+                        国际奥委会官网、冬奥会官方数据库、各国奥委会资料
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-purple-200 hover:text-white transition-colors">
+                            <i class="fab fa-olympics text-xl"></i>
+                        </a>
+                        <a href="#" class="text-purple-200 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-purple-200 hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-purple-700 text-center text-purple-200">
+                <p>&copy; 2024 冬奥会数据分析报告 | 数据驱动洞察，智慧预见未来</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 数字递增动画
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200;
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const increment = target / speed;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(() => animateCounters(), 1);
+                } else {
+                    counter.innerText = target.toLocaleString();
+                }
+            });
+        }
+
+        // 初始化样例数据表格
+        function initSampleTable() {
+            const tbody = document.getElementById('sample-table-body');
+            sample_data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-900">${row.年份}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${row.举办地}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${row.大项名称}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${row.小项名称}</td>
+                    <td class="px-6 py-4 text-sm text-yellow-600 font-medium">${row.金牌国家}</td>
+                    <td class="px-6 py-4 text-sm text-gray-400 font-medium">${row.银牌国家}</td>
+                    <td class="px-6 py-4 text-sm text-amber-700 font-medium">${row.铜牌国家}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 初始化排名表格
+        function initRankingTable() {
+            const tbody = document.getElementById('ranking-table-body');
+            country_rankings.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${row.国家}</td>
+                    <td class="px-6 py-4 text-sm text-yellow-600 font-bold text-center">${row.金牌}</td>
+                    <td class="px-6 py-4 text-sm text-gray-400 font-bold text-center">${row.银牌}</td>
+                    <td class="px-6 py-4 text-sm text-amber-700 font-bold text-center">${row.铜牌}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900 text-center">${row.总数}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 奖牌榜图表
+            const medalRankingCtx = document.getElementById('medalRankingChart').getContext('2d');
+            new Chart(medalRankingCtx, {
+                type: 'bar',
+                data: {
+                    labels: country_rankings.map(item => item.国家),
+                    datasets: [
+                        {
+                            label: '金牌',
+                            data: country_rankings.map(item => item.金牌),
+                            backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                            borderColor: 'rgba(255, 215, 0, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '银牌',
+                            data: country_rankings.map(item => item.银牌),
+                            backgroundColor: 'rgba(192, 192, 192, 0.8)',
+                            borderColor: 'rgba(192, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '铜牌',
+                            data: country_rankings.map(item => item.铜牌),
+                            backgroundColor: 'rgba(205, 127, 50, 0.8)',
+                            borderColor: 'rgba(205, 127, 50, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 奖牌类型分布饼图
+            const medalTypeCtx = document.getElementById('medalTypeChart').getContext('2d');
+            new Chart(medalTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['金牌', '银牌', '铜牌'],
+                    datasets: [{
+                        data: [overview_stats.total_golds, overview_stats.total_silvers, overview_stats.total_bronzes],
+                        backgroundColor: [
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(192, 192, 192, 0.8)',
+                            'rgba(205, 127, 50, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(192, 192, 192, 1)',
+                            'rgba(205, 127, 50, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 发展趋势图表
+            const developmentTrendCtx = document.getElementById('developmentTrendChart').getContext('2d');
+            new Chart(developmentTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: winter_olympics_trends.map(item => item.年份),
+                    datasets: [
+                        {
+                            label: '参赛国家',
+                            data: winter_olympics_trends.map(item => item.参赛国家),
+                            borderColor: 'rgba(147, 51, 234, 1)',
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '小项数量',
+                            data: winter_olympics_trends.map(item => item.小项),
+                            borderColor: 'rgba(236, 72, 153, 1)',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 中国奖牌趋势
+            const chinaMedalCtx = document.getElementById('chinaMedalChart').getContext('2d');
+            new Chart(chinaMedalCtx, {
+                type: 'line',
+                data: {
+                    labels: china_performance.map(item => item.年份),
+                    datasets: [
+                        {
+                            label: '金牌',
+                            data: china_performance.map(item => item.金牌),
+                            borderColor: 'rgba(255, 215, 0, 1)',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '银牌',
+                            data: china_performance.map(item => item.银牌),
+                            borderColor: 'rgba(192, 192, 192, 1)',
+                            backgroundColor: 'rgba(192, 192, 192, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '铜牌',
+                            data: china_performance.map(item => item.铜牌),
+                            borderColor: 'rgba(205, 127, 50, 1)',
+                            backgroundColor: 'rgba(205, 127, 50, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 中国奖牌类型分布
+            const chinaMedalTypeCtx = document.getElementById('chinaMedalTypeChart').getContext('2d');
+            const chinaTotalGold = china_performance.reduce((sum, item) => sum + item.金牌, 0);
+            const chinaTotalSilver = china_performance.reduce((sum, item) => sum + item.银牌, 0);
+            const chinaTotalBronze = china_performance.reduce((sum, item) => sum + item.铜牌, 0);
+
+            new Chart(chinaMedalTypeCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['金牌', '银牌', '铜牌'],
+                    datasets: [{
+                        data: [chinaTotalGold, chinaTotalSilver, chinaTotalBronze],
+                        backgroundColor: [
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(192, 192, 192, 0.8)',
+                            'rgba(205, 127, 50, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(192, 192, 192, 1)',
+                            'rgba(205, 127, 50, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 项目分布饼图
+            const sportDistributionCtx = document.getElementById('sportDistributionChart').getContext('2d');
+            new Chart(sportDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: sport_distribution.map(item => item.项目),
+                    datasets: [{
+                        data: sport_distribution.map(item => item.比例),
+                        backgroundColor: [
+                            'rgba(147, 51, 234, 0.8)',
+                            'rgba(192, 132, 252, 0.8)',
+                            'rgba(240, 171, 252, 0.8)',
+                            'rgba(252, 211, 77, 0.8)',
+                            'rgba(251, 146, 60, 0.8)',
+                            'rgba(34, 197, 94, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(147, 51, 234, 1)',
+                            'rgba(192, 132, 252, 1)',
+                            'rgba(240, 171, 252, 1)',
+                            'rgba(252, 211, 77, 1)',
+                            'rgba(251, 146, 60, 1)',
+                            'rgba(34, 197, 94, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 项目趋势图表
+            const sportTrendCtx = document.getElementById('sportTrendChart').getContext('2d');
+            new Chart(sportTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: winter_olympics_trends.map(item => item.年份),
+                    datasets: [
+                        {
+                            label: '大项数量',
+                            data: winter_olympics_trends.map(item => item.大项),
+                            borderColor: 'rgba(147, 51, 234, 1)',
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '小项数量',
+                            data: winter_olympics_trends.map(item => item.小项),
+                            borderColor: 'rgba(236, 72, 153, 1)',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // 2026预测图表
+            const predictionCtx = document.getElementById('predictionChart').getContext('2d');
+            new Chart(predictionCtx, {
+                type: 'bar',
+                data: {
+                    labels: prediction_2026.top_countries,
+                    datasets: [{
+                        label: '预计金牌数',
+                        data: [15, 12, 10, 8, 7],
+                        backgroundColor: 'rgba(147, 51, 234, 0.8)',
+                        borderColor: 'rgba(147, 51, 234, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(147, 51, 234, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // 页面滚动监听
+        function setupScrollAnimation() {
+            const sections = document.querySelectorAll('section');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in-up');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initSampleTable();
+            initRankingTable();
+            initCharts();
+            setupScrollAnimation();
+            
+            // 启动数字递增动画
+            setTimeout(animateCounters, 500);
+        });
+    </script>
+</body>
+</html>

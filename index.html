@@ -437,6 +437,108 @@
       line-height: 1.75;
     }
 
+    .ops-board {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+    }
+
+    .ops-card {
+      border: 1px solid rgba(219, 228, 246, .84);
+      border-radius: 20px;
+      background: rgba(255,255,255,.74);
+      padding: 14px 15px;
+    }
+
+    .ops-card h4 {
+      margin: 0 0 10px;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .inline-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .inline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(157, 78, 221, .15);
+      background: rgba(247, 241, 255, .72);
+      color: #44536f;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .state-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2DD4BF;
+    }
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .timeline li {
+      border: 1px solid rgba(219, 228, 246, .8);
+      border-radius: 14px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #52627f;
+      background: rgba(246, 251, 255, .76);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .action-btn {
+      border: 1px solid rgba(157, 78, 221, .2);
+      border-radius: 12px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, .85);
+      color: #3f4e68;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease;
+    }
+
+    .action-btn:hover {
+      background: rgba(247, 241, 255, .9);
+      border-color: rgba(157, 78, 221, .38);
+    }
+
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .asset-item {
+      border: 1px solid rgba(219, 228, 246, .78);
+      border-radius: 12px;
+      padding: 9px 10px;
+      font-size: 12px;
+      color: #52627f;
+      background: rgba(246, 251, 255, .76);
+    }
+
     .demo-list {
       padding: 14px 18px 16px 32px;
     }
@@ -543,7 +645,8 @@
       }
 
       .demo-grid,
-      .framework-grid {
+      .framework-grid,
+      .ops-board {
         grid-template-columns: 1fr;
       }
 
@@ -633,6 +736,26 @@
       <div class="demo-panel">
         <h3 style="padding:0 0 12px;">重点产品框架</h3>
         <div class="framework-grid" id="demoFramework"></div>
+
+        <div class="ops-board">
+          <section class="ops-card">
+            <h4>最小侦测闭环（系统运行态）</h4>
+            <div class="inline-pills" id="sitePills"></div>
+            <div style="height:10px;"></div>
+            <h4>目标识别与轨迹回放</h4>
+            <ul class="timeline" id="targetTimeline"></ul>
+          </section>
+          <section class="ops-card">
+            <h4>告警确认与工单归档</h4>
+            <ul class="timeline" id="alarmTimeline"></ul>
+            <div style="height:10px;"></div>
+            <h4>演示脚本执行</h4>
+            <div class="action-grid" id="scriptActions"></div>
+            <div style="height:10px;"></div>
+            <h4>样板资产</h4>
+            <div class="asset-grid" id="assetGrid"></div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -941,7 +1064,9 @@
         { label: '人民网：“中国飞谷”在杭州余杭揭牌成立', url: 'https://zj.people.com.cn/BIG5/n2/2024/0606/c370990-40870779.html' },
         { label: '杭州网：南湖未来科学园正式开园，将迎来首个低空试飞场', url: 'https://ori.hangzhou.com.cn/ornews/content/2024-12/06/content_8822849.htm' },
         { label: 'Cesium OSM Buildings', url: 'https://cesium.com/blog/2020/06/01/cesium-osm-buildings/' }
-      ]
+      ],
+      scripts: ['合法巡检任务', '未知目标发现', '边界接近预警', '复盘报告生成'],
+      assets: ['参观路线', '演示视频素材', '试运行报告', '生态伙伴联调记录']
     };
 
     const versionNotes = {
@@ -986,6 +1111,29 @@
       `).join('');
       document.getElementById('referenceList').innerHTML = data.references.map(item => `
         <li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.label}</a></li>
+      `).join('');
+
+      document.getElementById('sitePills').innerHTML = data.sites.map(site => `
+        <span class="inline-pill"><i class="state-dot" style="background:${site.status === 'online' ? '#2DD4BF' : '#B983FF'}"></i>${site.name}</span>
+      `).join('');
+
+      document.getElementById('targetTimeline').innerHTML = data.targets.map(t => `
+        <li><strong>${t.id}</strong> · ${t.name}<br>类型：${t.type}｜风险：${t.risk}｜高度：${t.alt}m</li>
+      `).join('');
+
+      document.getElementById('alarmTimeline').innerHTML = [
+        'RID/射频识别已接入，目标状态实时同步',
+        '边界接近告警自动弹窗并生成工单',
+        '值守确认后进入处置流转并留痕归档',
+        '复盘报告自动汇总告警/轨迹/处置记录'
+      ].map(item => `<li>${item}</li>`).join('');
+
+      document.getElementById('scriptActions').innerHTML = (data.scripts || []).map(item => `
+        <button class="action-btn" type="button">${item}</button>
+      `).join('');
+
+      document.getElementById('assetGrid').innerHTML = (data.assets || []).map(item => `
+        <div class="asset-item">${item}</div>
       `).join('');
     }
 
@@ -1102,10 +1250,15 @@
           sceneModePicker: false,
           navigationHelpButton: false,
           baseLayerPicker: false,
+          sceneMode: Cesium.SceneMode.SCENE3D,
           terrainProvider: new Cesium.EllipsoidTerrainProvider(),
           imageryProvider: false
         });
         cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+        cesiumViewer.scene.screenSpaceCameraController.enableTilt = true;
+        cesiumViewer.scene.screenSpaceCameraController.enableRotate = true;
+        cesiumViewer.scene.screenSpaceCameraController.enableZoom = true;
+        cesiumViewer.scene.morphTo3D(0);
         const candidates = createImageryCandidates(Cesium);
         applyImageryWithFallback(Cesium, 0, candidates);
       } else {

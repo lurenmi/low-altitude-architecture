@@ -139,7 +139,131 @@
       background: rgba(157, 78, 221, .06);
       color: #5f4a92;
       font-size: 13px;
+      font-family: inherit;
+      font-weight: 700;
       white-space: nowrap;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .version-chip:hover,
+    .version-chip:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(157, 78, 221, .34);
+      background: rgba(157, 78, 221, .10);
+      box-shadow: 0 10px 24px rgba(157, 78, 221, .14);
+      outline: none;
+    }
+
+    .product-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 20% 16%, rgba(185, 131, 255, .22), transparent 30%),
+        rgba(23, 32, 51, .34);
+      backdrop-filter: blur(14px);
+    }
+
+    .product-modal.is-open {
+      display: grid;
+    }
+
+    .modal-panel {
+      width: min(980px, 94vw);
+      max-height: min(760px, 88vh);
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, .78);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,255,255,.78)),
+        radial-gradient(circle at 92% 0%, rgba(114, 239, 221, .24), transparent 30%);
+      box-shadow: 0 30px 90px rgba(23, 32, 51, .22);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 26px 28px 18px;
+      border-bottom: 1px solid rgba(157, 78, 221, .12);
+    }
+
+    .modal-kicker {
+      display: inline-flex;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--primary);
+      background: rgba(157, 78, 221, .08);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .modal-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: -.04em;
+    }
+
+    .modal-desc {
+      max-width: 720px;
+      margin: 10px 0 0;
+      color: #5c6c88;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .modal-close {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(157, 78, 221, .18);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .78);
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 20px 28px 28px;
+    }
+
+    .framework-card {
+      min-height: 152px;
+      padding: 18px;
+      border: 1px solid rgba(219, 228, 246, .84);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .68);
+    }
+
+    .framework-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--ink);
+      font-size: 17px;
+    }
+
+    .framework-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #52627f;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .framework-card li::marker {
+      color: var(--primary);
     }
 
     .summary {
@@ -273,6 +397,19 @@
         min-height: 980px;
         height: 980px;
       }
+
+      .product-modal {
+        padding: 12px;
+      }
+
+      .modal-head {
+        padding: 20px 18px 14px;
+      }
+
+      .modal-body {
+        grid-template-columns: 1fr;
+        padding: 16px 18px 20px;
+      }
     }
 
     @media print {
@@ -292,11 +429,11 @@
 
     <section class="version-strip" aria-label="市场化版本">
       <strong>5个市场化版本</strong>
-      <span class="version-chip">样板展示版</span>
-      <span class="version-chip">活动保障版</span>
-      <span class="version-chip">园区标准版</span>
-      <span class="version-chip">敏感目标增强版</span>
-      <span class="version-chip">城市治理扩展版</span>
+      <button class="version-chip" type="button" data-version="demo">样板展示版</button>
+      <button class="version-chip" type="button" data-version="event">活动保障版</button>
+      <button class="version-chip" type="button" data-version="park">园区标准版</button>
+      <button class="version-chip" type="button" data-version="sensitive">敏感目标增强版</button>
+      <button class="version-chip" type="button" data-version="city">城市治理扩展版</button>
     </section>
 
     <section class="summary" aria-label="总体架构摘要">
@@ -561,5 +698,115 @@
 
     <div class="note">当前版本已收敛为单栏汇报版，便于直接用于方案汇报和投屏展示。</div>
   </main>
+
+  <section class="product-modal" id="productModal" aria-hidden="true" aria-labelledby="modalTitle" role="dialog">
+    <div class="modal-panel" role="document">
+      <div class="modal-head">
+        <div>
+          <span class="modal-kicker">重点产品框架</span>
+          <h2 class="modal-title" id="modalTitle"></h2>
+          <p class="modal-desc" id="modalDesc"></p>
+        </div>
+        <button class="modal-close" type="button" aria-label="关闭弹窗">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </section>
+
+  <script>
+    const versionFrameworks = {
+      demo: {
+        title: '样板展示版',
+        desc: '面向领导汇报、客户参观和生态伙伴共建，优先形成可看、可讲、可演示的最小闭环。',
+        cards: [
+          ['产品定位', ['低空安全样板点', '平台演示驾驶舱', '一次演练和一段演示视频']],
+          ['核心产品包', ['1套平台展示页', '1至2套侦测样机接入', '基础告警、轨迹和复盘报告']],
+          ['交付重点', ['快速部署、低成本验证', '突出可视化效果和闭环脚本', '沉淀参观路线和宣传素材']],
+          ['适用场景', ['内部立项汇报', '政府或园区参观', '生态伙伴联合展示']]
+        ]
+      },
+      event: {
+        title: '活动保障版',
+        desc: '面向会展、赛事、演出、会议等临时保障任务，强调快速布防、临时规则和现场处置闭环。',
+        cards: [
+          ['产品定位', ['重大活动低空安全保障', '临时管控区和白名单管理', '活动结束专项复盘']],
+          ['核心产品包', ['便携/车载侦测单元', '临时规则配置', '告警工单和现场回执']],
+          ['交付重点', ['活动前勘察和预案', '活动中值守和联动', '活动后报告和证据归档']],
+          ['适用场景', ['展会赛事', '文旅演出', '领导调研和重要会议']]
+        ]
+      },
+      park: {
+        title: '园区标准版',
+        desc: '面向低空产业园、科创园、物流园和无人机运营基地，兼顾合法飞行运营和异常飞行防控。',
+        cards: [
+          ['产品定位', ['园区低空安全运营底座', '合法任务与未知目标区分', '日常巡防和运营报表']],
+          ['核心产品包', ['固定侦测点', 'RID/射频接入', '园区地图、边界和航线规则']],
+          ['交付重点', ['设备在线率和告警有效率', '飞行任务统计', '月度运营报告']],
+          ['适用场景', ['低空产业园', '物流起降点', '大学科技园和试飞基地']]
+        ]
+      },
+      sensitive: {
+        title: '敏感目标增强版',
+        desc: '面向机场周边、能源设施、交通枢纽、重点机关等高风险区域，突出边界防护、复核取证和授权处置。',
+        cards: [
+          ['产品定位', ['重点目标低空防护', '高风险目标分级预警', '证据链和授权流程强化']],
+          ['核心产品包', ['射频/RID+雷达+光电组合', '敏感区规则引擎', '视频复核和证据归档']],
+          ['交付重点', ['点位勘察和覆盖评估', '误报治理和规则调优', '反制授权全流程留痕']],
+          ['适用场景', ['机场净空区', '能源石化设施', '政府机关、学校医院和交通枢纽']]
+        ]
+      },
+      city: {
+        title: '城市治理扩展版',
+        desc: '面向区县或城市级低空治理，强调多点站网、统一态势、多部门联动和长期运营服务。',
+        cards: [
+          ['产品定位', ['城市级低空安全运营平台', '多园区、多重点区域统一监管', '低空治理数据底座']],
+          ['核心产品包', ['固定站网和机动单元', '多源融合算法层', '城市驾驶舱、工单和运营分析']],
+          ['交付重点', ['分期建设和标准接口', '跨部门联动机制', '年度运营和扩面模型']],
+          ['适用场景', ['中心城区治理', '低空经济示范区', '城市级低空新基建']]
+        ]
+      }
+    };
+
+    const modal = document.getElementById('productModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalBody = document.getElementById('modalBody');
+    const closeButton = modal.querySelector('.modal-close');
+
+    function openProductModal(key) {
+      const data = versionFrameworks[key];
+      if (!data) return;
+
+      modalTitle.textContent = data.title;
+      modalDesc.textContent = data.desc;
+      modalBody.innerHTML = data.cards.map(([title, items]) => `
+        <article class="framework-card">
+          <strong>${title}</strong>
+          <ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>
+        </article>
+      `).join('');
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      closeButton.focus();
+    }
+
+    function closeProductModal() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.querySelectorAll('.version-chip').forEach(button => {
+      button.addEventListener('click', () => openProductModal(button.dataset.version));
+    });
+
+    closeButton.addEventListener('click', closeProductModal);
+    modal.addEventListener('click', event => {
+      if (event.target === modal) closeProductModal();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeProductModal();
+    });
+  </script>
 </body>
 </html>
